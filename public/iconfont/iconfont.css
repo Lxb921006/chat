@@ -1,0 +1,63 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 2385917 */
+  src: url('iconfont.woff2?t=1620807918127') format('woff2'),
+       url('iconfont.woff?t=1620807918127') format('woff'),
+       url('iconfont.ttf?t=1620807918127') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon008-saving:before {
+  content: "\e710";
+}
+
+.iconaddpeople_fill:before {
+  content: "\e6e1";
+}
+
+.iconhomepage:before {
+  content: "\e702";
+}
+
+.iconsetup_fill:before {
+  content: "\e728";
+}
+
+.iconsetup:before {
+  content: "\e729";
+}
+
+.iconindent:before {
+  content: "\e7f3";
+}
+
+.iconoutdent:before {
+  content: "\e7f4";
+}
+
+.iconother:before {
+  content: "\e714";
+}
+
+.iconunlock:before {
+  content: "\e609";
+}
+
+.iconairplaytouping:before {
+  content: "\e6cd";
+}
+
+.iconfilmyingpian:before {
+  content: "\e6de";
+}
+
+.iconuseryonghu:before {
+  content: "\e6f0";
+}
+
