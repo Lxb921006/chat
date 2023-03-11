@@ -69,7 +69,7 @@
 import { Message } from 'element-ui'
 import { mapState } from 'vuex'
 import store from '../../store/index'
-import baseUrl from "../../utlis/baseUrl";
+import baseUrl from "../../utils/baseUrl";
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 
