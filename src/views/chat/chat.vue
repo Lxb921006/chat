@@ -13,10 +13,12 @@
                     text-color="#fff"
                     active-text-color="#ffd04b"
                 >
-                    <el-menu-item :index=data.index v-for="(data,index) in chatCache" :key="index" @click="jump(data.id)">
+                <transition-group name="zoom" tag="ul">
+                    <el-menu-item :index=data.index v-for="data in chatCache" :key="data.index" @click="jump(data.id)" v-show="true">
                         <i class="el-icon-delete delete" @click="removeTab(data.id)"></i>
                         <span slot="title" class="cache-title">{{ data.title }}</span>
                     </el-menu-item>
+                </transition-group>
                 </el-menu>
             </div>
         </div>
@@ -38,12 +40,13 @@
                                 <el-tooltip class="item" effect="light" content="复制" placement="right" transition="el-fade-in-linear">
                                     <transition name="el-zoom-in-center">
                                         <svg class="icon-qa-copy" aria-hidden="true" @click="copy(data1.answer.join(''))" v-show="show2">
-                                            <use xlink:href="#icon-fuzhi1">copy</use>
+                                            <use :xlink:href="icon">copy</use>
                                         </svg>
                                     </transition>
                                 </el-tooltip>
                             </div>
-                            <pre><code class="code">{{ data1.answer.join('') }}</code></pre>
+                            <!-- <pre><code class="code">{{ data1.answer.join('') }}</code></pre> -->
+                            <p class="code">{{ data1.answer.join('') }}</p>
                         </div>
                     </div>
                 </template>
@@ -58,7 +61,7 @@
                 </el-input>
             </div>
             <div class="notice">
-                <p>*仅供学习, 无任何商业用途*</p>
+                <p>*仅供学习, 无任何其他用途*</p>
             </div>
         </div>
     </div>
@@ -80,6 +83,7 @@ export default {
             text:"copy me",
             show2:true,
             show1:true,
+            show3:true,
             chatContent: "",
             contents: [],
             socket: "",
@@ -90,6 +94,7 @@ export default {
             editableTabsValue: '',
             editableTabs: [],
             finished: false,
+            icon: "#icon-fuzhi2",
             code:"",
         }
     },
@@ -104,10 +109,14 @@ export default {
     methods: {
         copy (text) {
             this.show2 = false;
+            let that = this;
+            setTimeout(function(){
+                that.show2 = true;
+            },3000)
             this.$copyText(text).then(() => {
-                Message.success("copy finished");
+                Message.success("已复制");
             }, () => {
-                Message.error('copy failed');
+                Message.error('复制失败');
             })
         },
         wsInit () {
@@ -135,7 +144,6 @@ export default {
                 // 监听socket连接
                 this.socket.onopen = this.open;
                 // 监听socket错误信息
-                console.log("this.socket.onerror>>>", this.socket.onerror);
                 this.socket.onerror = this.error;
                 // 监听socket消息
                 this.socket.onmessage = this.getMessage;
@@ -177,7 +185,8 @@ export default {
                 } 
             }
             this.$nextTick(() => {
-                let blocks = document.querySelectorAll('pre code');
+                let blocks = document.querySelectorAll('.answer-loop p');
+                // let blocks = document.querySelectorAll('pre code');
                 blocks.forEach((block) => {
                     hljs.highlightBlock(block);
                 });
@@ -219,6 +228,7 @@ export default {
             this.editableTabsValue = activeName;
             let newChat = tabs.filter(tab => tab.id != targetName);
             store.commit("REMOVE_CHAT_CACHE", newChat);
+            
         },
         jump(id) {
             console.log(id);
@@ -232,7 +242,8 @@ export default {
             store.commit("ADD_CHAT_CACHE", JSON.parse(sessionStorage.getItem("chatCache")));
         }
         this.$nextTick(() => {
-            let blocks = document.querySelectorAll('pre code');
+            let blocks = document.querySelectorAll('.answer-loop p');
+            // let blocks = document.querySelectorAll('pre code');
             blocks.forEach((block) => {
                 hljs.highlightBlock(block);
             });
@@ -284,7 +295,7 @@ export default {
 }
 .footer {
     position: relative;
-    width: 400px;
+    width: 571px;
     margin: 0 auto;
     
 }
@@ -312,7 +323,7 @@ export default {
     border-bottom: 1px solid #dee2de;
 }
 .cache-title {
-    font-size: 1em;
+    font-size: 1rem;
     font-style: oblique;
 }
 .delete {
@@ -341,6 +352,7 @@ export default {
     border-radius: 5px;
     padding: 0 11px 5px 11px;
     font-size: 14px;
+    font-style: oblique;
 }
 .icon-qa {
     width: 2em;
@@ -398,10 +410,18 @@ export default {
     font-size: .75rem;
     color: rgba(0,0,0,.5);
 }
-// element-ui css修改
-:deep .el-tabs__item {
-    display: block;
-    color: #fff;
+/* 效果过程 */
+.zoom-enter-active,
+.zoom-leave-active {
+  transition: all 0.5s ease;
+}
+.zoom-enter {
+  transform: scale(0.5);
+  opacity: 0;
+}
+.zoom-leave-to {
+  transform: scale(0.5);
+  opacity: 0;
 }
 :deep .el-tabs__nav {
     float: none;
@@ -439,7 +459,7 @@ export default {
     box-shadow: 0px 0px 20px 0px rgb(0 0 0 / 25%);
 }
 :deep .el-input__inner {
-    height: 50px;
-    line-height: 50px;
+    height: 57px;
+    line-height: 57px;
 }
 </style>

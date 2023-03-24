@@ -59,7 +59,7 @@
 import { Message, Loading } from 'element-ui'
 import { mapState } from 'vuex'
 import store from '../../store/index'
-
+import baseUrl from "../../utils/baseUrl";
 
 
 
@@ -115,7 +115,7 @@ export default {
             } else {
                 // this.addTab(this.chatContent, data.id);
                 // 实例化socket
-                this.wsUrl = `ws://${baseUrl.replace(/http:\/\//, '')}/ws/chat/lxb/`
+                this.wsUrl = `ws://${baseUrl.replace(/http:\/\//, '')}/ws/img/lxb/`
                 this.socket = new WebSocket(this.wsUrl);
                 // 监听socket连接
                 this.socket.onopen = this.open;

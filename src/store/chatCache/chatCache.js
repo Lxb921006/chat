@@ -1,5 +1,3 @@
-
-
 const chatCache = {
   namespace: true,
   state: {
@@ -7,7 +5,6 @@ const chatCache = {
   },
   getters: {
     UPDATE_CHAT_CACHE(state) {
-
     }
   },
   mutations: {

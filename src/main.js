@@ -22,6 +22,8 @@ import { Row } from 'element-ui'
 import { Col } from 'element-ui'
 import { Image } from 'element-ui'
 
+import VuePageTransition from 'vue-page-transition'
+
 Vue.use(Button);
 Vue.use(Input);
 Vue.use(Divider);
@@ -36,6 +38,7 @@ Vue.use(Card);
 Vue.use(Row);
 Vue.use(Col);
 Vue.use(Image);
+Vue.use(VuePageTransition);
 
 //复制插件
 import VueClipboardPlus from 'vue-clipboard-plus';
@@ -45,6 +48,7 @@ Vue.use(VueClipboardPlus);
 Vue.config.productionTip = false
 
 new Vue({
+  mode: 'history',
   router,
   store,
   render: h => h(App)
