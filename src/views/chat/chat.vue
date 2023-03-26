@@ -56,8 +56,8 @@
             </div>
             <el-divider></el-divider>
             <div class="footer">
-                <el-input clearable v-model="chatContent" placeholder="请输入你想了解的领域" @keyup.enter.native="wsInit()" :disabled="finished">
-                    <el-button slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
+                <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished">
+                    <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
                 </el-input>
             </div>
             <div class="notice">
@@ -167,7 +167,9 @@ export default {
                     //     jd = jd.replace(/\n/g,'<br>')
                     // }
                     this.chatCache[i].answer.push(jd);
-                    window.scrollTo(0, document.body.scrollHeight);
+                    // window.scrollTo(0, document.body.scrollHeight);
+                    let div = document.querySelector(".content")
+                    div.scrollTop = div.scrollHeight - div.clientHeight;
                 } 
             }
             
@@ -184,13 +186,13 @@ export default {
                     break
                 } 
             }
-            this.$nextTick(() => {
-                let blocks = document.querySelectorAll('.answer-loop p');
-                // let blocks = document.querySelectorAll('pre code');
-                blocks.forEach((block) => {
-                    hljs.highlightBlock(block);
-                });
-            });
+            // this.$nextTick(() => {
+            //     let blocks = document.querySelectorAll('.answer-loop p');
+            //     // let blocks = document.querySelectorAll('pre code');
+            //     blocks.forEach((block) => {
+            //         hljs.highlightBlock(block);
+            //     });
+            // });
         },
         footer () {
             let content = document.getElementsByClassName('content')[0]
@@ -241,13 +243,13 @@ export default {
             this.show = true;
             store.commit("ADD_CHAT_CACHE", JSON.parse(sessionStorage.getItem("chatCache")));
         }
-        this.$nextTick(() => {
-            let blocks = document.querySelectorAll('.answer-loop p');
-            // let blocks = document.querySelectorAll('pre code');
-            blocks.forEach((block) => {
-                hljs.highlightBlock(block);
-            });
-        });
+        // this.$nextTick(() => {
+        //     let blocks = document.querySelectorAll('.answer-loop p');
+        //     // let blocks = document.querySelectorAll('pre code');
+        //     blocks.forEach((block) => {
+        //         hljs.highlightBlock(block);
+        //     });
+        // });
     },
     created () {
         // this.wsInit();
@@ -285,6 +287,7 @@ export default {
     float: left;
     height: 100%;
     width: calc(100% - 200px);
+    background-color: #262626;
 }
 .content {
     // padding: 20px;
@@ -308,19 +311,20 @@ export default {
 .answer-title {
     height: 80px;
     margin: 0 auto;
-    background-color: #fff;
+    // background-color: #fff;
     border-radius: 3px;
     line-height: 80px;
     font-size: 1rem;
+    color: #fff;
 }
 .answer-loop {
     text-align: justify;
     font-size: 1rem;
     overflow: auto;
     // padding: 18px;
-    background-color: #f7fbff;
-    border-top: 1px solid #dee2de;
-    border-bottom: 1px solid #dee2de;
+    // background-color: #f7fbff;
+    border-top: 1px solid #424242;
+    border-bottom: 1px solid #424242;
 }
 .cache-title {
     font-size: 1rem;
@@ -408,7 +412,7 @@ export default {
 .notice {
     margin-top: 40px;
     font-size: .75rem;
-    color: rgba(0,0,0,.5);
+    color: #bfbfbf;
 }
 /* 效果过程 */
 .zoom-enter-active,
@@ -422,6 +426,13 @@ export default {
 .zoom-leave-to {
   transform: scale(0.5);
   opacity: 0;
+}
+.data-load {
+    height: 58px;
+    width: 57px;
+}
+:deep .el-divider {
+    background-color: #424242;
 }
 :deep .el-tabs__nav {
     float: none;
@@ -461,5 +472,15 @@ export default {
 :deep .el-input__inner {
     height: 57px;
     line-height: 57px;
+    background-color: #262626;
+    border: 1px solid #323232;
+}
+:deep .el-input-group__append, .el-input-group__prepend {
+    background-color: #262626;
+    border: 1px solid #323232;
+}
+:deep .el-input.is-disabled .el-input__inner {
+    background-color: #262626;
+    border: 1px solid #323232;
 }
 </style>
