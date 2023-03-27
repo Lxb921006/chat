@@ -229,7 +229,7 @@ export default {
 }
 .tab {
     height: 73%;
-    overflow-y: hidden;
+    overflow-y: auto;
 }
 .tab::-webkit-scrollbar {
     display: none;
@@ -237,7 +237,7 @@ export default {
 .title h2 {
     display: inline-block;
     text-align: left;
-    padding-left: 17px;
+    padding-left: 8px;
     color: rgb(233, 236, 238);
 }
 .aside {
@@ -250,6 +250,7 @@ export default {
     float: left;
     height: 100%;
     width: calc(100% - 200px);
+    background-color: #262626;
 }
 .content {
     // padding: 20px;
@@ -260,7 +261,7 @@ export default {
 }
 .footer {
     position: relative;
-    width: 400px;
+    width: 571px;
     margin: 0 auto;
     
 }
@@ -273,19 +274,20 @@ export default {
 .answer-title {
     height: 80px;
     margin: 0 auto;
-    background-color: #fff;
+    // background-color: #fff;
     border-radius: 3px;
     line-height: 80px;
     font-size: 1rem;
+    color: #fff;
 }
 .answer-loop {
-    // text-align: justify;
+    text-align: justify;
     font-size: 1rem;
     overflow: auto;
-    padding: 18px;
-    background-color: #f7fbff;
-    border-top: 1px solid #dee2de;
-    border-bottom: 1px solid #dee2de;
+    // padding: 18px;
+    // background-color: #f7fbff;
+    border-top: 1px solid #424242;
+    border-bottom: 1px solid #424242;
 }
 .cache-title {
     font-size: 1rem;
@@ -294,13 +296,30 @@ export default {
 .delete {
     z-index: 100000000;
 }
+.copy {
+    position: relative;
+    width: 681px;
+    height: 42px;
+    bottom: 32px;
+    /* top: -32px; */
+    border-radius: 3px;
+    margin: 0px auto;
+    /* z-index: 1000; */
+    background-color: #313542;
+}
 .code {
     white-space: pre-wrap;
     display: block;
-    margin: 0 auto;
-    width: 658px;
+    margin: 13px auto;
+    width: 659px;
     position: relative;
-    bottom: 49px;
+    bottom: 50px;
+    color: #fff;
+    background-color: #201f1f;
+    border-radius: 5px;
+    padding: 0 11px 5px 11px;
+    font-size: 14px;
+    font-style: oblique;
 }
 .icon-qa {
     width: 2em;
@@ -324,24 +343,86 @@ export default {
     width: 580px;
     position: relative;
     right: 373px;
-    top: 18px;
+    top: 0;
+    // bottom: 18px;
     height: 2em;
     fill: currentColor;
     overflow: hidden;
     
 }
+.icon-qa-copy {
+    width: 27px;
+    height: 39px;
+    line-height: 39px;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+    float: right;
+    cursor: pointer;
+    padding-right: 8px;
+}
+.icon-qa-copy-2 {
+    width: 27px;
+    height: 39px;
+    line-height: 39px;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+    float: left;
+    cursor: pointer;
+    padding-left: 8px;
+}
 .notice {
     margin-top: 40px;
     font-size: .75rem;
-    color: rgba(0,0,0,.5);
+    color: #bfbfbf;
 }
-.img {
-    cursor: pointer;
+/* 效果过程 */
+.zoom-enter-active,
+.zoom-leave-active {
+  transition: all 0.5s ease;
 }
-// element-ui css修改
-:deep .el-tabs__item {
-    display: block;
-    color: #fff;
+.zoom-enter {
+  transform: scale(0.5);
+  opacity: 0;
+}
+.zoom-leave-to {
+  transform: scale(0.5);
+  opacity: 0;
+}
+.data-load {
+    height: 58px;
+    width: 57px;
+}
+
+
+//适应手机
+@media only screen and (max-width: 500px) {
+    .aside {
+        display: none;
+    }
+    .main {
+        height: 138%;
+        width: 138%;
+    }
+    .footer {
+        width: 435px;
+    }
+    .copy, .icon-qa-2 {
+        width: 100%;
+    }
+    .code {
+        width: 95%;
+    }
+    .el-image {
+        left: 27%;
+    }
+}
+
+
+// element-ui的css修改
+:deep .el-divider {
+    background-color: #424242;
 }
 :deep .el-tabs__nav {
     float: none;
@@ -379,7 +460,17 @@ export default {
     box-shadow: 0px 0px 20px 0px rgb(0 0 0 / 25%);
 }
 :deep .el-input__inner {
-    height: 50px;
-    line-height: 50px;
+    height: 57px;
+    line-height: 57px;
+    background-color: #262626;
+    border: 1px solid #323232;
+}
+:deep .el-input-group__append, .el-input-group__prepend {
+    background-color: #262626;
+    border: 1px solid #323232;
+}
+:deep .el-input.is-disabled .el-input__inner {
+    background-color: #262626;
+    border: 1px solid #323232;
 }
 </style>
