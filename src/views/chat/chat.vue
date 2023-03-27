@@ -431,6 +431,19 @@ export default {
     height: 58px;
     width: 57px;
 }
+//适应手机
+@media only screen and (max-width: 500px) {
+    .aside {
+        display: none;
+    }
+    .main {
+        height: 138%;
+        width: 138%;
+    }
+    .footer {
+        width: 435px;
+    }
+}
 :deep .el-divider {
     background-color: #424242;
 }
