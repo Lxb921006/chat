@@ -12,12 +12,15 @@ const chatCache = {
   },
   mutations: {
     ADD_IMG_CACHE(state, data){
-        state.imgList = data;
-        sessionStorage.setItem("imgList", JSON.stringify(data));
+      state.imgList.push(data);
+      sessionStorage.setItem("imgList", JSON.stringify(state.imgList));
     },
     REMOVE_IMG_CACHE(state, data) {
         state.imgList = data;
         sessionStorage.setItem("imgList", JSON.stringify(data));
+    },
+    CLEAR_IMG_CACHE(state, data) {
+      state.imgList = [];
     },
     SAVE_IMG_CACHE(state, data) {
       let imgData = sessionStorage.getItem("imgList");
