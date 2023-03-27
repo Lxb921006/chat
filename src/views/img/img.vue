@@ -107,8 +107,7 @@ export default {
                 index: index,
             };
             this.editableTabsValue = data.id;
-            this.imgList.push(data);
-            store.commit("ADD_IMG_CACHE", this.imgList);
+            store.commit("ADD_IMG_CACHE", data);
 
             if (typeof(WebSocket) === "undefined") {
                 Message.error("您的浏览器不支持socket")
@@ -141,9 +140,10 @@ export default {
             for (let i = 0; i < this.imgList.length; i++) {
                 if (this.imgList[i].id == this.editableTabsValue) {
                     this.imgList[i].answer= jd;
+                    let div = document.querySelector(".content")
+                    div.scrollTop = div.scrollHeight - div.clientHeight;
                 } 
             }
-            window.scrollTo(0, document.body.scrollHeight);
         },
         send () {
             this.socket.send(this.chatContent);
@@ -198,7 +198,6 @@ export default {
             store.commit("REMOVE_IMG_CACHE", newChat);
         },
         jump(id) {
-            console.log(id);
             location.hash = "#" + id;
             document.getElementById(id).setAttribute("style", "color: #9fbb91;");
         },
@@ -207,15 +206,16 @@ export default {
         },
     },
     mounted() {
-        // console.log(document.body.scrollWidth);
         if (sessionStorage.getItem("imgList")) {
             this.show = true;
-            store.commit("ADD_IMG_CACHE", JSON.parse(sessionStorage.getItem("imgList")));
+            store.commit("CLEAR_IMG_CACHE");
+            let cacheData = JSON.parse(sessionStorage.getItem("imgList"));
+            for (let i = 0; i < cacheData.length; i++) {
+                store.commit("ADD_IMG_CACHE", cacheData[i]);
+            }
         }
-        
     },
     created () {
-        // this.wsInit();
     }
 }
 </script>

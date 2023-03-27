@@ -132,8 +132,7 @@ export default {
                 index: index,
             };
             this.editableTabsValue = data.id;
-            this.chatCache.push(data);
-            store.commit("ADD_CHAT_CACHE", this.chatCache);
+            store.commit("ADD_CHAT_CACHE", data);
 
             if (typeof(WebSocket) === "undefined") {
                 Message.error("您的浏览器不支持socket")
@@ -153,7 +152,7 @@ export default {
             }
         },
         open () {
-            // this.$message.success('websocket连接成功')
+            // Message.success('websocket连接成功')
             this.send()
         },
         error () {
@@ -163,11 +162,7 @@ export default {
             let jd = JSON.parse(msg.data);
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
-                    // if(jd == "\n") {
-                    //     jd = jd.replace(/\n/g,'<br>')
-                    // }
                     this.chatCache[i].answer.push(jd);
-                    // window.scrollTo(0, document.body.scrollHeight);
                     let div = document.querySelector(".content")
                     div.scrollTop = div.scrollHeight - div.clientHeight;
                 } 
@@ -186,13 +181,6 @@ export default {
                     break
                 } 
             }
-            // this.$nextTick(() => {
-            //     let blocks = document.querySelectorAll('.answer-loop p');
-            //     // let blocks = document.querySelectorAll('pre code');
-            //     blocks.forEach((block) => {
-            //         hljs.highlightBlock(block);
-            //     });
-            // });
         },
         footer () {
             let content = document.getElementsByClassName('content')[0]
@@ -233,15 +221,18 @@ export default {
             
         },
         jump(id) {
-            console.log(id);
             location.hash = "#" + id;
             document.getElementById(id).setAttribute("style", "color: #9fbb91;");
         }
     },
     mounted() {
         if (sessionStorage.getItem("chatCache")) {
+            store.commit("CLEAR_CHAT_CACHE");
             this.show = true;
-            store.commit("ADD_CHAT_CACHE", JSON.parse(sessionStorage.getItem("chatCache")));
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            for (let i = 0; i < cacheData.length; i++) {
+                store.commit("ADD_CHAT_CACHE", cacheData[i]);
+            }
         }
         // this.$nextTick(() => {
         //     let blocks = document.querySelectorAll('.answer-loop p');
@@ -252,7 +243,6 @@ export default {
         // });
     },
     created () {
-        // this.wsInit();
     }
 }
 </script>

@@ -9,12 +9,15 @@ const chatCache = {
   },
   mutations: {
     ADD_CHAT_CACHE(state, data){
-        state.editableTabs = data;
-        sessionStorage.setItem("chatCache", JSON.stringify(data));
+      state.editableTabs.push(data);
+      sessionStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
     },
     REMOVE_CHAT_CACHE(state, data) {
-        state.editableTabs = data;
-        sessionStorage.setItem("chatCache", JSON.stringify(data));
+      state.editableTabs = data;
+      sessionStorage.setItem("chatCache", JSON.stringify(data));
+    },
+    CLEAR_CHAT_CACHE(state, data) {
+      state.editableTabs = [];
     },
     SAVE_CHAT_CACHE_ANSWER(state, data) {
         let chatData = sessionStorage.getItem("chatCache");
