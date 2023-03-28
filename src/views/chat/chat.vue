@@ -343,7 +343,8 @@ export default {
     bottom: 50px;
     color: #fff;
     background-color: #201f1f;
-    border-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
     padding: 0 11px 5px 11px;
     font-size: 14px;
     font-style: oblique;
@@ -439,7 +440,7 @@ export default {
         width: 100%;
     }
     .code {
-        width: 95%;
+        width: 96%;
     }
 }
 
