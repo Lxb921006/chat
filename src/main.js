@@ -21,6 +21,8 @@ import { Card } from 'element-ui'
 import { Row } from 'element-ui'
 import { Col } from 'element-ui'
 import { Image } from 'element-ui'
+import { Select } from 'element-ui'
+import { Option } from 'element-ui'
 
 import VuePageTransition from 'vue-page-transition'
 
@@ -38,6 +40,8 @@ Vue.use(Card);
 Vue.use(Row);
 Vue.use(Col);
 Vue.use(Image);
+Vue.use(Select);
+Vue.use(Option);
 Vue.use(VuePageTransition);
 
 //复制插件

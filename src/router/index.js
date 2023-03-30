@@ -6,9 +6,15 @@ Vue.use(VueRouter)
 
 const routes = [
   {
+    path: '/login',
+    name: 'login',
+    meta: { name: '登录' },
+    component: () => import('../views/login/login')
+  },
+  {
     path: '/',
     name: 'home',
-    redirect: 'index',
+    redirect: 'login',
     component: () => import(/* webpackChunkName: "about" */ '../views/home/home.vue'),
     children: [
       {
