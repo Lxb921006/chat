@@ -78,6 +78,7 @@ export default {
 
             if (resp.data.status !== 10000) {
                 this.submitLoad = false;
+                this.finished = false;
                 this.logintext = "确定";
                 return Message.error(resp.data.message)
             }
