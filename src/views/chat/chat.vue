@@ -23,7 +23,8 @@
             </div>
         </div>
         <div class="main">
-            <div class="models">
+            <transition name="el-zoom-in-top">
+            <div class="models" v-show="mh">
                 <el-select v-model="value" clearable placeholder="模型选择">
                     <el-option
                         v-for="item in options"
@@ -33,6 +34,7 @@
                         </el-option>
                 </el-select>
             </div>
+        </transition>
             <div class="content">
                 <template v-if="show">
                     <div v-for="(data1, index1) in chatCache" :key="index1+1">
@@ -66,7 +68,7 @@
             </div>
             <el-divider></el-divider>
             <div class="footer">
-                <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished">
+                <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
                     <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
                 </el-input>
             </div>
@@ -99,6 +101,7 @@ export default {
             socket: "",
             chatLoad: true,
             show: false,
+            mh: false,
             id: 0,
             wsUrl: "",
             editableTabsValue: '',
@@ -119,6 +122,9 @@ export default {
         // VueCodeHighlight,
     },
     methods: {
+        showModels () {
+            this.mh = true;
+        },
         copy (text) {
             this.show2 = false;
             let that = this;
@@ -186,6 +192,7 @@ export default {
         },
         close () {
             this.finished = false;
+            this.mh = false;
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
                     let data = {id: this.chatCache[i].id, answer: this.chatCache[i].answer}
