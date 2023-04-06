@@ -445,17 +445,20 @@ export default {
         display: none;
     }
     .main {
-        height: 138%;
-        width: 138%;
+        height: 100%;
+        width: 100%;
     }
     .footer {
-        width: 435px;
+        width: 311px;
     }
     .copy, .icon-qa-2 {
         width: 100%;
     }
     .code {
-        width: 96%;
+        width: 94%;
+    }
+    .notice {
+        margin-top: 20px;
     }
 }
 
