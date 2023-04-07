@@ -318,13 +318,19 @@ export default {
     right: 18px;
 }
 .answer-title {
-    height: 80px;
+    // height: 80px;
     margin: 0 auto;
     // background-color: #fff;
     border-radius: 3px;
     line-height: 80px;
     font-size: 1rem;
     color: #fff;
+    overflow-y: auto;
+    white-space: nowrap;
+    padding: 0 11px;
+}
+.answer-title::-webkit-scrollbar {
+    display: none;
 }
 .answer-loop {
     text-align: justify;

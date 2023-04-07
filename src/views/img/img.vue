@@ -56,10 +56,10 @@
 </template>
 
 <script>
-import { Message, Loading } from 'element-ui'
-import { mapState } from 'vuex'
-import store from '../../store/index'
-import baseUrl from "../../utils/baseUrl";
+import { Message, Loading } from 'element-ui';
+import { mapState } from 'vuex';
+import store from '../../store/index';
+import wssUrl from "../../utils/wssUrl";
 
 
 
@@ -114,7 +114,7 @@ export default {
             } else {
                 // this.addTab(this.chatContent, data.id);
                 // 实例化socket
-                this.wsUrl = `ws://${baseUrl.replace(/http:\/\//, '')}/ws/img/lxb/`
+                this.wsUrl = `ws://${wssUrl.replace(/http:\/\//, '')}/ws/img/lxb/`
                 this.socket = new WebSocket(this.wsUrl);
                 // 监听socket连接
                 this.socket.onopen = this.open;
@@ -254,7 +254,7 @@ export default {
 }
 .content {
     // padding: 20px;
-    overflow-y: auto;
+    // overflow-y: auto;
     // width: 700px;
     height: 76%;
     margin: 0 auto;
@@ -272,16 +272,22 @@ export default {
     right: 18px;
 }
 .answer-title {
-    height: 80px;
+    // height: 80px;
     margin: 0 auto;
     // background-color: #fff;
     border-radius: 3px;
     line-height: 80px;
     font-size: 1rem;
     color: #fff;
+    overflow-y: auto;
+    white-space: nowrap;
+    padding: 0 11px;
+}
+.answer-title::-webkit-scrollbar {
+    display: none;
 }
 .answer-loop {
-    text-align: justify;
+    // text-align: justify;
     font-size: 1rem;
     overflow: auto;
     // padding: 18px;
@@ -402,11 +408,11 @@ export default {
         display: none;
     }
     .main {
-        height: 138%;
-        width: 138%;
+        height: 100%;
+        width: 100%;
     }
     .footer {
-        width: 435px;
+        width: 311px;
     }
     .copy, .icon-qa-2 {
         width: 100%;
@@ -414,9 +420,12 @@ export default {
     .code {
         width: 95%;
     }
-    .el-image {
-        left: 27%;
+    .notice {
+        margin-top: 20px;
     }
+    // .el-image {
+    //     left: 27%;
+    // }
 }
 
 
