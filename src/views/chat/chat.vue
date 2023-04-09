@@ -43,13 +43,11 @@
                                 <use xlink:href="#icon-cankaodaan"></use>
                             </svg>
                             <div class="copy">
-                                <el-tooltip class="item" effect="light" content="复制" placement="right" transition="el-fade-in-linear">
-                                    <transition name="el-zoom-in-center">
-                                        <svg class="icon-qa-copy" aria-hidden="true" @click="copy(data1.answer.join(''))" v-show="show2">
-                                            <use :xlink:href="icon">copy</use>
-                                        </svg>
-                                    </transition>
-                                </el-tooltip>
+                                <transition name="el-zoom-in-center">
+                                    <svg class="icon-qa-copy" aria-hidden="true" @click="copy(data1.answer.join(''))" v-show="show2">
+                                        <use :xlink:href="icon">copy</use>
+                                    </svg>
+                                </transition>
                             </div>
                             <!-- <pre><code class="code">{{ data1.answer.join('') }}</code></pre> -->
                             <p class="code">{{ data1.answer.join('') }}</p>
