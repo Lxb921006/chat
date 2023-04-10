@@ -105,8 +105,8 @@ export default {
 <style lang="scss" scoped>
 .box {
     padding-top: 150px;
-    height: 100%;
-    background-color: #e9e9e9;
+    // height: 100%;
+    // background-color: #e9e9e9;
 }
 .title {
     position: relative;
@@ -135,5 +135,14 @@ export default {
 .col-2 {
     margin-top: 15px;
     margin-bottom: 15px;
+}
+//适应手机
+@media only screen and (max-width: 500px) {
+    // .aside {
+    //     display: none;
+    // }
+    .el-card {
+        width: 346px;
+    }
 }
 </style>
