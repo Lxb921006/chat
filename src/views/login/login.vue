@@ -141,8 +141,9 @@ export default {
     // .aside {
     //     display: none;
     // }
-    .el-card {
+    .el-card, .title {
         width: 346px;
     }
+    
 }
 </style>
