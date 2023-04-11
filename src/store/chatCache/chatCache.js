@@ -19,6 +19,16 @@ const chatCache = {
     CLEAR_CHAT_CACHE(state, data) {
       state.editableTabs = [];
     },
+    GET_CHAT_CACHE(state, data) {
+      let filterData = [];
+      let reg = new RegExp(data);
+      let cd = state.editableTabs;
+      for (let i = 0;i < cd.length; i++) {
+
+      }
+      let newChat = cd.filter(cd => cd.title.match(reg));
+      console.log(newChat)
+    },
     SAVE_CHAT_CACHE_ANSWER(state, data) {
         let chatData = sessionStorage.getItem("chatCache");
         let fcd = JSON.parse(chatData);

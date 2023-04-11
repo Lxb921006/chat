@@ -21,6 +21,14 @@
                 </transition-group>
                 </el-menu>
             </div>
+            <div class="search">
+                <el-input
+                    placeholder="请输入搜索内容"
+                    v-model="input"
+                    @keyup.enter.native="getSearchData()"
+                    clearable>
+                </el-input>
+            </div>
         </div>
         <div class="main">
             <transition name="el-zoom-in-top">
@@ -89,6 +97,7 @@ export default {
             show1:true,
             show3:true,
             chatContent: "",
+            input:"",
             contents: [],
             socket: "",
             chatLoad: true,
@@ -116,6 +125,9 @@ export default {
         // VueCodeHighlight,
     },
     methods: {
+        getSearchData() {
+            store.commit("GET_CHAT_CACHE", this.input);
+        },
         showAside() {
             // this.ash != this.ash
             // this.ash = false ? this.ash : true;
@@ -285,11 +297,15 @@ export default {
     height: 100%;
 }
 .title {
-    padding: 16px 0;
+    padding: 13px 0;
 }
 .tab {
-    height: 73%;
+    height: 72%;
     overflow-y: auto;
+    border-bottom: 1px solid #242424;
+}
+.search {
+    margin-top: 24px;
 }
 .tab::-webkit-scrollbar {
     display: none;
@@ -492,6 +508,9 @@ export default {
     }
     .notice {
         margin-top: 20px;
+    }
+    .title {
+        padding: 11px 0;
     }
 }
 
