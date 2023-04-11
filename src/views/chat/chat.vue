@@ -464,6 +464,7 @@ export default {
 .models {
     position: fixed;
     top: 11px;
+    z-index: 1000;
 }
 .btu1 {
     cursor: pointer;
