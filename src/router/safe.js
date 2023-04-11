@@ -10,7 +10,7 @@ router.beforeEach((to, from, next) => {
         if (to.path == '/login' && user) {
             next('/index'); 
         } else {
-            // 必须在调用next(), 否则死循环
+            // 必须调用next(), 否则死循环
             next(); 
         }
     }
