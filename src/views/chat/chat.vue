@@ -413,7 +413,7 @@ export default {
     border-bottom-right-radius: 5px;
     padding: 0 11px 5px 11px;
     font-size: 14px;
-    font-style: oblique;
+    // font-style: oblique;
 }
 .icon-qa {
     width: 2em;
