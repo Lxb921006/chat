@@ -27,7 +27,7 @@ const chatCache = {
 
       }
       let newChat = cd.filter(cd => cd.title.match(reg));
-      console.log(newChat)
+      state.editableTabs = newChat;
     },
     SAVE_CHAT_CACHE_ANSWER(state, data) {
         let chatData = sessionStorage.getItem("chatCache");

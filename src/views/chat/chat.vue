@@ -7,6 +7,15 @@
                 </svg>
                 <h2>DaVinci AI</h2>
             </div>
+            <div class="search">
+                <el-input
+                    placeholder="请输入搜索内容"
+                    v-model="input"
+                    @keyup.enter.native="getSearchData()"
+                    @clear="getAllChatData()"
+                    clearable>
+                </el-input>
+            </div>
             <div class="tab">
                 <el-menu
                     background-color="rgb(21, 24, 21)"
@@ -21,20 +30,11 @@
                 </transition-group>
                 </el-menu>
             </div>
-            <div class="search">
-                <el-input
-                    placeholder="请输入搜索内容"
-                    v-model="input"
-                    @keyup.enter.native="getSearchData()"
-                    clearable>
-                </el-input>
-            </div>
         </div>
         <div class="main">
             <transition name="el-zoom-in-top">
                 <div class="models" v-show="mh">
                     <el-button class="btu1" size="mini" :icon="but1Icon" @click="showAside()"></el-button>
-                    <!-- <el-tag size="small" class="btu1" @click="showAside()" icon="el-icon-arrow-left"></el-tag> -->
                 </div>
             </transition>
             <div class="content">
@@ -125,12 +125,24 @@ export default {
         // VueCodeHighlight,
     },
     methods: {
+        getAllChatData () {
+            if (sessionStorage.getItem("chatCache")) {
+                store.commit("CLEAR_CHAT_CACHE");
+                this.show = true;
+                let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+                for (let i = 0; i < cacheData.length; i++) {
+                    store.commit("ADD_CHAT_CACHE", cacheData[i]);
+                }
+            }
+        },
         getSearchData() {
-            store.commit("GET_CHAT_CACHE", this.input);
+            if (this.chatCache.length != 0) {
+                store.commit("GET_CHAT_CACHE", this.input);
+            } else {
+                Message.info("还没有聊天数据哟")
+            }
         },
         showAside() {
-            // this.ash != this.ash
-            // this.ash = false ? this.ash : true;
             const mainEl = document.querySelector('.main');
             const asideEl = document.querySelector('.aside');
             const asideSt = getComputedStyle(asideEl);
@@ -160,6 +172,10 @@ export default {
             })
         },
         wsInit () {
+            if (!this.chatContent) {
+                Message.error("请输出对话内容.")
+                return
+            }
             this.finished = true;
             let id = (100000000 - 1) * Math.random() + 1;
             let index = Math.random().toString(36).slice(-8);
@@ -271,14 +287,7 @@ export default {
             this.ash = false;
         }
 
-        if (sessionStorage.getItem("chatCache")) {
-            store.commit("CLEAR_CHAT_CACHE");
-            this.show = true;
-            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            for (let i = 0; i < cacheData.length; i++) {
-                store.commit("ADD_CHAT_CACHE", cacheData[i]);
-            }
-        }
+        this.getAllChatData();
         // this.$nextTick(() => {
         //     let blocks = document.querySelectorAll('.answer-loop p');
         //     // let blocks = document.querySelectorAll('pre code');
@@ -297,15 +306,17 @@ export default {
     height: 100%;
 }
 .title {
-    padding: 13px 0;
+    padding: 14px 0;
 }
 .tab {
-    height: 72%;
+    height: 73%;
     overflow-y: auto;
-    border-bottom: 1px solid #242424;
+    border-top: 1px solid #242424;
 }
 .search {
-    margin-top: 24px;
+    width: 158px;
+    margin: 24px auto;
+    // border-bottom: 1px solid #242424;
 }
 .tab::-webkit-scrollbar {
     display: none;
@@ -511,6 +522,9 @@ export default {
     }
     .title {
         padding: 11px 0;
+    }
+    .tab {
+        height: 72%;
     }
 }
 
