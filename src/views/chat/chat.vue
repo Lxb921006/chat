@@ -309,7 +309,7 @@ export default {
     padding: 14px 0;
 }
 .tab {
-    height: 73%;
+    height: 64%;
     overflow-y: auto;
     border-top: 1px solid #242424;
 }
