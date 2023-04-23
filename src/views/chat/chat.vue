@@ -67,11 +67,13 @@
                 <el-button icon="el-icon-bottom" circle small @click="footer()"></el-button>
             </div>
             <el-divider></el-divider>
-            <div class="footer">
-                <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
-                    <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
-                </el-input>
-            </div>
+            <vue-draggable-resizable :grid="[25, 25]">
+                <div class="footer draggable-resizable-handle">
+                    <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
+                        <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
+                    </el-input>
+                </div>
+            </vue-draggable-resizable>
             <div class="notice">
                 <p>*仅供学习, 无任何其他用途*</p>
             </div>
@@ -87,6 +89,7 @@ import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
+import { Draggable, Resizable } from 'vuedraggable';
 
 export default {
     name: "chat",
@@ -131,6 +134,7 @@ export default {
     },
     components: {
         // VueCodeHighlight,
+        VueDraggableResizable: Draggable.extend(Resizable)
     },
     methods: {
         getAllChatData () {
