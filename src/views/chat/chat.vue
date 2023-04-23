@@ -117,7 +117,7 @@ export default {
         }
     },
     watch: {
-        input: function(newVal,oldVal) {
+        input: function(newVal, oldVal) {
             if (newVal === "") {
                 this.getAllChatData();
             }
@@ -184,6 +184,11 @@ export default {
                 Message.error("请输出对话内容.")
                 return
             }
+            if (this.input) {
+                this.input = "";
+                this.getAllChatData();
+            }
+
             this.finished = true;
             let id = (100000000 - 1) * Math.random() + 1;
             let index = Math.random().toString(36).slice(-8);
