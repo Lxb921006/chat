@@ -47,6 +47,7 @@
                              {{ data1.title }}
                         </h2>
                         <div class="answer-loop">
+                       
                             <svg class="icon-qa-2" aria-hidden="true">
                                 <use xlink:href="#icon-cankaodaan"></use>
                             </svg>
@@ -59,6 +60,7 @@
                             </div>
                             <!-- <pre><code class="code">{{ data1.answer.join('') }}</code></pre> -->
                             <p class="code">{{ data1.answer.join('') }}</p>
+                      
                         </div>
                     </div>
                 </template>
@@ -67,13 +69,11 @@
                 <el-button icon="el-icon-bottom" circle small @click="footer()"></el-button>
             </div>
             <el-divider></el-divider>
-            <vue-draggable-resizable :grid="[25, 25]">
-                <div class="footer draggable-resizable-handle">
-                    <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
-                        <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
-                    </el-input>
-                </div>
-            </vue-draggable-resizable>
+            <div class="footer list-group"  id="sortable">
+                <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
+                    <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
+                </el-input>
+            </div>
             <div class="notice">
                 <p>*仅供学习, 无任何其他用途*</p>
             </div>
@@ -87,9 +87,10 @@ import { Message } from 'element-ui'
 import { mapState } from 'vuex'
 import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
-import hljs from 'highlight.js'
+// import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
-import { Draggable, Resizable } from 'vuedraggable';
+// import VueDraggableResizable from 'vue-draggable-resizable'
+
 
 export default {
     name: "chat",
@@ -99,6 +100,7 @@ export default {
             show2:true,
             show1:true,
             show3:true,
+            isDragging: false,
             chatContent: "",
             input:"",
             contents: [],
@@ -134,7 +136,7 @@ export default {
     },
     components: {
         // VueCodeHighlight,
-        VueDraggableResizable: Draggable.extend(Resizable)
+        // VueDraggableResizable 拖拽
     },
     methods: {
         getAllChatData () {
