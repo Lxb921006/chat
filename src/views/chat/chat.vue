@@ -245,7 +245,8 @@ export default {
             
         },
         send () {
-            this.socket.send(this.chatContent+'|'+this.value);
+            // this.socket.send(this.chatContent+'|'+this.value);
+            this.socket.send(this.chatContent);
         },
         close () {
             this.finished = false;
