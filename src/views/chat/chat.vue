@@ -279,6 +279,7 @@ export default {
             this.editableTabsValue = newTabName;
         },
         removeTab(targetName) {
+            this.getAllChatData();
             let tabs = this.chatCache;
             let activeName = this.editableTabsValue;
             if (activeName == targetName) {
