@@ -24,11 +24,15 @@
                 >
                 <transition-group name="zoom" tag="ul">
                     <el-menu-item :index=data.index v-for="data in chatCache" :key="data.index" @click="jump(data.id)" v-show="true">
-                        <i class="el-icon-delete delete" @click="removeTab(data.id)"></i>
+                        <i class="el-icon-delete delete" @click="removeChat(data.id)"></i>
                         <span slot="title" class="cache-title">{{ data.title }}</span>
                     </el-menu-item>
                 </transition-group>
                 </el-menu>
+            </div>
+            <div class="logout">
+                <i class="el-icon-switch-button"></i>
+                <el-button type="info" circle icon="el-icon-switch-button" @click="loginout()"></el-button>
             </div>
         </div>
         <div class="main">
@@ -59,8 +63,7 @@
                                 </transition>
                             </div>
                             <!-- <pre><code class="code">{{ data1.answer.join('') }}</code></pre> -->
-                            <p class="code">{{ data1.answer.join('') }}</p>
-                      
+                            <p class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></p>
                         </div>
                     </div>
                 </template>
@@ -98,8 +101,10 @@ export default {
         return {
             text:"copy me",
             show2:true,
+            showCursor: true,
             show1:true,
             show3:true,
+            clearS: "",
             isDragging: false,
             chatContent: "",
             input:"",
@@ -139,6 +144,15 @@ export default {
         // VueDraggableResizable 拖拽
     },
     methods: {
+        loginout() {
+            sessionStorage.removeItem('user');
+            this.$router.replace('/login').catch((err) => err);
+        },
+        addB() {
+            this.clearS = setInterval(() => {
+                this.showCursor = !this.showCursor;
+            }, 500);
+        },
         getAllChatData () {
             if (sessionStorage.getItem("chatCache")) {
                 store.commit("CLEAR_CHAT_CACHE");
@@ -190,6 +204,7 @@ export default {
                 Message.error("请输出对话内容.")
                 return
             }
+
             if (this.input) {
                 this.input = "";
                 this.getAllChatData();
@@ -205,8 +220,15 @@ export default {
                 id: Math.floor(id),
                 name: this.id++,
                 index: index,
+                cursor: true,
             };
+
+            this.clearS = setInterval(() => {
+                data.cursor = !data.cursor;
+            }, 500);
+
             this.editableTabsValue = data.id;
+
             store.commit("ADD_CHAT_CACHE", data);
 
             if (typeof(WebSocket) === "undefined") {
@@ -242,7 +264,6 @@ export default {
                     div.scrollTop = div.scrollHeight - div.clientHeight;
                 } 
             }
-            
         },
         send () {
             // this.socket.send(this.chatContent+'|'+this.value);
@@ -258,6 +279,7 @@ export default {
                     break
                 } 
             }
+            clearInterval(this.clearS);
         },
         footer () {
             let content = document.getElementsByClassName('content')[0]
@@ -268,7 +290,7 @@ export default {
                 },0);
             }
         },
-        addTab(targetName, id) {
+        addChat(targetName, id) {
             let newTabName = ++this.tabIndex + '';
             this.editableTabs.push({
                 title: targetName,
@@ -278,7 +300,7 @@ export default {
             });
             this.editableTabsValue = newTabName;
         },
-        removeTab(targetName) {
+        removeChat(targetName) {
             this.getAllChatData();
             let tabs = this.chatCache;
             let activeName = this.editableTabsValue;
@@ -307,6 +329,7 @@ export default {
         if (window.innerWidth < 600) {
             this.ash = false;
         }
+        
 
         this.getAllChatData();
         // this.$nextTick(() => {
@@ -317,6 +340,7 @@ export default {
         //     });
         // });
     },
+
     created () {
     }
 }
@@ -548,7 +572,23 @@ export default {
         height: 72%;
     }
 }
+.cursor {
+  background-color: black;
+  width: 1px;
+  height: 1em;
+  display: inline-block;
+  margin-left: 1px;
+  animation: blink 1s infinite;
+}
 
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
 
 // element-ui的css修改
 :deep .el-divider {

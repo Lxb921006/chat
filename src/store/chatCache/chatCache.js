@@ -36,10 +36,13 @@ const chatCache = {
             if (fcd[i].id == data.id) {
                 let lfcd = fcd[i];
                 lfcd['answer'] = data['answer'];
+                lfcd['cursor'] = false;
                 break
             }
         }
+        state.editableTabs = fcd;
         let jd = JSON.stringify(fcd);
+
         sessionStorage.setItem("chatCache", jd);
     }
   },
