@@ -56,7 +56,7 @@
                             </svg>
                             <div class="copy">
                                 <transition name="el-zoom-in-center">
-                                    <svg class="icon-qa-copy" aria-hidden="true" @click="copy(data1.answer.join(''))" v-show="show2">
+                                    <svg class="icon-qa-copy" aria-hidden="true" @click="copy(data1.answer.join(''))">
                                         <use :xlink:href="icon">copy</use>
                                     </svg>
                                 </transition>
