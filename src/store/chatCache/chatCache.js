@@ -37,6 +37,7 @@ const chatCache = {
                 let lfcd = fcd[i];
                 lfcd['answer'] = data['answer'];
                 lfcd['cursor'] = false;
+                lfcd['timeShow'] = true;
                 break
             }
         }

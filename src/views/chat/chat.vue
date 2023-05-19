@@ -31,7 +31,6 @@
                 </el-menu>
             </div>
             <div class="logout">
-                <i class="el-icon-switch-button"></i>
                 <el-button type="info" circle icon="el-icon-switch-button" @click="loginout()"></el-button>
             </div>
         </div>
@@ -64,6 +63,10 @@
                             </div>
                             <!-- <pre><code class="code">{{ data1.answer.join('') }}</code></pre> -->
                             <p class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></p>
+                            <!-- <span class="time">{{ data1.time }}</span> -->
+                            <transition name="el-zoom-in-center">
+                                <i class="el-icon-time time-2" v-show="data1.timeShow">{{ data1.time }}</i>
+                            </transition>
                         </div>
                     </div>
                 </template>
@@ -100,6 +103,8 @@ export default {
     data()  {
         return {
             text:"copy me",
+            now: "",
+            timeShow: false,
             show2:true,
             showCursor: true,
             show1:true,
@@ -144,6 +149,21 @@ export default {
         // VueDraggableResizable 拖拽
     },
     methods: {
+        getDate() {
+            // 获取当前时间
+            let now = new Date()
+
+            // 格式化时间为字符串
+            let year = now.getFullYear();
+            let month = (now.getMonth() + 1).toString().padStart(2, '0');
+            let day = now.getDate().toString().padStart(2, '0');
+            let hour = now.getHours().toString().padStart(2, '0');
+            let minute = now.getMinutes().toString().padStart(2, '0');
+            let second = now.getSeconds().toString().padStart(2, '0');
+
+            let formattedTime = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+            return formattedTime;
+        },
         loginout() {
             sessionStorage.removeItem('user');
             this.$router.replace('/login').catch((err) => err);
@@ -221,6 +241,8 @@ export default {
                 name: this.id++,
                 index: index,
                 cursor: true,
+                time: this.getDate(),
+                timeShow: false,
             };
 
             this.clearS = setInterval(() => {
@@ -274,11 +296,14 @@ export default {
             this.mh = false;
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
-                    let data = {id: this.chatCache[i].id, answer: this.chatCache[i].answer}
+                    let data = {id: this.chatCache[i].id, answer: this.chatCache[i].answer, time: this.getDate(), timeShow: true}
                     store.commit("SAVE_CHAT_CACHE_ANSWER", data);
                     break
                 } 
             }
+
+            this.timeShow = true;
+
             clearInterval(this.clearS);
         },
         footer () {
@@ -590,6 +615,19 @@ export default {
   }
 }
 
+.time-2 {
+    white-space: pre-wrap;
+    display: block;
+    margin: 13px auto;
+    width: 659px;
+    position: relative;
+    bottom: 50px;
+    color: #fff;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 0 11px 5px 11px;
+    font-size: 12px;
+}
 // element-ui的css修改
 :deep .el-divider {
     background-color: #424242;
