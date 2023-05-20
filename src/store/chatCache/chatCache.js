@@ -1,3 +1,6 @@
+
+import createPersistedState from 'vuex-persistedstate'
+
 const chatCache = {
   namespace: true,
   state: {
@@ -47,7 +50,11 @@ const chatCache = {
         sessionStorage.setItem("chatCache", jd);
     }
   },
-  actions: {}
+  actions: {},
+  plugins: [createPersistedState({
+    storage: window.localStorage,
+    paths: ['editableTabs']
+  })],
 };
 
 export default chatCache
