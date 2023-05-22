@@ -485,6 +485,19 @@ export default {
     font-size: 14px;
     // font-style: oblique;
 }
+.time-2 {
+    white-space: pre-wrap;
+    display: block;
+    margin: 13px auto;
+    width: 659px;
+    position: relative;
+    bottom: 50px;
+    color: #fff;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 0 11px 5px 11px;
+    font-size: 12px;
+}
 .icon-qa {
     width: 2em;
     height: 2em;
@@ -584,7 +597,10 @@ export default {
     .copy, .icon-qa-2 {
         width: 100%;
     }
-    .code {
+    .code{
+        width: 94%;
+    }
+    .time-2 {
         width: 94%;
     }
     .notice {
@@ -594,7 +610,7 @@ export default {
         padding: 11px 0;
     }
     .tab {
-        height: 72%;
+        height: 61%;
     }
 }
 .cursor {
@@ -615,19 +631,7 @@ export default {
   }
 }
 
-.time-2 {
-    white-space: pre-wrap;
-    display: block;
-    margin: 13px auto;
-    width: 659px;
-    position: relative;
-    bottom: 50px;
-    color: #fff;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    padding: 0 11px 5px 11px;
-    font-size: 12px;
-}
+
 // element-ui的css修改
 :deep .el-divider {
     background-color: #424242;
