@@ -243,6 +243,8 @@ export default {
                 cursor: true,
                 time: this.getDate(),
                 timeShow: false,
+                cid: "",
+                pid: "",
             };
 
             this.clearS = setInterval(() => {
@@ -272,6 +274,7 @@ export default {
         },
         open () {
             // Message.success('websocket连接成功')
+            
             this.send()
         },
         error () {
@@ -279,24 +282,35 @@ export default {
         },
         getMessage (msg) {
             let jd = JSON.parse(msg.data);
+            // jd = jd.data;
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
-                    this.chatCache[i].answer.push(jd);
+                    this.chatCache[i].answer.push(jd.data);
+                    this.chatCache[i].cid = jd.cid;
+                    this.chatCache[i].pid = jd.pid;
                     let div = document.querySelector(".content")
                     div.scrollTop = div.scrollHeight - div.clientHeight;
                 } 
             }
         },
         send () {
-            // this.socket.send(this.chatContent+'|'+this.value);
-            this.socket.send(this.chatContent);
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let lastData = cacheData[cacheData.length - 2];
+            let sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent};
+            let fd = JSON.stringify(sendData);
+            console.log(sendData);
+            this.socket.send(fd);
         },
         close () {
             this.finished = false;
             this.mh = false;
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
-                    let data = {id: this.chatCache[i].id, answer: this.chatCache[i].answer, time: this.getDate(), timeShow: true}
+                    let data = {id: this.chatCache[i].id, answer: this.chatCache[i].answer, time: this.getDate(), 
+                        timeShow: true,
+                        cid: this.chatCache[i].cid,
+                        pid: this.chatCache[i].pid,
+                    }
                     store.commit("SAVE_CHAT_CACHE_ANSWER", data);
                     break
                 } 
@@ -354,16 +368,7 @@ export default {
         if (window.innerWidth < 600) {
             this.ash = false;
         }
-        
-
         this.getAllChatData();
-        // this.$nextTick(() => {
-        //     let blocks = document.querySelectorAll('.answer-loop p');
-        //     // let blocks = document.querySelectorAll('pre code');
-        //     blocks.forEach((block) => {
-        //         hljs.highlightBlock(block);
-        //     });
-        // });
     },
 
     created () {

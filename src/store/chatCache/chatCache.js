@@ -41,6 +41,8 @@ const chatCache = {
                 lfcd['answer'] = data['answer'];
                 lfcd['cursor'] = false;
                 lfcd['timeShow'] = true;
+                lfcd['pid'] = data['pid'];
+                lfcd['cid'] = data['cid'];
                 break
             }
         }
