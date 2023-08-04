@@ -31,39 +31,55 @@
                 </el-menu>
             </div>
             <div class="logout">
-                <el-button type="info" circle icon="el-icon-switch-button" @click="loginout()"></el-button>
+                <el-button class="btu0" type="primary" round  @click="loginout()"><span class="iconfont icon-tuichu3 icon-size"></span></el-button>
+            </div>
+            <div class="item-url">
+                <span class="iconfont icon-githubb icon-git"></span>
+                <el-link type="info" class="addr-size" :underline="false" href="https://github.com/Lxb921006/chat/tree/dev">项目地址</el-link>
             </div>
         </div>
         <div class="main">
+            <div class="top">
+                <el-button icon="el-icon-top" circle small @click="juamTop()"></el-button>
+            </div>
             <transition name="el-zoom-in-top">
                 <div class="models" v-show="mh">
-                    <el-button class="btu1" size="mini" :icon="but1Icon" @click="showAside()"></el-button>
+
+                    <svg class="icon" aria-hidden="true" @click="showAside()">
+                        <use xlink:href="#icon-shousuo"></use>
+                    </svg>
+                    
+                    <!-- <el-button class="btu1" size="mini" @click="showAside()">
+                        
+                    </el-button> -->
+                    <!-- <el-button class="btu1" size="mini" :icon="but1Icon" @click="showAside()"></el-button> -->
                 </div>
             </transition>
             <div class="content">
                 <template v-if="show">
                     <div v-for="(data1, index1) in chatCache" :key="index1+1">
                         <h2 class="answer-title" :id=data1.id>
-                            <svg class="icon-qa" aria-hidden="true">
-                                <use xlink:href="#icon-changjianwenti"></use>
-                            </svg>
-                             {{ data1.title }}
+                            <p class="question" ref="title">
+                                <svg class="icon-qa" aria-hidden="true">
+                                    <use xlink:href="#icon-changjianwenti"></use>
+                                </svg>
+                                {{ data1.title }}
+                            </p>
                         </h2>
                         <div class="answer-loop">
-                       
                             <svg class="icon-qa-2" aria-hidden="true">
                                 <use xlink:href="#icon-cankaodaan"></use>
                             </svg>
-                            <div class="copy">
+                            <!-- <div class="copy">
                                 <transition name="el-zoom-in-center">
                                     <svg class="icon-qa-copy" aria-hidden="true" @click="copy(data1.answer.join(''))">
                                         <use :xlink:href="icon">copy</use>
                                     </svg>
                                 </transition>
-                            </div>
-                            <!-- <pre><code class="code">{{ data1.answer.join('') }}</code></pre> -->
-                            <p class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></p>
-                            <!-- <span class="time">{{ data1.time }}</span> -->
+                            </div> -->
+                            <CodeBlock :code="data1.answer.join('')"></CodeBlock> <span class="cursor" v-show="data1.cursor">|</span>
+                            <!-- <p class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></p> -->
+                            <!-- <pre><code class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></code></pre> -->
                             <transition name="el-zoom-in-center">
                                 <i class="el-icon-time time-2" v-show="data1.timeShow">{{ data1.time }}</i>
                             </transition>
@@ -76,6 +92,11 @@
             </div>
             <el-divider></el-divider>
             <div class="footer list-group"  id="sortable">
+                <div class="stop">
+                    <transition name="el-zoom-in-center">
+                        <el-button round class="stop-b" @click="stopChat()" v-show="stopResp"><span class="iconfont icon-lujing"></span> 停止</el-button>
+                    </transition>
+                </div>
                 <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
                     <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
                 </el-input>
@@ -93,10 +114,17 @@ import { Message } from 'element-ui'
 import { mapState } from 'vuex'
 import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
+import CodeBlock from './code';
 // import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 // import VueDraggableResizable from 'vue-draggable-resizable'
-
+import Prism from "prismjs";
+import "prismjs/themes/prism.css";
+import "prismjs/components/prism-go";
+import hljs from 'highlight.js/lib/core';
+import 'highlight.js/styles/github.css';
+import python from 'highlight.js/lib/languages/python';
+hljs.registerLanguage('python', python);
 
 export default {
     name: "chat",
@@ -109,12 +137,13 @@ export default {
             showCursor: true,
             show1:true,
             show3:true,
+            stopResp: false,
             clearS: "",
             isDragging: false,
             chatContent: "",
             input:"",
             contents: [],
-            socket: "",
+            socket: null,
             chatLoad: true,
             show: false,
             mh: false,
@@ -147,8 +176,15 @@ export default {
     components: {
         // VueCodeHighlight,
         // VueDraggableResizable 拖拽
+        CodeBlock,
     },
     methods: {
+        stopChat(){
+            if (this.socket) {
+                this.socket.close();
+                this.socket = null;
+            }
+        },
         getDate() {
             // 获取当前时间
             let now = new Date()
@@ -221,7 +257,7 @@ export default {
         },
         wsInit () {
             if (!this.chatContent) {
-                Message.error("请输出对话内容.")
+                Message.error("请输入对话内容.")
                 return
             }
 
@@ -273,8 +309,7 @@ export default {
             }
         },
         open () {
-            // Message.success('websocket连接成功')
-            
+            this.stopResp = true;
             this.send()
         },
         error () {
@@ -282,31 +317,39 @@ export default {
         },
         getMessage (msg) {
             let jd = JSON.parse(msg.data);
-            // jd = jd.data;
+            let div = document.querySelector(".content")
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
                     this.chatCache[i].answer.push(jd.data);
                     this.chatCache[i].cid = jd.cid;
                     this.chatCache[i].pid = jd.pid;
-                    let div = document.querySelector(".content")
-                    div.scrollTop = div.scrollHeight - div.clientHeight;
                 } 
+                div.scrollTop = div.scrollHeight - div.clientHeight;
             }
         },
         send () {
+            let sendData = {};
+            let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let lastData = cacheData[cacheData.length - 2];
-            let sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent};
-            let fd = JSON.stringify(sendData);
-            console.log(sendData);
-            this.socket.send(fd);
+            if (cacheData.length > 1) {
+                lastData = cacheData[cacheData.length - 2];
+                sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent};
+            } else {
+                lastData = cacheData[cacheData.length];
+                sendData = {cid: "", pid: "", data: this.chatContent};
+            }
+            this.socket.send(JSON.stringify(sendData));
         },
         close () {
             this.finished = false;
             this.mh = false;
+            let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
-                    let data = {id: this.chatCache[i].id, answer: this.chatCache[i].answer, time: this.getDate(), 
+                    let data = {
+                        id: this.chatCache[i].id, 
+                        answer: this.chatCache[i].answer, 
+                        time: this.getDate(), 
                         timeShow: true,
                         cid: this.chatCache[i].cid,
                         pid: this.chatCache[i].pid,
@@ -314,10 +357,11 @@ export default {
                     store.commit("SAVE_CHAT_CACHE_ANSWER", data);
                     break
                 } 
+                div.scrollTop = div.scrollHeight - div.clientHeight;
             }
 
             this.timeShow = true;
-
+            this.stopResp = false;
             clearInterval(this.clearS);
         },
         footer () {
@@ -326,6 +370,15 @@ export default {
                 setTimeout(function(){
                     //设置滚动条到最底部
                     content.scrollTop = content.scrollHeight;
+                },0);
+            }
+        },
+        juamTop() {
+            let content = document.getElementsByClassName('content')[0]
+            if(content.scrollHeight > content.clientHeight) {
+                setTimeout(function(){
+                    //设置滚动条到最底部
+                    content.scrollTop = 0;
                 },0);
             }
         },
@@ -364,13 +417,27 @@ export default {
             document.getElementById(id).setAttribute("style", "color: #9fbb91;");
         }
     },
+    filters: {
+        getCode(data) {
+            const regex = /```([\s\S]*?)```/g;
+            const content = data;
+            let newContent = content;
+            let match;
+            while ((match = regex.exec(content)) !== null) {
+                // 将代码块用 <pre> 和 <code> 标签包裹起来
+                const code = match[1].trim();
+                const formattedCode = `<pre><code class="code">${code}</code></pre>`;
+                newContent = newContent.replace(match[0], formattedCode);
+            }
+            return newContent;
+        },
+    },
     mounted() {
         if (window.innerWidth < 600) {
             this.ash = false;
         }
         this.getAllChatData();
     },
-
     created () {
     }
 }
@@ -433,20 +500,31 @@ export default {
     bottom: 16px;
     right: 18px;
 }
+.top {
+    position: fixed;
+    right: 18px;
+}
 .answer-title {
     // height: 80px;
     margin: 0 auto;
     // background-color: #fff;
     border-radius: 3px;
-    line-height: 80px;
+    line-height: 2.3;
     font-size: 1rem;
     color: #fff;
     overflow-y: auto;
-    white-space: nowrap;
+    // white-space: nowrap;
     padding: 0 11px;
+    width: 659px;
 }
 .answer-title::-webkit-scrollbar {
     display: none;
+}
+.question-1 {
+    text-align: center;
+}
+.question-2 {
+    text-align: left;
 }
 .answer-loop {
     text-align: justify;
@@ -456,6 +534,7 @@ export default {
     // background-color: #f7fbff;
     border-top: 1px solid #424242;
     border-bottom: 1px solid #424242;
+    background-color: #373737;
 }
 .cache-title {
     font-size: 1rem;
@@ -478,12 +557,12 @@ export default {
 .code {
     white-space: pre-wrap;
     display: block;
-    margin: 13px auto;
+    margin: 0 auto;
     width: 659px;
     position: relative;
-    bottom: 50px;
+    bottom: 15px;
     color: #fff;
-    background-color: #201f1f;
+    background-color: #373737;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     padding: 0 11px 5px 11px;
@@ -493,14 +572,14 @@ export default {
 .time-2 {
     white-space: pre-wrap;
     display: block;
-    margin: 13px auto;
+    margin: 10px auto;
     width: 659px;
     position: relative;
-    bottom: 50px;
+    bottom: 7px;
     color: #fff;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-    padding: 0 11px 5px 11px;
+    padding: 0 11px 0px 11px;
     font-size: 12px;
 }
 .icon-qa {
@@ -509,6 +588,8 @@ export default {
     vertical-align: -0.15em;
     fill: currentColor;
     overflow: hidden;
+    position: relative;
+    top: 5px;
 }
 .icon-qa-3 {
     position: relative;
@@ -525,8 +606,7 @@ export default {
     width: 580px;
     position: relative;
     right: 373px;
-    top: 0;
-    // bottom: 18px;
+    top: 18px;
     height: 2em;
     fill: currentColor;
     overflow: hidden;
@@ -578,7 +658,7 @@ export default {
 }
 .models {
     position: fixed;
-    top: 11px;
+    // top: 11px;
     z-index: 1000;
 }
 .btu1 {
@@ -586,6 +666,46 @@ export default {
     color: #fff;
     background-color: #616463;
     border-color: #616463;
+}
+pre code {
+  font-family: monospace;
+}
+.logout {
+    position: fixed;
+    bottom: 68px;
+    width: 200px;
+}
+.item-url {
+    position: fixed;
+    bottom: 34px;
+    width: 200px;
+}
+.btu0 {
+    width: 70%;
+}
+.stop {
+    margin-bottom: 10px;
+}
+.stop-b {
+    width: 100px;
+}
+.icon-git {
+    position: relative;
+    top: 2px;
+    right: 4px;
+}
+.addr-size {
+    font-size: 12px;
+}
+.icon {
+  width: 2em;
+  height: 2em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+  cursor: pointer;
+position: relative;
+right: 4px;
 }
 //适应手机
 @media only screen and (max-width: 500px) {

@@ -25,6 +25,7 @@ import { Col } from 'element-ui'
 import { Image } from 'element-ui'
 import { Select } from 'element-ui'
 import { Option } from 'element-ui'
+import { Link } from 'element-ui'
 
 import VuePageTransition from 'vue-page-transition'
 
@@ -44,6 +45,7 @@ Vue.use(Col);
 Vue.use(Image);
 Vue.use(Select);
 Vue.use(Option);
+Vue.use(Link);
 Vue.use(VuePageTransition);
 
 //复制插件

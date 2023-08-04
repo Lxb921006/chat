@@ -1,0 +1,114 @@
+{
+  "id": "4197599",
+  "name": "chat",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "8334063",
+      "name": "收缩",
+      "font_class": "shousuo",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "11795690",
+      "name": "侧边栏收缩",
+      "font_class": "cebianlanshousuo",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "25149194",
+      "name": "14_收缩",
+      "font_class": "a-14_shousuo",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
+      "icon_id": "35323377",
+      "name": "收缩-copy",
+      "font_class": "shousuo1",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "4546594",
+      "name": "githubb",
+      "font_class": "githubb",
+      "unicode": "e63b",
+      "unicode_decimal": 58939
+    },
+    {
+      "icon_id": "3172004",
+      "name": "退出",
+      "font_class": "tuichu",
+      "unicode": "e634",
+      "unicode_decimal": 58932
+    },
+    {
+      "icon_id": "16243298",
+      "name": "退出",
+      "font_class": "tuichu1",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "31176497",
+      "name": "退出",
+      "font_class": "tuichu2",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "34862241",
+      "name": "退出",
+      "font_class": "tuichu3",
+      "unicode": "e73c",
+      "unicode_decimal": 59196
+    },
+    {
+      "icon_id": "28890891",
+      "name": "5_模型同步",
+      "font_class": "a-5_moxingtongbu",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "1265755",
+      "name": "图片",
+      "font_class": "tupian",
+      "unicode": "e744",
+      "unicode_decimal": 59204
+    },
+    {
+      "icon_id": "2170581",
+      "name": "代码",
+      "font_class": "daima",
+      "unicode": "e702",
+      "unicode_decimal": 59138
+    },
+    {
+      "icon_id": "22959349",
+      "name": "常见问题",
+      "font_class": "changjianwenti",
+      "unicode": "e80d",
+      "unicode_decimal": 59405
+    },
+    {
+      "icon_id": "24777045",
+      "name": "参考答案",
+      "font_class": "cankaodaan",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "6841616",
+      "name": "停止",
+      "font_class": "lujing",
+      "unicode": "e691",
+      "unicode_decimal": 59025
+    }
+  ]
+}
