@@ -44,15 +44,9 @@
             </div>
             <transition name="el-zoom-in-top">
                 <div class="models" v-show="mh">
-
                     <svg class="icon" aria-hidden="true" @click="showAside()">
-                        <use xlink:href="#icon-shousuo"></use>
+                        <use xlink:href="#icon-caidan-shousuo"></use>
                     </svg>
-                    
-                    <!-- <el-button class="btu1" size="mini" @click="showAside()">
-                        
-                    </el-button> -->
-                    <!-- <el-button class="btu1" size="mini" :icon="but1Icon" @click="showAside()"></el-button> -->
                 </div>
             </transition>
             <div class="content">
@@ -77,9 +71,18 @@
                                     </svg>
                                 </transition>
                             </div> -->
-                            <CodeBlock :code="data1.answer.join('')"></CodeBlock> <span class="cursor" v-show="data1.cursor">|</span>
                             <!-- <p class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></p> -->
-                            <!-- <pre><code class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></code></pre> -->
+                            <!-- <p class="code">{{ data1.answer.join('') | getCode }}</p> -->
+                            <!-- <pre>
+                                <code class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></code>
+                            </pre> -->
+                            <markdown-code-block :code="data1.answer.join('')"></markdown-code-block>
+                            <!-- <pre>
+                                <code class="code" v-for="(data, index) in data1.answer" :key="index">{{ data }}</code>
+                            </pre> -->
+                            <!-- <pre>
+                                <span class="code" v-for="(data3, index3) in data1.answer" :key="index3">{{ data3 }} <span class="cursor" v-show="data1.cursor">|</span></span>
+                            </pre> -->
                             <transition name="el-zoom-in-center">
                                 <i class="el-icon-time time-2" v-show="data1.timeShow">{{ data1.time }}</i>
                             </transition>
@@ -114,17 +117,17 @@ import { Message } from 'element-ui'
 import { mapState } from 'vuex'
 import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
-import CodeBlock from './code';
 // import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 // import VueDraggableResizable from 'vue-draggable-resizable'
-import Prism from "prismjs";
-import "prismjs/themes/prism.css";
-import "prismjs/components/prism-go";
-import hljs from 'highlight.js/lib/core';
-import 'highlight.js/styles/github.css';
-import python from 'highlight.js/lib/languages/python';
-hljs.registerLanguage('python', python);
+// import Prism from "prismjs";
+// import "prismjs/themes/prism.css";
+// import "prismjs/components/prism-go";
+// import hljs from 'highlight.js/lib/core';
+// import 'highlight.js/styles/github.css';
+// import python from 'highlight.js/lib/languages/python';
+// hljs.registerLanguage('python', python);
+import MarkdownCodeBlock from './MarkdownCodeBlock';
 
 export default {
     name: "chat",
@@ -176,11 +179,13 @@ export default {
     components: {
         // VueCodeHighlight,
         // VueDraggableResizable 拖拽
-        CodeBlock,
+        // CodeBlock,
+        MarkdownCodeBlock
     },
     methods: {
         stopChat(){
             if (this.socket) {
+                this.close();
                 this.socket.close();
                 this.socket = null;
             }
@@ -444,6 +449,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .custom-code-block {
+  background-color: #2e2e2e;
+  padding: 10px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+::v-deep .custom-code-block-dev {
+  height: 39px;
+  line-height: 39px;
+  background-color: #262626;
+  border-radius: 2px;
+}
+::v-deep  .custom-code-block-dev p {
+  padding-left: 10px;
+}
+::v-deep .code-3 {
+  white-space: pre-wrap;
+}
 .chat-frame {
     height: 100%;
 }
@@ -698,15 +721,17 @@ pre code {
     font-size: 12px;
 }
 .icon {
-  width: 2em;
-  height: 2em;
-  vertical-align: -0.15em;
-  fill: currentColor;
-  overflow: hidden;
-  cursor: pointer;
-position: relative;
-right: 4px;
+    width: 2em;
+    height: 2em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    right: 4px;
+    bottom: 5px;
 }
+
 //适应手机
 @media only screen and (max-width: 500px) {
     // .aside {

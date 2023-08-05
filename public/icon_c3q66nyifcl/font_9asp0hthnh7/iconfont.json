@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "32556825",
+      "name": "收缩",
+      "font_class": "a-262-shousuoshuangse",
+      "unicode": "e657",
+      "unicode_decimal": 58967
+    },
+    {
+      "icon_id": "36484115",
+      "name": "收缩",
+      "font_class": "a-Group231",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "27313367",
+      "name": "菜单-收缩",
+      "font_class": "caidan-shousuo",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
+      "icon_id": "28415658",
+      "name": "收缩悬浮",
+      "font_class": "shousuoxuanfu",
+      "unicode": "e613",
+      "unicode_decimal": 58899
+    },
+    {
       "icon_id": "8334063",
       "name": "收缩",
       "font_class": "shousuo",

@@ -13,6 +13,7 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.15.13",
     "highlight.js": "^11.7.0",
+    "markdown-it": "^13.0.1",
     "prismjs": "^1.29.0",
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.11",

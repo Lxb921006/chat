@@ -4,7 +4,7 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 //路由守卫, 访问入口
-import './router/safe'
+// import './router/safe'
 
 // element-ui
 import 'element-ui/lib/theme-chalk/index.css';
