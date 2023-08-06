@@ -40,7 +40,7 @@
         </div>
         <div class="main">
             <div class="top">
-                <el-button icon="el-icon-top" circle small @click="juamTop()"></el-button>
+                <el-button icon="el-icon-top" circle mini @click="juamTop()"></el-button>
             </div>
             <transition name="el-zoom-in-top">
                 <div class="models" v-show="mh">
@@ -64,25 +64,7 @@
                             <svg class="icon-qa-2" aria-hidden="true">
                                 <use xlink:href="#icon-cankaodaan"></use>
                             </svg>
-                            <!-- <div class="copy">
-                                <transition name="el-zoom-in-center">
-                                    <svg class="icon-qa-copy" aria-hidden="true" @click="copy(data1.answer.join(''))">
-                                        <use :xlink:href="icon">copy</use>
-                                    </svg>
-                                </transition>
-                            </div> -->
-                            <!-- <p class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></p> -->
-                            <!-- <p class="code">{{ data1.answer.join('') | getCode }}</p> -->
-                            <!-- <pre>
-                                <code class="code">{{ data1.answer.join('') }} <span class="cursor" v-show="data1.cursor">|</span></code>
-                            </pre> -->
                             <markdown-code-block :code="data1.answer.join('')"></markdown-code-block>
-                            <!-- <pre>
-                                <code class="code" v-for="(data, index) in data1.answer" :key="index">{{ data }}</code>
-                            </pre> -->
-                            <!-- <pre>
-                                <span class="code" v-for="(data3, index3) in data1.answer" :key="index3">{{ data3 }} <span class="cursor" v-show="data1.cursor">|</span></span>
-                            </pre> -->
                             <transition name="el-zoom-in-center">
                                 <i class="el-icon-time time-2" v-show="data1.timeShow">{{ data1.time }}</i>
                             </transition>
@@ -91,7 +73,7 @@
                 </template>
             </div>
             <div class="scoll">
-                <el-button icon="el-icon-bottom" circle small @click="footer()"></el-button>
+                <el-button icon="el-icon-bottom" circle mini @click="footer()"></el-button>
             </div>
             <el-divider></el-divider>
             <div class="footer list-group"  id="sortable">
@@ -117,16 +99,7 @@ import { Message } from 'element-ui'
 import { mapState } from 'vuex'
 import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
-// import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
-// import VueDraggableResizable from 'vue-draggable-resizable'
-// import Prism from "prismjs";
-// import "prismjs/themes/prism.css";
-// import "prismjs/components/prism-go";
-// import hljs from 'highlight.js/lib/core';
-// import 'highlight.js/styles/github.css';
-// import python from 'highlight.js/lib/languages/python';
-// hljs.registerLanguage('python', python);
 import MarkdownCodeBlock from './MarkdownCodeBlock';
 
 export default {
@@ -249,11 +222,11 @@ export default {
             this.mh = true;
         },
         copy (text) {
-            this.show2 = false;
-            let that = this;
-            setTimeout(function(){
-                that.show2 = true;
-            },3000)
+            // this.show2 = false;
+            // let that = this;
+            // setTimeout(function(){
+            //     that.show2 = true;
+            // },3000)
             this.$copyText(text).then(() => {
                 Message.success("已复制");
             }, () => {
@@ -454,18 +427,32 @@ export default {
   padding: 10px;
   line-height: 1.5;
   margin-bottom: 10px;
+  
 }
 ::v-deep .custom-code-block-dev {
   height: 39px;
   line-height: 39px;
   background-color: #262626;
   border-radius: 2px;
+  display: flex;
+  justify-content: space-between;
 }
 ::v-deep  .custom-code-block-dev p {
   padding-left: 10px;
 }
 ::v-deep .code-3 {
   white-space: pre-wrap;
+}
+::v-deep .copy-1 {
+    background-color: #262626;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    padding-right: 10px;
+}
+::v-deep .copy-1:hover span {
+    background-color: #727272;
+    border-radius: 50%;
 }
 .chat-frame {
     height: 100%;
@@ -522,10 +509,12 @@ export default {
     position: relative;
     bottom: 16px;
     right: 18px;
+    opacity: 0.2;
 }
 .top {
     position: fixed;
     right: 18px;
+    opacity: 0.2;
 }
 .answer-title {
     // height: 80px;
@@ -598,7 +587,7 @@ export default {
     margin: 10px auto;
     width: 659px;
     position: relative;
-    bottom: 7px;
+    bottom: 76px;
     color: #fff;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
