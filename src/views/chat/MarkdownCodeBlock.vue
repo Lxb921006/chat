@@ -10,12 +10,19 @@
 import MarkdownIt from 'markdown-it';
 import { Message } from 'element-ui'
 import hljs from 'highlight.js';
-import 'highlight.js/styles/monokai.css';
+// import 'highlight.js/styles/monokai.css';
+import 'highlight.js/styles/stackoverflow-dark.css';
+// import 'highlight.js/styles/tomorrow-night-blue.css';
+// import 'highlight.js/styles/tomorrow-night-bright.css';
 
 export default {
   props: {
     code: {
       type: String,
+      required: true,
+    },
+    cursor: {
+      type: Boolean,
       required: true,
     },
   },
@@ -37,25 +44,6 @@ export default {
     this.renderMarkdown2();
   },
   methods: {
-    updateRenderedHtml() {
-      // 使用MarkdownIt解析Markdown文本，并进行代码高亮
-      const md = new MarkdownIt({
-        highlight: function (str, lang) {
-          if (lang && hljs.getLanguage(lang)) {
-            try {
-              return '<pre class="hljs"><code>' +
-                     hljs.highlight(lang, str, true).value +
-                     '</code></pre>';
-            } catch (__) {}
-          }
-
-          return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
-        }
-      });
-
-      // 将Markdown文本转换为HTML，并设置到renderedHtml中
-      return md.render(this.code);
-    },
     copy (text) {
       const h = this.$createElement;
       this.$copyText(text).then(() => {
@@ -107,14 +95,14 @@ export default {
         highlight: function (str, lang) {
           if (lang && hljs.getLanguage(lang)) {
             try {
-              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${hljs.highlight(lang, str, true).value}</code></pre>`;
+              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${hljs.highlight(lang, str, true).value} </code></pre>`;
             } catch (__) {}
-            return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${md.utils.escapeHtml(str)}</code></pre>`;
+            return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${md.utils.escapeHtml(str)} </code></pre>`;
           } else {
             try {
-              return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${hljs.highlight("text", str, true).value}</code></pre>`;
+              return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${hljs.highlight("text", str, true).value} </code></pre>`;
             } catch (__) {}
-            return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(str)}</code></pre>`;
+            return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(str)} </code></pre>`;
           }
         }
       });

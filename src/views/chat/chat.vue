@@ -40,7 +40,7 @@
         </div>
         <div class="main">
             <div class="top">
-                <el-button icon="el-icon-top" circle mini @click="juamTop()"></el-button>
+                <el-button circle mini @click="juamTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
             </div>
             <transition name="el-zoom-in-top">
                 <div class="models" v-show="mh">
@@ -64,7 +64,7 @@
                             <svg class="icon-qa-2" aria-hidden="true">
                                 <use xlink:href="#icon-cankaodaan"></use>
                             </svg>
-                            <markdown-code-block :code="data1.answer.join('')"></markdown-code-block>
+                            <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor"></markdown-code-block>
                             <transition name="el-zoom-in-center">
                                 <i class="el-icon-time time-2" v-show="data1.timeShow">{{ data1.time }}</i>
                             </transition>
@@ -73,7 +73,7 @@
                 </template>
             </div>
             <div class="scoll">
-                <el-button icon="el-icon-bottom" circle mini @click="footer()"></el-button>
+                <el-button circle mini @click="footer()"><span class="iconfont icon-cs-dw-xx-1"></span></el-button>
             </div>
             <el-divider></el-divider>
             <div class="footer list-group"  id="sortable">
@@ -133,6 +133,7 @@ export default {
             but1Icon: "el-icon-arrow-right",
             code:"",
             value: "text-davinci-003",
+            cc: "<span class='cursor' v-show='this.cursor'>|</span>",
             options: [{value: 'babbage', label: 'babbage'}, {value: 'davinci', label: 'davinci'}, {value: 'text-davinci-edit-001', label: 'text-davinci-edit-001'}, {value: 'babbage-code-search-code', label: 'babbage-code-search-code'}, {value: 'text-similarity-babbage-001', label: 'text-similarity-babbage-001'}, {value: 'code-davinci-edit-001', label: 'code-davinci-edit-001'}, {value: 'text-davinci-001', label: 'text-davinci-001'}, {value: 'ada', label: 'ada'}, {value: 'curie-instruct-beta', label: 'curie-instruct-beta'}, {value: 'babbage-code-search-text', label: 'babbage-code-search-text'}, {value: 'babbage-similarity', label: 'babbage-similarity'}, {value: 'whisper-1', label: 'whisper-1'}, {value: 'code-search-babbage-text-001', label: 'code-search-babbage-text-001'}, {value: 'text-curie-001', label: 'text-curie-001'}, {value: 'code-search-babbage-code-001', label: 'code-search-babbage-code-001'}, {value: 'text-ada-001', label: 'text-ada-001'}, {value: 'text-embedding-ada-002', label: 'text-embedding-ada-002'}, {value: 'text-similarity-ada-001', label: 'text-similarity-ada-001'}, {value: 'ada-code-search-code', label: 'ada-code-search-code'}, {value: 'ada-similarity', label: 'ada-similarity'}, {value: 'text-davinci-003', label: 'text-davinci-003'}, {value: 'code-search-ada-text-001', label: 'code-search-ada-text-001'}, {value: 'text-search-ada-query-001', label: 'text-search-ada-query-001'}, {value: 'davinci-search-document', label: 'davinci-search-document'}, {value: 'ada-code-search-text', label: 'ada-code-search-text'}, {value: 'text-search-ada-doc-001', label: 'text-search-ada-doc-001'}, {value: 'davinci-instruct-beta', label: 'davinci-instruct-beta'}, {value: 'text-similarity-curie-001', label: 'text-similarity-curie-001'}, {value: 'code-search-ada-code-001', label: 'code-search-ada-code-001'}, {value: 'ada-search-query', label: 'ada-search-query'}, {value: 'text-search-davinci-query-001', label: 'text-search-davinci-query-001'}, {value: 'curie-search-query', label: 'curie-search-query'}, {value: 'gpt-3.5-turbo-0301', label: 'gpt-3.5-turbo-0301'}, {value: 'davinci-search-query', label: 'davinci-search-query'}, {value: 'babbage-search-document', label: 'babbage-search-document'}, {value: 'ada-search-document', label: 'ada-search-document'}, {value: 'text-search-curie-query-001', label: 'text-search-curie-query-001'}, {value: 'text-search-babbage-doc-001', label: 'text-search-babbage-doc-001'}, {value: 'gpt-3.5-turbo', label: 'gpt-3.5-turbo'}, {value: 'curie-search-document', label: 'curie-search-document'}, {value: 'text-search-curie-doc-001', label: 'text-search-curie-doc-001'}, {value: 'babbage-search-query', label: 'babbage-search-query'}, {value: 'text-babbage-001', label: 'text-babbage-001'}, {value: 'text-search-davinci-doc-001', label: 'text-search-davinci-doc-001'}, {value: 'text-search-babbage-query-001', label: 'text-search-babbage-query-001'}, {value: 'curie-similarity', label: 'curie-similarity'}, {value: 'curie', label: 'curie'}, {value: 'text-similarity-davinci-001', label: 'text-similarity-davinci-001'}, {value: 'text-davinci-002', label: 'text-davinci-002'}, {value: 'davinci-similarity', label: 'davinci-similarity'}, {value: 'cushman:2020-05-03', label: 'cushman:2020-05-03'}, {value: 'ada:2020-05-03', label: 'ada:2020-05-03'}, {value: 'babbage:2020-05-03', label: 'babbage:2020-05-03'}, {value: 'curie:2020-05-03', label: 'curie:2020-05-03'}, {value: 'davinci:2020-05-03', label: 'davinci:2020-05-03'}, {value: 'if-davinci-v2', label: 'if-davinci-v2'}, {value: 'if-curie-v2', label: 'if-curie-v2'}, {value: 'if-davinci:3.0.0', label: 'if-davinci:3.0.0'}, {value: 'davinci-if:3.0.0', label: 'davinci-if:3.0.0'}, {value: 'davinci-instruct-beta:2.0.0', label: 'davinci-instruct-beta:2.0.0'}, {value: 'text-ada:001', label: 'text-ada:001'}, {value: 'text-davinci:001', label: 'text-davinci:001'}, {value: 'text-curie:001', label: 'text-curie:001'}, {value: 'text-babbage:001', label: 'text-babbage:001'}],
         }
     },
@@ -427,13 +428,13 @@ export default {
   padding: 10px;
   line-height: 1.5;
   margin-bottom: 10px;
-  
+  border-radius: 0 0 4px 4px;
 }
 ::v-deep .custom-code-block-dev {
   height: 39px;
   line-height: 39px;
   background-color: #262626;
-  border-radius: 2px;
+  border-radius: 4px 4px 0 0;
   display: flex;
   justify-content: space-between;
 }
@@ -449,6 +450,7 @@ export default {
     cursor: pointer;
     border: none;
     padding-right: 10px;
+    border-radius: 0 4px 0 0;
 }
 ::v-deep .copy-1:hover span {
     background-color: #727272;
@@ -493,10 +495,38 @@ export default {
 }
 .content {
     // padding: 20px;
-    overflow-y: auto;
+    overflow: auto;
     // width: 700px;
     height: 76%;
     margin: 0 auto;
+    scrollbar-width: none;
+    // margin-right: calc(100% - 5vw);
+}
+.content::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none; /* 确保伪元素不遮挡实际内容的点击事件 */
+}
+.content::-webkit-scrollbar {
+  width: 1px!important; /* 设置滚动条宽度 */
+}
+
+.content::-webkit-scrollbar-track {
+  background-color: #373737!important; /* 设置滚动条背景颜色 */
+}
+
+.content::-webkit-scrollbar-thumb {
+  background-color: #cecece!important; /* 设置滚动条滑块颜色 */
+  border-radius: 3px; /* 设置滑块的圆角 */
+  cursor: pointer;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background-color: #eeeded!important; /* 设置滚动条滑块悬停时的颜色 */
 }
 .footer {
     position: relative;
@@ -507,13 +537,14 @@ export default {
 .scoll {
     float: right;
     position: relative;
-    bottom: 16px;
-    right: 18px;
+    bottom: 20%;
+    right: 57px;
     opacity: 0.2;
 }
 .top {
     position: fixed;
-    right: 18px;
+    right: 57px;
+    top: 20%;
     opacity: 0.2;
 }
 .answer-title {
@@ -752,8 +783,8 @@ pre code {
         height: 61%;
     }
 }
-.cursor {
-  background-color: black;
+::v-deep .cursor {
+  background-color: rgb(238, 234, 234);
   width: 1px;
   height: 1em;
   display: inline-block;
