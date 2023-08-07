@@ -45,6 +45,7 @@ export default {
   },
   methods: {
     copy (text) {
+      console.log("copy text >>>", 1111);
       this.$copyText(text).then(() => {
           Message.info('复制成功');
       }, (err) => {
@@ -89,14 +90,24 @@ export default {
             try {
               return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${hljs.highlight(lang, str, true).value} </code></pre>`;
             } catch (err) {
-              console.log("md err >>>", err);
+              console.log("md1 err >>>", err);
             }
-            return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${md.utils.escapeHtml(str)} </code></pre>`;
+            try {
+              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${md.utils.escapeHtml(str)} </code></pre>`;
+            } catch (err) {
+              console.log("md2 err >>>", err);
+            }  
           } else {
             try {
               return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${hljs.highlight("text", str, true).value} </code></pre>`;
-            } catch (__) {}
-            return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(str)} </code></pre>`;
+            } catch (err) {
+              console.log("md3 err >>>", err);
+            }
+            try {
+              return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(str)} </code></pre>`;
+            } catch (err) {
+              console.log("md4 err >>>", err);
+            }
           }
         }
       });
