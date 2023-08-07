@@ -453,8 +453,9 @@ export default {
     border-radius: 0 4px 0 0;
 }
 ::v-deep .copy-1:hover span {
-    background-color: #727272;
-    border-radius: 50%;
+    // background-color: #727272;
+    // border-radius: 50%;
+    color: #727272;
 }
 .chat-frame {
     height: 100%;

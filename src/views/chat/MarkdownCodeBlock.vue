@@ -45,19 +45,11 @@ export default {
   },
   methods: {
     copy (text) {
-      const h = this.$createElement;
       this.$copyText(text).then(() => {
-          Message.info({
-            message: h('p', null, [
-                h('i', { style: 'color: teal' }, '复制成功')
-              ])
-          });
-      }, () => {
-        Message.error({
-            message: h('p', null, [
-                h('i', { style: 'color: teal' }, '复制失败')
-              ])
-          });
+          Message.info('复制成功');
+      }, (err) => {
+        console.log("复制失败 >>>", err);
+        Message.error('复制失败');
       });
     },
     renderCode() {
@@ -96,7 +88,9 @@ export default {
           if (lang && hljs.getLanguage(lang)) {
             try {
               return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${hljs.highlight(lang, str, true).value} </code></pre>`;
-            } catch (__) {}
+            } catch (err) {
+              console.log("md err >>>", err);
+            }
             return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${md.utils.escapeHtml(str)} </code></pre>`;
           } else {
             try {
