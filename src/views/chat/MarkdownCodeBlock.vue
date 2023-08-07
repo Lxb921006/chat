@@ -36,26 +36,32 @@ export default {
     formattedCode() {
       // const md = new MarkdownIt();
       // return md.render(this.code);
-      return this.renderMarkdown2();
+      return this.renderMarkdownUpdate();
     },
   },
   mounted () {
     window.copy = this.copy;
-    this.renderMarkdown2();
+    this.renderMarkdownUpdate();
   },
   methods: {
     copy (text) {
-      console.log("copy text >>>", 1111);
-      this.$copyText(text).then(() => {
+      let newText = text.replace(/kbkbkb/g, '`');
+      console.log(newText);
+      this.$copyText(newText).then(() => {
           Message.info('复制成功');
-      }, (err) => {
+      }).catch((err) => {
         console.log("复制失败 >>>", err);
-        Message.error('复制失败');
+        Message.error('复制失败');;
       });
     },
     renderCode() {
       const md = new MarkdownIt();
       this.renderedCode = md.render(this.code);
+    },
+    escapeHtml(html) {
+      const textArea = document.createElement('textarea');
+      textArea.innerHTML = html;
+      return textArea.value;
     },
     renderMarkdown() {
       // const md = new MarkdownIt();
@@ -82,13 +88,14 @@ export default {
       // this.renderedCode = md.render(this.code);
       return md.render(this.code);
     },
-    renderMarkdown2() {
+    renderMarkdownUpdate() {
+      let that = this;
       // 使用MarkdownIt解析Markdown文本，并进行代码高亮
       const md = new MarkdownIt({
         highlight: function (str, lang) {
           if (lang && hljs.getLanguage(lang)) {
             try {
-              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${hljs.highlight(lang, str, true).value} </code></pre>`;
+              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${hljs.highlight(lang, str, true).value} </code></pre>`;
             } catch (err) {
               console.log("md1 err >>>", err);
             }
