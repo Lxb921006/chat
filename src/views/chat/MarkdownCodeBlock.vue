@@ -45,8 +45,7 @@ export default {
   },
   methods: {
     copy (text) {
-      let newText = text.replace(/kbkbkb/g, '`');
-      console.log(newText);
+      let newText = text.replace(/kbkbkb/g, '`').replace(/jjjj/g, '$');
       this.$copyText(newText).then(() => {
           Message.info('复制成功');
       }).catch((err) => {
@@ -57,11 +56,6 @@ export default {
     renderCode() {
       const md = new MarkdownIt();
       this.renderedCode = md.render(this.code);
-    },
-    escapeHtml(html) {
-      const textArea = document.createElement('textarea');
-      textArea.innerHTML = html;
-      return textArea.value;
     },
     renderMarkdown() {
       // const md = new MarkdownIt();
@@ -89,29 +83,28 @@ export default {
       return md.render(this.code);
     },
     renderMarkdownUpdate() {
-      let that = this;
       // 使用MarkdownIt解析Markdown文本，并进行代码高亮
       const md = new MarkdownIt({
         highlight: function (str, lang) {
           if (lang && hljs.getLanguage(lang)) {
             try {
-              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${hljs.highlight(lang, str, true).value} </code></pre>`;
+              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${hljs.highlight(lang, str, true).value} </code></pre>`;
             } catch (err) {
               console.log("md1 err >>>", err);
             }
             try {
-              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${md.utils.escapeHtml(str)} </code></pre>`;
+              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${md.utils.escapeHtml(str)} </code></pre>`;
             } catch (err) {
               console.log("md2 err >>>", err);
             }  
           } else {
             try {
-              return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${hljs.highlight("text", str, true).value} </code></pre>`;
+              return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${hljs.highlight("text", str, true).value} </code></pre>`;
             } catch (err) {
               console.log("md3 err >>>", err);
             }
             try {
-              return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(str)} </code></pre>`;
+              return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(str)} </code></pre>`;
             } catch (err) {
               console.log("md4 err >>>", err);
             }

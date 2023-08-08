@@ -6,6 +6,83 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "8341781",
+      "name": "播放",
+      "font_class": "bofang",
+      "unicode": "e63a",
+      "unicode_decimal": 58938
+    },
+    {
+      "icon_id": "9874517",
+      "name": "KHCFDC_设置",
+      "font_class": "shezhi",
+      "unicode": "e6d8",
+      "unicode_decimal": 59096
+    },
+    {
+      "icon_id": "25739954",
+      "name": "设 置",
+      "font_class": "a-shezhi",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "36762596",
+      "name": "设置",
+      "font_class": "shezhi1",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "2402857",
+      "name": "省略号",
+      "font_class": "shenglvehao",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    },
+    {
+      "icon_id": "6434797",
+      "name": "省略号",
+      "font_class": "shenglvehao1",
+      "unicode": "ebb0",
+      "unicode_decimal": 60336
+    },
+    {
+      "icon_id": "10227412",
+      "name": "省略号",
+      "font_class": "shenglvehao2",
+      "unicode": "e677",
+      "unicode_decimal": 58999
+    },
+    {
+      "icon_id": "36252406",
+      "name": "省略号-copy",
+      "font_class": "shenglvehao3",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "17624367",
+      "name": "收缩",
+      "font_class": "shousuo2",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "22069746",
+      "name": "收缩",
+      "font_class": "shousuo3",
+      "unicode": "e678",
+      "unicode_decimal": 59000
+    },
+    {
+      "icon_id": "28514764",
+      "name": "wmf-common43",
+      "font_class": "wmf-common43",
+      "unicode": "e8e1",
+      "unicode_decimal": 59617
+    },
+    {
       "icon_id": "5237977",
       "name": "向上",
       "font_class": "tubiao-",

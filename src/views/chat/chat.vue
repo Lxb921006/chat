@@ -40,58 +40,102 @@
         </div>
         <div class="main">
             <div class="top">
-                <el-button circle mini @click="juamTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
+                <el-button circle mini @click="scrollToTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
             </div>
             <transition name="el-zoom-in-top">
                 <div class="models" v-show="mh">
-                    <svg class="icon" aria-hidden="true" @click="showAside()">
-                        <use xlink:href="#icon-caidan-shousuo"></use>
+                    <svg class="icon ss-aside" aria-hidden="true" @click="showAside()">
+                        <use xlink:href="#icon-wmf-common43"></use>
                     </svg>
                 </div>
             </transition>
-            <div class="content">
+            <div class="content"  ref="content">
                 <template v-if="show">
                     <div v-for="(data1, index1) in chatCache" :key="index1+1">
+                        <!-- <markdown-code-block :code="data1.title" :cursor="data1.cursor"></markdown-code-block> -->
                         <h2 class="answer-title" :id=data1.id>
                             <p class="question" ref="title">
                                 <svg class="icon-qa" aria-hidden="true">
                                     <use xlink:href="#icon-changjianwenti"></use>
                                 </svg>
-                                {{ data1.title }}
+                                {{ data1.title }}  <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
                             </p>
                         </h2>
                         <div class="answer-loop">
                             <svg class="icon-qa-2" aria-hidden="true">
                                 <use xlink:href="#icon-cankaodaan"></use>
                             </svg>
+                            <!-- 自定义的代码高亮显示组件 -->
                             <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor"></markdown-code-block>
                             <transition name="el-zoom-in-center">
-                                <i class="el-icon-time time-2" v-show="data1.timeShow">{{ data1.time }}</i>
+                                <div class="show-time" v-show="data1.timeShow">
+                                    <i class="el-icon-time time-2">{{ data1.time }}</i>
+                                    <div class="whole-answer">
+                                        <el-dropdown>
+                                            <span class="el-dropdown-link">
+                                                <svg class="icon" aria-hidden="true">
+                                                    <use xlink:href="#icon-shenglvehao"></use>
+                                                </svg>
+                                            </span>
+                                            <el-dropdown-menu slot="dropdown">
+                                                <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer.join(''))">复制整个对话</el-dropdown-item>
+                                                <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.id)">删改该对话</el-dropdown-item>
+                                            </el-dropdown-menu>
+                                        </el-dropdown>
+                                    </div>
+                                </div>
                             </transition>
                         </div>
                     </div>
                 </template>
+            </div>
+            <div class="stop">
+                <transition name="el-zoom-in-center">
+                    <el-button :style="{ visibility: stopResp ? 'visible' : 'hidden' }" round class="stop-b" @click="stopChat()" ><span class="iconfont icon-lujing"></span> 停止</el-button>
+                </transition>
             </div>
             <div class="scoll">
                 <el-button circle mini @click="footer()"><span class="iconfont icon-cs-dw-xx-1"></span></el-button>
             </div>
             <el-divider></el-divider>
             <div class="footer list-group"  id="sortable">
-                <div class="stop">
-                    <transition name="el-zoom-in-center">
-                        <el-button round class="stop-b" @click="stopChat()" v-show="stopResp"><span class="iconfont icon-lujing"></span> 停止</el-button>
-                    </transition>
+                <div class="setting">
+                    <el-popover
+                        placement="right-start"
+                        title="设置"
+                        width="200"
+                        trigger="click"
+                        >
+                        <el-row :gutter="10">
+                            <el-col :span="1" class="context-switch">是否开启上下文: </el-col>
+                            <el-col :span="1">
+                                <el-switch
+                                    @change="isOpenContext()"
+                                    v-model="contextSwitch"
+                                    active-color="#13ce66"
+                                    inactive-color="#ff4949">
+                                </el-switch>
+                            </el-col>
+                        </el-row>
+                        <el-button slot="reference">
+                            <svg class="icon sessing-svg" aria-hidden="true">
+                                <use xlink:href="#icon-shezhi"></use>
+                            </svg>
+                        </el-button>
+                    </el-popover>
                 </div>
-                <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
-                    <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
-                </el-input>
+                <div class="send-question">
+                    <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
+                        <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
+                    </el-input>
+                </div>
             </div>
             <div class="notice">
                 <p>*仅供学习, 无任何其他用途*</p>
             </div>
         </div>
+        
     </div>
-    
 </template>
 
 <script>
@@ -122,8 +166,10 @@ export default {
             socket: null,
             chatLoad: true,
             show: false,
-            mh: false,
+            mh: true,
             ash: true,
+            contextSwitch: "",
+            showAsideView: false,
             id: 0,
             wsUrl: "",
             editableTabsValue: '',
@@ -151,12 +197,17 @@ export default {
         })
     },
     components: {
-        // VueCodeHighlight,
-        // VueDraggableResizable 拖拽
-        // CodeBlock,
         MarkdownCodeBlock
     },
     methods: {
+        scrollToTop() {
+            console.log(this.$refs.content);
+            const contentElement = this.$refs.content;
+            contentElement.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        },
         stopChat(){
             if (this.socket) {
                 this.close();
@@ -206,30 +257,30 @@ export default {
             }
         },
         showAside() {
-            const mainEl = document.querySelector('.main');
             const asideEl = document.querySelector('.aside');
             const asideSt = getComputedStyle(asideEl);
             if (asideSt.display == 'none') {
                 document.querySelector(".aside").setAttribute("style", "display:block");
                 document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px)");
-                this.but1Icon = "el-icon-arrow-right";
+                // this.but1Icon = "el-icon-arrow-right";
             } else {
                 document.querySelector(".aside").setAttribute("style", "display:none");
                 document.querySelector(".main").setAttribute("style", "width:100%");
-                this.but1Icon = "el-icon-arrow-left";
+                // this.but1Icon = "el-icon-arrow-left";
+            }
+        },
+        defaultHideAside() {
+            if (!this.showAsideView) {
+                document.querySelector(".aside").setAttribute("style", "display:none");
+                document.querySelector(".main").setAttribute("style", "width:100%");
             }
         },
         showModels () {
             this.mh = true;
         },
-        copy (text) {
-            // this.show2 = false;
-            // let that = this;
-            // setTimeout(function(){
-            //     that.show2 = true;
-            // },3000)
+        copyAll (text) {
             this.$copyText(text).then(() => {
-                Message.success("已复制");
+                Message.info("已复制");
             }, () => {
                 Message.error('复制失败');
             })
@@ -294,6 +345,25 @@ export default {
         error () {
             Message.error("websocket连接失败")
         },
+        checkContextStatus() {
+            let contextSwitch = sessionStorage.getItem('oc');
+            if (contextSwitch == 1) {
+                this.contextSwitch = true;
+            } else if (contextSwitch == 2) {
+                this.contextSwitch = false;
+            } else {
+                this.contextSwitch = true;
+            }
+        },
+        isOpenContext() {
+            if (this.contextSwitch) {
+                Message.success('对话已启用上下文关联');
+                sessionStorage.setItem("oc", 1);
+            } else {
+                Message.error('对话已禁用上下文关联');
+                sessionStorage.setItem("oc", 2);
+            }
+        },
         getMessage (msg) {
             let jd = JSON.parse(msg.data);
             let div = document.querySelector(".content")
@@ -310,18 +380,24 @@ export default {
             let sendData = {};
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            if (cacheData.length > 1) {
-                lastData = cacheData[cacheData.length - 2];
-                sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent};
+            if (this.contextSwitch) {
+                if (cacheData.length > 1) {
+                //发送的信息关联上下文
+                    lastData = cacheData[cacheData.length - 2];
+                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent};
+                } else {
+                    // lastData = cacheData[cacheData.length];
+                    sendData = {cid: "", pid: "", data: this.chatContent};
+                }
             } else {
-                lastData = cacheData[cacheData.length];
                 sendData = {cid: "", pid: "", data: this.chatContent};
             }
+            
             this.socket.send(JSON.stringify(sendData));
         },
         close () {
             this.finished = false;
-            this.mh = false;
+            // this.mh = false;
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
@@ -344,20 +420,34 @@ export default {
             clearInterval(this.clearS);
         },
         footer () {
-            let content = document.getElementsByClassName('content')[0]
+            let tab = document.getElementsByClassName('tab')[0];
+            let content = document.getElementsByClassName('content')[0];
             if(content.scrollHeight > content.clientHeight) {
                 setTimeout(function(){
                     //设置滚动条到最底部
                     content.scrollTop = content.scrollHeight;
                 },0);
+                setTimeout(function(){
+                    //设置滚动条到最底部
+                    tab.scrollTop = tab.scrollHeight;
+                },0);
             }
         },
         juamTop() {
             let content = document.getElementsByClassName('content')[0]
+            let tab = document.getElementsByClassName('tab')[0];
             if(content.scrollHeight > content.clientHeight) {
+                
                 setTimeout(function(){
-                    //设置滚动条到最底部
+                    //设置滚动条到最顶部
                     content.scrollTop = 0;
+                    content.behavior = "smooth";
+                },0);
+                setTimeout(function(){
+                    //设置滚动条到最顶部
+                    tab.scrollTop = 0;
+                    tab.behavior = "smooth";
+                    
                 },0);
             }
         },
@@ -415,7 +505,9 @@ export default {
         if (window.innerWidth < 600) {
             this.ash = false;
         }
+        this.checkContextStatus();
         this.getAllChatData();
+        this.defaultHideAside();
     },
     created () {
     }
@@ -423,6 +515,62 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.ss-aside:hover {
+    color: #585858;
+}
+.context-switch {
+    width: 120px;
+}
+::v-deep .el-popover__reference-wrapper button {
+    background-color: #262626;
+    border: none;
+}
+.setting {
+    position: relative;
+    bottom: 15px;
+}
+.sessing-svg {
+    font-size: 15px;
+    animation: rotate 16s linear infinite;
+
+}
+@keyframes rotate {
+    from {
+    transform: rotate(0deg);
+    }
+    to {
+    transform: rotate(360deg);
+    }
+}
+.copy-title {
+    cursor: pointer;
+    position: relative;
+    top: 1px;
+    left: 13px;
+    font-size: 10px;
+}
+.copy-title:hover {
+    color: #727272;
+}
+.show-time {
+    width: 659px;
+    margin: 0 auto;
+}
+.whole-answer {
+    white-space: pre-wrap;
+    display: inline-block;
+    margin: 10px auto;
+    /* width: 659px; */
+    position: relative;
+    bottom: 68px;
+    color: #fff;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 0 11px 0px 11px;
+    /* padding-left: 5px; */
+    font-size: 12px;
+    cursor: pointer;
+}
 ::v-deep .custom-code-block {
   background-color: #2e2e2e;
   padding: 10px;
@@ -533,7 +681,7 @@ export default {
     position: relative;
     width: 571px;
     margin: 0 auto;
-    
+    top: 16px
 }
 .scoll {
     float: right;
@@ -587,6 +735,9 @@ export default {
 .delete {
     z-index: 100000000;
 }
+.delete:hover {
+    color: #af6060;
+}
 .copy {
     position: relative;
     width: 681px;
@@ -615,15 +766,15 @@ export default {
 }
 .time-2 {
     white-space: pre-wrap;
-    display: block;
+    display: inline-block;
     margin: 10px auto;
-    width: 659px;
+    /* width: 659px; */
     position: relative;
     bottom: 76px;
     color: #fff;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-    padding: 0 11px 0px 11px;
+    /* padding: 0 11px 0px 11px; */
     font-size: 12px;
 }
 .icon-qa {
@@ -728,7 +879,8 @@ pre code {
     width: 70%;
 }
 .stop {
-    margin-bottom: 10px;
+    margin-top: 7px;
+    visibility: visible;
 }
 .stop-b {
     width: 100px;
@@ -750,7 +902,9 @@ pre code {
     cursor: pointer;
     position: relative;
     right: 4px;
-    bottom: 5px;
+    bottom: 0px;
+    // top: 5px;
+    color: #fff;
 }
 
 //适应手机
@@ -806,6 +960,7 @@ pre code {
 // element-ui的css修改
 :deep .el-divider {
     background-color: #424242;
+    margin: 7px 0;
 }
 :deep .el-tabs__nav {
     float: none;

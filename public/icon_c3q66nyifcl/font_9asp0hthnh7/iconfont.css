@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4197599 */
-  src: url('iconfont.woff2?t=1691334578050') format('woff2'),
-       url('iconfont.woff?t=1691334578050') format('woff'),
-       url('iconfont.ttf?t=1691334578050') format('truetype');
+  src: url('iconfont.woff2?t=1691478225844') format('woff2'),
+       url('iconfont.woff?t=1691478225844') format('woff'),
+       url('iconfont.ttf?t=1691478225844') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,50 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bofang:before {
+  content: "\e63a";
+}
+
+.icon-shezhi:before {
+  content: "\e6d8";
+}
+
+.icon-a-shezhi:before {
+  content: "\e607";
+}
+
+.icon-shezhi1:before {
+  content: "\e608";
+}
+
+.icon-shenglvehao:before {
+  content: "\e625";
+}
+
+.icon-shenglvehao1:before {
+  content: "\ebb0";
+}
+
+.icon-shenglvehao2:before {
+  content: "\e677";
+}
+
+.icon-shenglvehao3:before {
+  content: "\e606";
+}
+
+.icon-shousuo2:before {
+  content: "\e604";
+}
+
+.icon-shousuo3:before {
+  content: "\e678";
+}
+
+.icon-wmf-common43:before {
+  content: "\e8e1";
 }
 
 .icon-tubiao-:before {
