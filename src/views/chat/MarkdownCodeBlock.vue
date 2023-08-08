@@ -1,7 +1,8 @@
 <template>
   <div ref="html">
       <pre>
-        <code v-html="formattedCode" class="code"></code>
+        <code ref="contentContainer"  v-html="formattedCode" class="code"></code>
+        <!-- <span class="cursor" v-show="true"></span> -->
       </pre>
   </div>
 </template>
@@ -14,6 +15,7 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/stackoverflow-dark.css';
 // import 'highlight.js/styles/tomorrow-night-blue.css';
 // import 'highlight.js/styles/tomorrow-night-bright.css';
+// import VueHighlightJS from 'vue-highlight';
 
 export default {
   props: {
@@ -29,19 +31,18 @@ export default {
   data() {
     return {
       renderedCode: '',
-      language: '',
     };
   },
   computed: {
     formattedCode() {
       // const md = new MarkdownIt();
       // return md.render(this.code);
-      return this.renderMarkdownUpdate();
+      return this.renderMarkdown();
     },
   },
   mounted () {
     window.copy = this.copy;
-    this.renderMarkdownUpdate();
+    this.renderMarkdown();
   },
   methods: {
     copy (text) {
@@ -71,12 +72,20 @@ export default {
       });
       md.renderer.rules.fence = (tokens, idx) => {
         const token = tokens[idx];
-        const lang = token.info.trim();
+        let lang = token.info.trim();
+        let langOld = lang;
         const code = token.content.trim();
         if (lang) {
-          return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)}</code></pre>`;
+          if (lang == "vue") {
+            lang = "javascript";
+          }
+          try {
+            return `<div class="custom-code-block-dev"><p>${langOld}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${hljs.highlight(lang, code).value} </code></pre>`;
+          } catch (err) {
+            return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)} </code></pre>`;
+          }
         } else {
-          return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code)}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)}</code></pre>`;
+          return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)} </code></pre>`;
         }
       };
       // this.renderedCode = md.render(this.code);

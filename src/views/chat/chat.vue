@@ -40,7 +40,7 @@
         </div>
         <div class="main">
             <div class="top">
-                <el-button circle mini @click="scrollToTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
+                <el-button circle mini @click="juamTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
             </div>
             <transition name="el-zoom-in-top">
                 <div class="models" v-show="mh">
@@ -49,7 +49,7 @@
                     </svg>
                 </div>
             </transition>
-            <div class="content"  ref="content">
+            <div class="content" ref="wrapper">
                 <template v-if="show">
                     <div v-for="(data1, index1) in chatCache" :key="index1+1">
                         <!-- <markdown-code-block :code="data1.title" :cursor="data1.cursor"></markdown-code-block> -->
@@ -95,7 +95,7 @@
                 </transition>
             </div>
             <div class="scoll">
-                <el-button circle mini @click="footer()"><span class="iconfont icon-cs-dw-xx-1"></span></el-button>
+                <el-button circle mini @click="jumpFooter()"><span class="iconfont icon-cs-dw-xx-1"></span></el-button>
             </div>
             <el-divider></el-divider>
             <div class="footer list-group"  id="sortable">
@@ -145,6 +145,7 @@ import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './MarkdownCodeBlock';
+// import BScroll from '@better-scroll/core'
 
 export default {
     name: "chat",
@@ -200,14 +201,6 @@ export default {
         MarkdownCodeBlock
     },
     methods: {
-        scrollToTop() {
-            console.log(this.$refs.content);
-            const contentElement = this.$refs.content;
-            contentElement.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        },
         stopChat(){
             if (this.socket) {
                 this.close();
@@ -419,7 +412,7 @@ export default {
             this.stopResp = false;
             clearInterval(this.clearS);
         },
-        footer () {
+        jumpFooter () {
             let tab = document.getElementsByClassName('tab')[0];
             let content = document.getElementsByClassName('content')[0];
             if(content.scrollHeight > content.clientHeight) {
@@ -483,7 +476,7 @@ export default {
         },
         jump(id) {
             location.hash = "#" + id;
-            document.getElementById(id).setAttribute("style", "color: #9fbb91;");
+            document.getElementById(id).setAttribute("style", "color: #d9d04b;");
         }
     },
     filters: {
@@ -524,13 +517,15 @@ export default {
 ::v-deep .el-popover__reference-wrapper button {
     background-color: #262626;
     border: none;
+    width: 30px;
+    height: 30px;
 }
 .setting {
     position: relative;
     bottom: 15px;
 }
 .sessing-svg {
-    font-size: 15px;
+    font-size: 11px;
     animation: rotate 16s linear infinite;
 
 }
@@ -940,7 +935,7 @@ pre code {
 }
 ::v-deep .cursor {
   background-color: rgb(238, 234, 234);
-  width: 1px;
+  width: 10px;
   height: 1em;
   display: inline-block;
   margin-left: 1px;
