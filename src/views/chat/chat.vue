@@ -39,11 +39,11 @@
             </div>
         </div>
         <div class="main">
-            <div class="top">
+            <div class="jump-top">
                 <el-button circle mini @click="juamTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
             </div>
             <transition name="el-zoom-in-top">
-                <div class="models" v-show="mh">
+                <div class="collapse-aside" v-show="mh">
                     <svg class="icon ss-aside" aria-hidden="true" @click="showAside()">
                         <use xlink:href="#icon-wmf-common43"></use>
                     </svg>
@@ -62,13 +62,15 @@
                             </p>
                         </h2>
                         <div class="answer-loop">
-                            <svg class="icon-qa-2" aria-hidden="true">
-                                <use xlink:href="#icon-cankaodaan"></use>
-                            </svg>
+                            <div class="answer-icon">
+                                <svg class="icon-qa-2" aria-hidden="true">
+                                    <use xlink:href="#icon-cankaodaan"></use>
+                                </svg>
+                            </div>
                             <!-- 自定义的代码高亮显示组件 -->
                             <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor"></markdown-code-block>
                             <transition name="el-zoom-in-center">
-                                <div class="show-time" v-show="data1.timeShow">
+                                <div class="finished-time" v-show="data1.timeShow">
                                     <i class="el-icon-time time-2">{{ data1.time }}</i>
                                     <div class="whole-answer">
                                         <el-dropdown>
@@ -94,7 +96,7 @@
                     <el-button :style="{ visibility: stopResp ? 'visible' : 'hidden' }" round class="stop-b" @click="stopChat()" ><span class="iconfont icon-lujing"></span> 停止</el-button>
                 </transition>
             </div>
-            <div class="scoll">
+            <div class="jump-bottom">
                 <el-button circle mini @click="jumpFooter()"><span class="iconfont icon-cs-dw-xx-1"></span></el-button>
             </div>
             <el-divider></el-divider>
@@ -106,12 +108,23 @@
                         width="200"
                         trigger="click"
                         >
-                        <el-row :gutter="10">
+                        <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="context-switch">是否开启上下文: </el-col>
                             <el-col :span="1">
                                 <el-switch
                                     @change="isOpenContext()"
                                     v-model="contextSwitch"
+                                    active-color="#13ce66"
+                                    inactive-color="#ff4949">
+                                </el-switch>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="10" class="set-item">
+                            <el-col :span="1" class="context-switch">是否开启白天模式: </el-col>
+                            <el-col :span="1">
+                                <el-switch
+                                    @change="isOpenDay()"
+                                    v-model="dnSwitch"
                                     active-color="#13ce66"
                                     inactive-color="#ff4949">
                                 </el-switch>
@@ -125,9 +138,11 @@
                     </el-popover>
                 </div>
                 <div class="send-question">
-                    <el-input clearable v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
-                        <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
-                    </el-input>
+                    <div class="send-input">
+                        <el-input clearable  v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
+                            <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
+                        </el-input>
+                    </div>
                 </div>
             </div>
             <div class="notice">
@@ -144,7 +159,7 @@ import { mapState } from 'vuex'
 import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
-import MarkdownCodeBlock from './MarkdownCodeBlock';
+import MarkdownCodeBlock from './markdownCodeBlock';
 // import BScroll from '@better-scroll/core'
 
 export default {
@@ -170,6 +185,7 @@ export default {
             mh: true,
             ash: true,
             contextSwitch: "",
+            dnSwitch: false,
             showAsideView: false,
             id: 0,
             wsUrl: "",
@@ -353,9 +369,39 @@ export default {
                 Message.success('对话已启用上下文关联');
                 sessionStorage.setItem("oc", 1);
             } else {
-                Message.error('对话已禁用上下文关联');
+                Message.warning('对话已禁用上下文关联');
                 sessionStorage.setItem("oc", 2);
             }
+        },
+        isOpenDay() {
+            const main = document.querySelector(".main");
+            const aside = document.querySelector(".ss-aside");
+            const answerTitle = document.querySelector(".answer-title");
+            const answerLoop = document.querySelector(".answer-loop");
+            const code = document.querySelector(".code");
+            const codeP = document.querySelectorAll('code p')
+            if (this.dnSwitch) {
+                main.style.backgroundColor = "#fff"
+                aside.style.color = "#fff"
+                answerTitle.style.backgroundColor = "#fff"
+                answerTitle.style.color = "#262626"
+                answerLoop.style.backgroundColor = "#fff"
+                code.style.backgroundColor = "#fff"
+                codeP.forEach(paragraph => {
+                    paragraph.classList.add('code-day');
+                });
+            } else {
+                main.style.backgroundColor = "#262626"
+                aside.style.color = "#262626"
+                answerTitle.style.backgroundColor = "#262626"
+                answerTitle.style.color = "#fff"
+                answerLoop.style.backgroundColor = "#373737"
+                code.style.backgroundColor = "#373737"
+                codeP.forEach(paragraph => {
+                    paragraph.classList.remove('code-day');
+                });
+            }
+            
         },
         getMessage (msg) {
             let jd = JSON.parse(msg.data);
@@ -434,13 +480,10 @@ export default {
                 setTimeout(function(){
                     //设置滚动条到最顶部
                     content.scrollTop = 0;
-                    content.behavior = "smooth";
                 },0);
                 setTimeout(function(){
                     //设置滚动条到最顶部
                     tab.scrollTop = 0;
-                    tab.behavior = "smooth";
-                    
                 },0);
             }
         },
@@ -477,6 +520,7 @@ export default {
         jump(id) {
             location.hash = "#" + id;
             document.getElementById(id).setAttribute("style", "color: #d9d04b;");
+            const main = document.querySelector(".main");
         }
     },
     filters: {
@@ -508,11 +552,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .code-day {
+    color: #262626
+}
+.set-item-1 {
+    border-top: 1px solid #e5e5e5;
+    padding-top: 14px;
+}
+.set-item {
+    margin-top: 15px;
+}
 .ss-aside:hover {
     color: #585858;
 }
 .context-switch {
-    width: 120px;
+    width: 128px;
 }
 ::v-deep .el-popover__reference-wrapper button {
     background-color: #262626;
@@ -545,25 +599,27 @@ export default {
     font-size: 10px;
 }
 .copy-title:hover {
-    color: #727272;
+    color: #999999;
 }
-.show-time {
+.finished-time {
     width: 659px;
     margin: 0 auto;
+    position: relative;
+    margin-top: -29px;
 }
 .whole-answer {
     white-space: pre-wrap;
     display: inline-block;
-    margin: 10px auto;
+    /* margin: 10px auto; */
     /* width: 659px; */
-    position: relative;
+    /* position: relative; */
     bottom: 68px;
     color: #fff;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+    /* border-bottom-left-radius: 5px; */
+    /* border-bottom-right-radius: 5px; */
     padding: 0 11px 0px 11px;
     /* padding-left: 5px; */
-    font-size: 12px;
+    /* font-size: 12px; */
     cursor: pointer;
 }
 ::v-deep .custom-code-block {
@@ -571,13 +627,13 @@ export default {
   padding: 10px;
   line-height: 1.5;
   margin-bottom: 10px;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 11px 11px;
 }
 ::v-deep .custom-code-block-dev {
-  height: 39px;
-  line-height: 39px;
+  height: 49px;
+  line-height: 49px;
   background-color: #262626;
-  border-radius: 4px 4px 0 0;
+  border-radius: 11px 11px 0 0;
   display: flex;
   justify-content: space-between;
 }
@@ -593,7 +649,7 @@ export default {
     cursor: pointer;
     border: none;
     padding-right: 10px;
-    border-radius: 0 4px 0 0;
+    border-radius: 0 11px 0 0;
 }
 ::v-deep .copy-1:hover span {
     // background-color: #727272;
@@ -678,31 +734,33 @@ export default {
     margin: 0 auto;
     top: 16px
 }
-.scoll {
+.jump-bottom {
     float: right;
     position: relative;
     bottom: 20%;
     right: 57px;
     opacity: 0.2;
 }
-.top {
+.jump-top {
     position: fixed;
     right: 57px;
     top: 20%;
     opacity: 0.2;
+    z-index: 100000;
 }
 .answer-title {
-    // height: 80px;
     margin: 0 auto;
-    // background-color: #fff;
     border-radius: 3px;
-    line-height: 2.3;
+    line-height: 78px;
+    height: 78px;
     font-size: 1rem;
+    font-weight: 900;
     color: #fff;
     overflow-y: auto;
-    // white-space: nowrap;
-    padding: 0 11px;
+    /* padding: 0 11px; */
     width: 659px;
+    // background-color: #fbfbfb;
+    // color: #413e3e;
 }
 .answer-title::-webkit-scrollbar {
     display: none;
@@ -760,17 +818,22 @@ export default {
     // font-style: oblique;
 }
 .time-2 {
-    white-space: pre-wrap;
+    // white-space: pre-wrap; 
     display: inline-block;
-    margin: 10px auto;
-    /* width: 659px; */
     position: relative;
+    top: -8px;
+    bottom: 1px;
+    /* margin: 10px auto; */
+    /* width: 659px; */
+    /* position: relative; */
     bottom: 76px;
     color: #fff;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    /* padding: 0 11px 0px 11px; */
+    /* border-bottom-left-radius: 5px; */
+    /* border-bottom-right-radius: 5px; */
+    padding: 0 0 0px 0;
+    /* padding-bottom: 4px; */
     font-size: 12px;
+    color: #009844!important;
 }
 .icon-qa {
     width: 2em;
@@ -846,7 +909,12 @@ export default {
     height: 58px;
     width: 57px;
 }
-.models {
+::v-deep .data-load i {
+    position: relative;
+    right: 7px;
+    font-size: 2em;
+}
+.collapse-aside {
     position: fixed;
     // top: 11px;
     z-index: 1000;

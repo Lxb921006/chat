@@ -1,8 +1,8 @@
 <template>
-  <div ref="html">
+  <div ref="html" class="box">
       <pre>
-        <code ref="contentContainer"  v-html="formattedCode" class="code"></code>
-        <!-- <span class="cursor" v-show="true"></span> -->
+        <code v-html="formattedCode" class="code"></code>
+        <!-- <span class="cursor"></span> -->
       </pre>
   </div>
 </template>
@@ -11,11 +11,10 @@
 import MarkdownIt from 'markdown-it';
 import { Message } from 'element-ui'
 import hljs from 'highlight.js';
-// import 'highlight.js/styles/monokai.css';
 import 'highlight.js/styles/stackoverflow-dark.css';
+// import 'highlight.js/styles/monokai.css'; // 高亮样式
 // import 'highlight.js/styles/tomorrow-night-blue.css';
 // import 'highlight.js/styles/tomorrow-night-bright.css';
-// import VueHighlightJS from 'vue-highlight';
 
 export default {
   props: {
@@ -48,9 +47,8 @@ export default {
     copy (text) {
       let newText = text.replace(/kbkbkb/g, '`').replace(/jjjj/g, '$');
       this.$copyText(newText).then(() => {
-          Message.info('复制成功');
+          Message.info('已复制到剪贴板');
       }).catch((err) => {
-        console.log("复制失败 >>>", err);
         Message.error('复制失败');;
       });
     },
@@ -59,7 +57,6 @@ export default {
       this.renderedCode = md.render(this.code);
     },
     renderMarkdown() {
-      // const md = new MarkdownIt();
       const md = new MarkdownIt({
         highlight: function (code, lang) {
           if (lang && hljs.getLanguage(lang)) {
@@ -76,7 +73,7 @@ export default {
         let langOld = lang;
         const code = token.content.trim();
         if (lang) {
-          if (lang == "vue") {
+          if (lang == "vue") { // 没有找到对vue.js的代码高亮支持，只能匹配到vue就让它显示js的高亮
             lang = "javascript";
           }
           try {
@@ -88,7 +85,6 @@ export default {
           return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)} </code></pre>`;
         }
       };
-      // this.renderedCode = md.render(this.code);
       return md.render(this.code);
     },
     renderMarkdownUpdate() {
@@ -129,6 +125,13 @@ export default {
 </script>
 
 <style scoped>
+.code-day {
+    color: #262626
+}
+.box {
+  position: relative;
+  margin-top: -31px;
+}
 .custom-code-block {
   background-color: #2e2e2e;
   padding: 10px;
@@ -149,19 +152,20 @@ export default {
   white-space: pre-wrap;
 }
 .code {
-    white-space: pre-wrap;
+  white-space: pre-wrap;
     display: block;
     margin: 0 auto;
     width: 659px;
     position: relative;
-    bottom: 30px;
+    /* bottom: 30px; */
     color: #fff;
     background-color: #373737;
     /* background-color: #373737; */
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
-    padding: 0 11px 5px 11px;
+    padding: 0 11px 0px 11px;
     font-size: 14px;
+    line-height: 1.5;
 }
 .title-block {
   white-space: pre-wrap;
@@ -177,5 +181,7 @@ export default {
     padding: 0 11px 5px 11px;
     font-size: 14px;
 }
-
+.code-day {
+    color: #262626
+}
 </style>

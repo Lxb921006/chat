@@ -6,6 +6,48 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "8788631",
+      "name": "0底部导航栏-46",
+      "font_class": "dibudaohanglan-",
+      "unicode": "e637",
+      "unicode_decimal": 58935
+    },
+    {
+      "icon_id": "12090089",
+      "name": "导航",
+      "font_class": "daohang",
+      "unicode": "e62e",
+      "unicode_decimal": 58926
+    },
+    {
+      "icon_id": "19317203",
+      "name": "导航",
+      "font_class": "daohang1",
+      "unicode": "f06f",
+      "unicode_decimal": 61551
+    },
+    {
+      "icon_id": "3386803",
+      "name": "删除",
+      "font_class": "shanchu",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
+      "icon_id": "3876781",
+      "name": "删除",
+      "font_class": "delete",
+      "unicode": "e60d",
+      "unicode_decimal": 58893
+    },
+    {
+      "icon_id": "10005060",
+      "name": "删除",
+      "font_class": "shanchu1",
+      "unicode": "e639",
+      "unicode_decimal": 58937
+    },
+    {
       "icon_id": "8341781",
       "name": "播放",
       "font_class": "bofang",
