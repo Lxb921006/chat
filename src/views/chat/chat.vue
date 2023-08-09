@@ -376,27 +376,48 @@ export default {
         isOpenDay() {
             const main = document.querySelector(".main");
             const aside = document.querySelector(".ss-aside");
-            const answerTitle = document.querySelector(".answer-title");
-            const answerLoop = document.querySelector(".answer-loop");
-            const code = document.querySelector(".code");
+            const answerTitle = document.querySelectorAll(".answer-title");
+            const answerLoop = document.querySelectorAll(".answer-loop");
+            const code = document.querySelectorAll(".code");
             const codeP = document.querySelectorAll('code p')
             if (this.dnSwitch) {
                 main.style.backgroundColor = "#fff"
-                aside.style.color = "#fff"
-                answerTitle.style.backgroundColor = "#fff"
-                answerTitle.style.color = "#262626"
-                answerLoop.style.backgroundColor = "#fff"
-                code.style.backgroundColor = "#fff"
+                aside.style.color = "#262626"
+
+                answerTitle.forEach(paragraph => {
+                    paragraph.style.backgroundColor = "#fff";
+                    paragraph.style.color = "#262626";
+                });
+                
+                answerLoop.forEach(paragraph => {
+                    paragraph.style.backgroundColor = "#fff";
+                });
+
+                code.forEach(paragraph => {
+                    paragraph.style.backgroundColor = "#fff";
+                });
+
                 codeP.forEach(paragraph => {
                     paragraph.classList.add('code-day');
                 });
+
             } else {
-                main.style.backgroundColor = "#262626"
-                aside.style.color = "#262626"
-                answerTitle.style.backgroundColor = "#262626"
-                answerTitle.style.color = "#fff"
-                answerLoop.style.backgroundColor = "#373737"
-                code.style.backgroundColor = "#373737"
+                main.style.backgroundColor = "#262626";
+                aside.style.color = "#fff";
+
+                answerTitle.forEach(paragraph => {
+                    paragraph.style.backgroundColor = "#262626";
+                    paragraph.style.color = "#fff";
+                });
+
+                answerLoop.forEach(paragraph => {
+                    paragraph.style.backgroundColor = "#373737";
+                });
+
+                code.forEach(paragraph => {
+                    paragraph.style.backgroundColor = "#373737";
+                });
+
                 codeP.forEach(paragraph => {
                     paragraph.classList.remove('code-day');
                 });
@@ -520,7 +541,6 @@ export default {
         jump(id) {
             location.hash = "#" + id;
             document.getElementById(id).setAttribute("style", "color: #d9d04b;");
-            const main = document.querySelector(".main");
         }
     },
     filters: {
