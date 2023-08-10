@@ -185,7 +185,7 @@ import { mapState } from 'vuex'
 import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
-import MarkdownCodeBlock from './markdownCodeBlock';
+import MarkdownCodeBlock from './markdownBlock';
 // import BScroll from '@better-scroll/core'
 
 export default {
