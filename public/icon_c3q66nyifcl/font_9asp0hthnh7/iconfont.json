@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "17122697",
+      "name": "提示",
+      "font_class": "tishi",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "20416120",
+      "name": "提示",
+      "font_class": "tishi1",
+      "unicode": "ed02",
+      "unicode_decimal": 60674
+    },
+    {
+      "icon_id": "26797094",
+      "name": "提示",
+      "font_class": "tishi2",
+      "unicode": "10088",
+      "unicode_decimal": 65672
+    },
+    {
       "icon_id": "8788631",
       "name": "0底部导航栏-46",
       "font_class": "dibudaohanglan-",

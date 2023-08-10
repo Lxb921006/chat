@@ -39,9 +39,6 @@
             </div>
         </div>
         <div class="main">
-            <div class="jump-top">
-                <el-button circle mini @click="juamTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
-            </div>
             <transition name="el-zoom-in-top">
                 <div class="collapse-aside" v-show="mh">
                     <svg class="icon ss-aside" aria-hidden="true" @click="showAside()">
@@ -49,10 +46,23 @@
                     </svg>
                 </div>
             </transition>
+            <!-- chatGPT回复内容 -->
             <div class="content" ref="wrapper">
+                <transition name="el-zoom-in-top">
+                    <div class="reach" v-show="showhi">
+                        <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
+                    </div>
+                </transition>
                 <template v-if="show">
                     <div v-for="(data1, index1) in chatCache" :key="index1+1">
                         <!-- <markdown-code-block :code="data1.title" :cursor="data1.cursor"></markdown-code-block> -->
+                        <transition name="el-zoom-in-top">
+                            <div class="platform" @click="chatGptUrl()" v-if="data1.answer.length > 0">
+                                <p>
+                                    <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-a-5_moxingtongbu"></use></svg> <span>ChatGPT-3.5</span>
+                                </p>
+                            </div>
+                        </transition>
                         <h2 class="answer-title" :id=data1.id>
                             <p class="question" ref="title">
                                 <svg class="icon-qa" aria-hidden="true">
@@ -68,7 +78,8 @@
                                 </svg>
                             </div>
                             <!-- 自定义的代码高亮显示组件 -->
-                            <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor"></markdown-code-block>
+                            <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
+                            <span class="cursor" v-else></span>
                             <transition name="el-zoom-in-center">
                                 <div class="finished-time" v-show="data1.timeShow">
                                     <i class="el-icon-time time-2">{{ data1.time }}</i>
@@ -90,15 +101,30 @@
                         </div>
                     </div>
                 </template>
+                <transition name="el-zoom-in-top">
+                    <div class="reach" v-show="showhi">
+                        <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>底部</span>
+                    </div>
+                </transition>
             </div>
             <div class="stop">
+                <transition name="el-zoom-in-top">
+                    <div class="jump-top">
+                        <el-button v-show="showhi" circle mini @click="juamTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
+                    </div>
+                </transition>
                 <transition name="el-zoom-in-center">
                     <el-button :style="{ visibility: stopResp ? 'visible' : 'hidden' }" round class="stop-b" @click="stopChat()" ><span class="iconfont icon-lujing"></span> 停止</el-button>
                 </transition>
+                <transition name="el-zoom-in-top">
+                    <div class="jump-bottom">
+                        <el-button v-show="showhi" circle mini @click="jumpFooter()"><span class="iconfont icon-cs-dw-xx-1"></span></el-button>
+                    </div>
+                </transition>
             </div>
-            <div class="jump-bottom">
+            <!-- <div class="jump-bottom">
                 <el-button circle mini @click="jumpFooter()"><span class="iconfont icon-cs-dw-xx-1"></span></el-button>
-            </div>
+            </div> -->
             <el-divider></el-divider>
             <div class="footer list-group"  id="sortable">
                 <div class="setting">
@@ -145,9 +171,9 @@
                     </div>
                 </div>
             </div>
-            <div class="notice">
+            <!-- <div class="notice">
                 <p>*仅供学习, 无任何其他用途*</p>
-            </div>
+            </div> -->
         </div>
         
     </div>
@@ -173,6 +199,7 @@ export default {
             showCursor: true,
             show1:true,
             show3:true,
+            showhi: false,
             stopResp: false,
             clearS: "",
             isDragging: false,
@@ -211,12 +238,22 @@ export default {
     computed: {
         ...mapState({
             'chatCache': state => state.chatCache.editableTabs,
-        })
+        }),
     },
     components: {
         MarkdownCodeBlock
     },
     methods: {
+        getContentLen() {
+            if (this.chatCache.length > 0) {
+                this.showhi = true;
+            } else {
+                this.showhi = false;
+            }
+        },
+        chatGptUrl() {
+            window.open('https://openai.com/');
+        },
         stopChat(){
             if (this.socket) {
                 this.close();
@@ -270,11 +307,20 @@ export default {
             const asideSt = getComputedStyle(asideEl);
             if (asideSt.display == 'none') {
                 document.querySelector(".aside").setAttribute("style", "display:block");
-                document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px)");
+                if (this.dnSwitch) {
+                    document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px);background-color: #e5e5e5");
+                } else {
+                    document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px);background-color: #262626");
+                }
                 // this.but1Icon = "el-icon-arrow-right";
             } else {
                 document.querySelector(".aside").setAttribute("style", "display:none");
-                document.querySelector(".main").setAttribute("style", "width:100%");
+                if (this.dnSwitch) {
+                    document.querySelector(".main").setAttribute("style", "width:100%;;background-color: #e5e5e5");
+                } else {
+                    document.querySelector(".main").setAttribute("style", "width:100%;background-color: #262626");
+                }
+                
                 // this.but1Icon = "el-icon-arrow-left";
             }
         },
@@ -289,7 +335,7 @@ export default {
         },
         copyAll (text) {
             this.$copyText(text).then(() => {
-                Message.info("已复制");
+                Message.info("已复制到粘贴板");
             }, () => {
                 Message.error('复制失败');
             })
@@ -373,54 +419,104 @@ export default {
                 sessionStorage.setItem("oc", 2);
             }
         },
+        checkDn() {
+            const main = document.querySelector(".main");
+            let dn = JSON.parse(sessionStorage.getItem('day'));
+            if (dn) {
+                if (dn.status == 1) {
+                    this.dnSwitch = true;
+                    main.style.backgroundColor = dn.color;
+                } else if (dn.status == 2) {
+                    this.dnSwitch = false;
+                    main.style.backgroundColor = dn.color;
+                } else {
+                    this.dnSwitch = false;
+                }
+            }
+        },
         isOpenDay() {
             const main = document.querySelector(".main");
-            const aside = document.querySelector(".ss-aside");
+            const asideIcon = document.querySelector(".ss-aside");
             const answerTitle = document.querySelectorAll(".answer-title");
             const answerLoop = document.querySelectorAll(".answer-loop");
             const code = document.querySelectorAll(".code");
-            const codeP = document.querySelectorAll('code p')
+            const codeP = document.querySelectorAll('code p');
+            const lang = document.querySelectorAll('code .lang-s');
+            const eli = document.querySelector('.el-divider')
+            const setBtn = document.querySelector('.el-popover__reference-wrapper button');
+            const contentInt = document.querySelector('.send-input input');
+            const sendBtn = document.querySelector('.el-input-group__append, .el-input-group__prepend');
+
             if (this.dnSwitch) {
-                main.style.backgroundColor = "#fff"
-                aside.style.color = "#262626"
+                main.style.backgroundColor = "#e5e5e5";
+                let data = {status: 1, color: "#e5e5e5"}
+                sessionStorage.setItem("day", JSON.stringify(data));
+                // asideIcon.style.color = "#409eff";
+                // setBtn.style.backgroundColor = "#fff";
+                // eli.style.backgroundColor = "#e1e1e1";
+                // contentInt.style.backgroundColor = "#ffffff";
+                // contentInt.style.borderColor = "#dcdfe6";
+                // sendBtn.style.backgroundColor = "#f5f7fa";
+                // sendBtn.style.borderColor = "#dcdfe6";
+                // sendBtn.style.borderLeft = "none";
 
-                answerTitle.forEach(paragraph => {
-                    paragraph.style.backgroundColor = "#fff";
-                    paragraph.style.color = "#262626";
-                });
+                // answerTitle.forEach(paragraph => {
+                //     paragraph.style.backgroundColor = "#f7fbf7";
+                //     paragraph.style.color = "#262626";
+                //     paragraph.style.borderColor = "#e1e1e1"
+                // });
                 
-                answerLoop.forEach(paragraph => {
-                    paragraph.style.backgroundColor = "#fff";
-                });
+                // answerLoop.forEach(paragraph => {
+                //     paragraph.style.backgroundColor = "#f7fbf7";
+                //     paragraph.style.borderColor = "#e1e1e1";
+                // });
 
-                code.forEach(paragraph => {
-                    paragraph.style.backgroundColor = "#fff";
-                });
+                // code.forEach(paragraph => {
+                //     paragraph.style.backgroundColor = "#f7fbf7";
+                // });
 
-                codeP.forEach(paragraph => {
-                    paragraph.classList.add('code-day');
-                });
+                // codeP.forEach(paragraph => {
+                //     paragraph.classList.add('code-day');
+                // });
+
+                // lang.forEach(paragraph => {
+                //     paragraph.style.color = "#fff";
+                // });
 
             } else {
                 main.style.backgroundColor = "#262626";
-                aside.style.color = "#fff";
+                let data = {status: 2, color: "#262626"}
+                sessionStorage.setItem("day", JSON.stringify(data));
+                // asideIcon.style.color = "#fff";
+                // setBtn.style.backgroundColor = "#262626";
+                // eli.style.backgroundColor = "#424242";
+                // contentInt.style.backgroundColor = "#262626";
+                // contentInt.style.borderColor = "#323232";
+                // sendBtn.style.backgroundColor = "#262626";
+                // sendBtn.style.borderColor = "#323232";
 
-                answerTitle.forEach(paragraph => {
-                    paragraph.style.backgroundColor = "#262626";
-                    paragraph.style.color = "#fff";
-                });
+                // answerTitle.forEach(paragraph => {
+                //     paragraph.style.backgroundColor = "#373737";
+                //     paragraph.style.color = "#fff";
+                //     paragraph.style.borderColor = "#424242"
+                // });
 
-                answerLoop.forEach(paragraph => {
-                    paragraph.style.backgroundColor = "#373737";
-                });
+                // answerLoop.forEach(paragraph => {
+                //     paragraph.style.backgroundColor = "#373737";
+                //     paragraph.style.borderColor = "#424242";
+                // });
 
-                code.forEach(paragraph => {
-                    paragraph.style.backgroundColor = "#373737";
-                });
+                // code.forEach(paragraph => {
+                //     paragraph.style.backgroundColor = "#373737";
+                // });
 
-                codeP.forEach(paragraph => {
-                    paragraph.classList.remove('code-day');
-                });
+                // codeP.forEach(paragraph => {
+                //     paragraph.classList.remove('code-day');
+                // });
+
+                // lang.forEach(paragraph => {
+                //     paragraph.style.color = "#fff";
+                // });
             }
             
         },
@@ -435,6 +531,7 @@ export default {
                 } 
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
+            this.getContentLen();
         },
         send () {
             let sendData = {};
@@ -536,6 +633,7 @@ export default {
             this.editableTabsValue = activeName;
             let newChat = tabs.filter(tab => tab.id != targetName);
             store.commit("REMOVE_CHAT_CACHE", newChat);
+            this.getContentLen();
             
         },
         jump(id) {
@@ -565,6 +663,8 @@ export default {
         this.checkContextStatus();
         this.getAllChatData();
         this.defaultHideAside();
+        this.checkDn();
+        this.getContentLen();
     },
     created () {
     }
@@ -572,526 +672,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .code-day {
-    color: #262626
-}
-.set-item-1 {
-    border-top: 1px solid #e5e5e5;
-    padding-top: 14px;
-}
-.set-item {
-    margin-top: 15px;
-}
-.ss-aside:hover {
-    color: #585858;
-}
-.context-switch {
-    width: 128px;
-}
-::v-deep .el-popover__reference-wrapper button {
-    background-color: #262626;
-    border: none;
-    width: 30px;
-    height: 30px;
-}
-.setting {
-    position: relative;
-    bottom: 15px;
-}
-.sessing-svg {
-    font-size: 11px;
-    animation: rotate 16s linear infinite;
-
-}
-@keyframes rotate {
-    from {
-    transform: rotate(0deg);
-    }
-    to {
-    transform: rotate(360deg);
-    }
-}
-.copy-title {
-    cursor: pointer;
-    position: relative;
-    top: 1px;
-    left: 13px;
-    font-size: 10px;
-}
-.copy-title:hover {
-    color: #999999;
-}
-.finished-time {
-    width: 659px;
-    margin: 0 auto;
-    position: relative;
-    margin-top: -29px;
-}
-.whole-answer {
-    white-space: pre-wrap;
-    display: inline-block;
-    /* margin: 10px auto; */
-    /* width: 659px; */
-    /* position: relative; */
-    bottom: 68px;
-    color: #fff;
-    /* border-bottom-left-radius: 5px; */
-    /* border-bottom-right-radius: 5px; */
-    padding: 0 11px 0px 11px;
-    /* padding-left: 5px; */
-    /* font-size: 12px; */
-    cursor: pointer;
-}
-::v-deep .custom-code-block {
-  background-color: #2e2e2e;
-  padding: 10px;
-  line-height: 1.5;
-  margin-bottom: 10px;
-  border-radius: 0 0 11px 11px;
-}
-::v-deep .custom-code-block-dev {
-  height: 49px;
-  line-height: 49px;
-  background-color: #262626;
-  border-radius: 11px 11px 0 0;
-  display: flex;
-  justify-content: space-between;
-}
-::v-deep  .custom-code-block-dev p {
-  padding-left: 10px;
-}
-::v-deep .code-3 {
-  white-space: pre-wrap;
-}
-::v-deep .copy-1 {
-    background-color: #262626;
-    color: #fff;
-    cursor: pointer;
-    border: none;
-    padding-right: 10px;
-    border-radius: 0 11px 0 0;
-}
-::v-deep .copy-1:hover span {
-    // background-color: #727272;
-    // border-radius: 50%;
-    color: #727272;
-}
-.chat-frame {
-    height: 100%;
-}
-.title {
-    padding: 14px 0;
-}
-.tab {
-    height: 64%;
-    overflow-y: auto;
-    border-top: 1px solid #242424;
-}
-.search {
-    width: 158px;
-    margin: 24px auto;
-    // border-bottom: 1px solid #242424;
-}
-.tab::-webkit-scrollbar {
-    display: none;
-}
-.title h2 {
-    display: inline-block;
-    text-align: left;
-    padding-left: 8px;
-    color: rgb(233, 236, 238);
-}
-.aside {
-    height: 100%;
-    width: 200px;
-    float: left;
-    background-color: rgb(21, 24, 21);
-}
-.main {
-    float: left;
-    height: 100%;
-    width: calc(100% - 200px);
-    background-color: #262626;
-}
-.content {
-    // padding: 20px;
-    overflow: auto;
-    // width: 700px;
-    height: 76%;
-    margin: 0 auto;
-    scrollbar-width: none;
-    // margin-right: calc(100% - 5vw);
-}
-.content::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  pointer-events: none; /* 确保伪元素不遮挡实际内容的点击事件 */
-}
-.content::-webkit-scrollbar {
-  width: 1px!important; /* 设置滚动条宽度 */
-}
-
-.content::-webkit-scrollbar-track {
-  background-color: #373737!important; /* 设置滚动条背景颜色 */
-}
-
-.content::-webkit-scrollbar-thumb {
-  background-color: #cecece!important; /* 设置滚动条滑块颜色 */
-  border-radius: 3px; /* 设置滑块的圆角 */
-  cursor: pointer;
-}
-
-.content::-webkit-scrollbar-thumb:hover {
-  background-color: #eeeded!important; /* 设置滚动条滑块悬停时的颜色 */
-}
-.footer {
-    position: relative;
-    width: 571px;
-    margin: 0 auto;
-    top: 16px
-}
-.jump-bottom {
-    float: right;
-    position: relative;
-    bottom: 20%;
-    right: 57px;
-    opacity: 0.2;
-}
-.jump-top {
-    position: fixed;
-    right: 57px;
-    top: 20%;
-    opacity: 0.2;
-    z-index: 100000;
-}
-.answer-title {
-    margin: 0 auto;
-    border-radius: 3px;
-    line-height: 78px;
-    height: 78px;
-    font-size: 1rem;
-    font-weight: 900;
-    color: #fff;
-    overflow-y: auto;
-    /* padding: 0 11px; */
-    width: 659px;
-    // background-color: #fbfbfb;
-    // color: #413e3e;
-}
-.answer-title::-webkit-scrollbar {
-    display: none;
-}
-.question-1 {
-    text-align: center;
-}
-.question-2 {
-    text-align: left;
-}
-.answer-loop {
-    text-align: justify;
-    font-size: 1rem;
-    overflow: auto;
-    // padding: 18px;
-    // background-color: #f7fbff;
-    border-top: 1px solid #424242;
-    border-bottom: 1px solid #424242;
-    background-color: #373737;
-}
-.cache-title {
-    font-size: 1rem;
-    font-style: oblique;
-}
-.delete {
-    z-index: 100000000;
-}
-.delete:hover {
-    color: #af6060;
-}
-.copy {
-    position: relative;
-    width: 681px;
-    height: 42px;
-    bottom: 32px;
-    /* top: -32px; */
-    border-radius: 3px;
-    margin: 0px auto;
-    /* z-index: 1000; */
-    background-color: #313542;
-}
-.code {
-    white-space: pre-wrap;
-    display: block;
-    margin: 0 auto;
-    width: 659px;
-    position: relative;
-    bottom: 15px;
-    color: #fff;
-    background-color: #373737;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    padding: 0 11px 5px 11px;
-    font-size: 14px;
-    // font-style: oblique;
-}
-.time-2 {
-    // white-space: pre-wrap; 
-    display: inline-block;
-    position: relative;
-    top: -8px;
-    bottom: 1px;
-    /* margin: 10px auto; */
-    /* width: 659px; */
-    /* position: relative; */
-    bottom: 76px;
-    color: #fff;
-    /* border-bottom-left-radius: 5px; */
-    /* border-bottom-right-radius: 5px; */
-    padding: 0 0 0px 0;
-    /* padding-bottom: 4px; */
-    font-size: 12px;
-    color: #009844!important;
-}
-.icon-qa {
-    width: 2em;
-    height: 2em;
-    vertical-align: -0.15em;
-    fill: currentColor;
-    overflow: hidden;
-    position: relative;
-    top: 5px;
-}
-.icon-qa-3 {
-    position: relative;
-    top: 3px;
-    width: 2em;
-    height: 2em;
-    vertical-align: -0.15em;
-    fill: currentColor;
-    overflow: hidden;
-}
-.icon-qa-2 {
-    display: block;
-    margin: 0 auto;
-    width: 580px;
-    position: relative;
-    right: 373px;
-    top: 18px;
-    height: 2em;
-    fill: currentColor;
-    overflow: hidden;
-    
-}
-.icon-qa-copy {
-    width: 27px;
-    height: 39px;
-    line-height: 39px;
-    vertical-align: -0.15em;
-    fill: currentColor;
-    overflow: hidden;
-    float: right;
-    cursor: pointer;
-    padding-right: 8px;
-}
-.icon-qa-copy-2 {
-    width: 27px;
-    height: 39px;
-    line-height: 39px;
-    vertical-align: -0.15em;
-    fill: currentColor;
-    overflow: hidden;
-    float: left;
-    cursor: pointer;
-    padding-left: 8px;
-}
-.notice {
-    margin-top: 40px;
-    font-size: .75rem;
-    color: #bfbfbf;
-}
-/* 效果过程 */
-.zoom-enter-active,
-.zoom-leave-active {
-  transition: all 0.5s ease;
-}
-.zoom-enter {
-  transform: scale(0.5);
-  opacity: 0;
-}
-.zoom-leave-to {
-  transform: scale(0.5);
-  opacity: 0;
-}
-.data-load {
-    height: 58px;
-    width: 57px;
-}
-::v-deep .data-load i {
-    position: relative;
-    right: 7px;
-    font-size: 2em;
-}
-.collapse-aside {
-    position: fixed;
-    // top: 11px;
-    z-index: 1000;
-}
-.btu1 {
-    cursor: pointer;
-    color: #fff;
-    background-color: #616463;
-    border-color: #616463;
-}
-pre code {
-  font-family: monospace;
-}
-.logout {
-    position: fixed;
-    bottom: 68px;
-    width: 200px;
-}
-.item-url {
-    position: fixed;
-    bottom: 34px;
-    width: 200px;
-}
-.btu0 {
-    width: 70%;
-}
-.stop {
-    margin-top: 7px;
-    visibility: visible;
-}
-.stop-b {
-    width: 100px;
-}
-.icon-git {
-    position: relative;
-    top: 2px;
-    right: 4px;
-}
-.addr-size {
-    font-size: 12px;
-}
-.icon {
-    width: 2em;
-    height: 2em;
-    vertical-align: -0.15em;
-    fill: currentColor;
-    overflow: hidden;
-    cursor: pointer;
-    position: relative;
-    right: 4px;
-    bottom: 0px;
-    // top: 5px;
-    color: #fff;
-}
-
-//适应手机
-@media only screen and (max-width: 500px) {
-    // .aside {
-    //     display: none;
-    // }
-    .main {
-        height: 100%;
-        width: 100%;
-    }
-    .footer {
-        width: 311px;
-    }
-    .copy, .icon-qa-2 {
-        width: 100%;
-    }
-    .code{
-        width: 94%;
-    }
-    .time-2 {
-        width: 94%;
-    }
-    .notice {
-        margin-top: 20px;
-    }
-    .title {
-        padding: 11px 0;
-    }
-    .tab {
-        height: 61%;
-    }
-}
-::v-deep .cursor {
-  background-color: rgb(238, 234, 234);
-  width: 10px;
-  height: 1em;
-  display: inline-block;
-  margin-left: 1px;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  0%, 50% {
-    opacity: 1;
-  }
-  51%, 100% {
-    opacity: 0;
-  }
-}
-
-
-// element-ui的css修改
-:deep .el-divider {
-    background-color: #424242;
-    margin: 7px 0;
-}
-:deep .el-tabs__nav {
-    float: none;
-}
-:deep .el-tabs--border-card {
-    background-color: #151815;
-}
-:deep .el-tabs--border-card {
-    border: 1px solid #151815; 
-}
-:deep .el-tabs--card>.el-tabs__header .el-tabs__nav {
-    border: 1px solid #151815;
-}
-:deep .el-tabs--card>.el-tabs__header .el-tabs__item {
-    border: 1px solid #151815;
-    text-align: left;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-:deep .el-menu {
-    border-right: 1px solid #151815;
-}
-:deep .el-menu-item {
-    text-align: left;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-:deep .el-menu-item:hover {
-    background-color: #373837 !important;
-    border-radius: 3px;
-}
-:deep .el-input-group {
-    box-shadow: 0px 0px 20px 0px rgb(0 0 0 / 25%);
-}
-:deep .el-input__inner {
-    height: 57px;
-    line-height: 57px;
-    background-color: #262626;
-    border: 1px solid #323232;
-}
-:deep .el-input-group__append, .el-input-group__prepend {
-    background-color: #262626;
-    border: 1px solid #323232;
-}
-:deep .el-input.is-disabled .el-input__inner {
-    background-color: #262626;
-    border: 1px solid #323232;
-}
+    @import '../../../public/style/chat-style.css';
 </style>

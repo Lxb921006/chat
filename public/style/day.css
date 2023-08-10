@@ -1,0 +1,50 @@
+.main {
+  background-color: #262626;
+}
+
+.ss-aside {
+  color: #fff;
+}
+
+.answer-title {
+  background-color: #373737;
+  color: #fff;
+  border-color: #424242;
+}
+
+.answer-loop {
+  background-color: #373737;
+  border-color: #424242;
+}
+
+.code {
+  background-color: #373737;
+}
+
+.code p {
+  /* Assuming there is a class called 'code-day' that needs to be removed */
+  /* paragraph.classList.remove('code-day'); */
+}
+
+.code .lang-s {
+  color: #fff;
+}
+
+.el-divider {
+  background-color: #424242;
+}
+
+.el-popover__reference-wrapper button {
+  background-color: #262626;
+}
+
+.send-input input {
+  background-color: #262626;
+  border-color: #323232;
+}
+
+.el-input-group__append,
+.el-input-group__prepend {
+  background-color: #262626;
+  border-color: #323232;
+}

@@ -77,12 +77,12 @@ export default {
             lang = "javascript";
           }
           try {
-            return `<div class="custom-code-block-dev"><p>${langOld}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${hljs.highlight(lang, code).value} </code></pre>`;
+            return `<div class="custom-code-block-dev"><p class="lang-s">${langOld}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${hljs.highlight(lang, code).value} </code></pre>`;
           } catch (err) {
-            return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)} </code></pre>`;
+            return `<div class="custom-code-block-dev"><p class="lang-s">${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)} </code></pre>`;
           }
         } else {
-          return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)} </code></pre>`;
+          return `<div class="custom-code-block-dev"><p class="lang-s">text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)} </code></pre>`;
         }
       };
       return md.render(this.code);
@@ -125,63 +125,5 @@ export default {
 </script>
 
 <style scoped>
-.code-day {
-    color: #262626
-}
-.box {
-  position: relative;
-  margin-top: -31px;
-}
-.custom-code-block {
-  background-color: #2e2e2e;
-  padding: 10px;
-  line-height: 1.5;
-  width: 659px;
-  margin-bottom: 10px;
-}
-.custom-code-block-dev {
-  height: 39px;
-  line-height: 39px;
-  background-color: #262626;
-  border-radius: 2px;
-}
-.custom-code-block-dev p {
-  padding-left: 10px;
-}
-.code-3 {
-  white-space: pre-wrap;
-}
-.code {
-  white-space: pre-wrap;
-    display: block;
-    margin: 0 auto;
-    width: 659px;
-    position: relative;
-    /* bottom: 30px; */
-    color: #fff;
-    background-color: #373737;
-    /* background-color: #373737; */
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    padding: 0 11px 0px 11px;
-    font-size: 14px;
-    line-height: 1.5;
-}
-.title-block {
-  white-space: pre-wrap;
-    display: block;
-    margin: 0 auto;
-    width: 659px;
-    position: relative;
-    bottom: 15px;
-    color: #fff;
-    background-color: #373737;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    padding: 0 11px 5px 11px;
-    font-size: 14px;
-}
-.code-day {
-    color: #262626
-}
+    @import '../../../public/style/markdown-style.css';
 </style>
