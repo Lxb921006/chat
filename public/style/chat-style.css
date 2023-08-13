@@ -442,7 +442,7 @@ pre code {
     bottom: 3px;
     color: #fff;
 }
-@media only screen and (max-height: 500px) {
+@media only screen and (max-height: 700px) {
     .content {
         height: 70%;
     }
