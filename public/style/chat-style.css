@@ -16,7 +16,7 @@
     color: #585858;
 }
 .context-switch {
-    width: 128px;
+    width: 97px;
 }
 .el-popover {
     width: auto!important;
@@ -385,8 +385,8 @@
 }
 .data-load i {
     position: relative;
-    right: 7px;
-    font-size: 2em;
+    right: 5px;
+    font-size: 23px;
 }
 .collapse-aside {
     position: fixed;
@@ -590,4 +590,32 @@ ol li > p:first-child {
 }
 .col-font {
     font-size: 12px;
+}
+.z-col-2 {
+    position: relative;
+    width: 47px;
+    bottom: 2px;
+}
+.z-col-3 {
+    width: 121px;
+    padding-left: 16px!important;
+}
+.z-col-4 {
+    position: relative;
+    width: 47px;
+    bottom: 2px;
+}
+.z-col-5 {
+    width: 72px;
+    padding-left: 16px!important;
+}
+.z-col-6 {
+    position: relative;
+    bottom: 7px;
+}
+.el-popover__title {
+    font-weight: 900!important;
+}
+.model-icon {
+    border-radius: 9px;
 }

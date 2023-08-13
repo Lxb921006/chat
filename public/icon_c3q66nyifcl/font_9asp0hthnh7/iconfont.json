@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "36677843",
+      "name": "Claude2",
+      "font_class": "Claude2",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "36677846",
+      "name": "Chatgpt 3.5",
+      "font_class": "a-Chatgpt35",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
       "icon_id": "17122697",
       "name": "提示",
       "font_class": "tishi",

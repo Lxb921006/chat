@@ -59,7 +59,7 @@
                         <transition name="el-zoom-in-top">
                             <div class="platform" @click="chatGptUrl(data1.model)" v-if="data1.answer.length > 0">
                                 <p>
-                                    <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-a-5_moxingtongbu"></use></svg> <span>{{ data1.model }}</span>
+                                    <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span>{{ data1.model }}</span>
                                 </p>
                             </div>
                         </transition>
@@ -134,7 +134,7 @@
                         >
                         <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="context-switch col-font">是否开启上下文: </el-col>
-                            <el-col :span="1">
+                            <el-col :span="1" class="z-col-2">
                                 <el-switch
                                     @change="isOpenContext()"
                                     v-model="contextSwitch"
@@ -142,10 +142,8 @@
                                     inactive-color="#ff4949">
                                 </el-switch>
                             </el-col>
-                        </el-row>
-                        <el-row :gutter="10" class="set-item">
-                            <el-col :span="1" class="context-switch col-font">是否开启白天模式: </el-col>
-                            <el-col :span="1">
+                            <el-col :span="1" class="z-col-3 col-font">是否开启白天模式: </el-col>
+                            <el-col :span="1" class="z-col-4">
                                 <el-switch
                                     @change="isOpenDay()"
                                     v-model="dnSwitch"
@@ -153,16 +151,16 @@
                                     inactive-color="#ff4949">
                                 </el-switch>
                             </el-col>
-                        </el-row>
-                        <el-row :gutter="10" class="set-item">
-                            <el-col :span="1" class="context-switch col-font">模型选择: </el-col>
-                            <el-col :span="1">
-                                <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
+                            <el-col :span="1" class="z-col-5 col-font">模型选择: </el-col>
+                            <el-col :span="1" class="z-col-6">
+                                <el-select v-model="selectedModel" placeholder="请选择" class="c-select">
                                     <el-option
                                     v-for="item in modelAll"
                                     :key="item.value"
                                     :label="item.label"
-                                    :value="item.value">
+                                    :value="item.value"
+                                    :disabled="item.disabled"
+                                    >
                                     </el-option>
                                 </el-select>
                             </el-col>
@@ -182,9 +180,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="notice">
-                <p>*仅供学习, 无任何其他用途*</p>
-            </div> -->
         </div>
         
     </div>
@@ -197,7 +192,6 @@ import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
-// import BScroll from '@better-scroll/core'
 
 export default {
     name: "chat",
@@ -225,7 +219,6 @@ export default {
             contextSwitch: "",
             dnSwitch: false,
             showAsideView: false,
-            
             id: 0,
             wsUrl: "",
             editableTabsValue: '',
@@ -237,14 +230,27 @@ export default {
             value: "text-davinci-003",
             cc: "<span class='cursor' v-show='this.cursor'>|</span>",
             selectedModel: "claude-2",
+            claudeIcon: "#icon-Claude2",
+            defaultIcon: "#icon-a-5_moxingtongbu",
+            chatGptIcon: "#icon-a-Chatgpt35",
             modelAll: [
                 {
                     value: 'claude-2',
-                    label: 'claude'
+                    label: 'claude-2',
                 },
                 {
                     value: 'chatGPT',
                     label: 'chatGPT-3.5'
+                },
+                {
+                    value: 'claude-instant-100k',
+                    label: 'claude-instant-100k',
+                    disabled: true,
+                },
+                {
+                    value: 'GPT-4',
+                    label: 'GPT-4',
+                    disabled: true,
                 },
             ],
         }
@@ -394,6 +400,18 @@ export default {
             let id = (100000000 - 1) * Math.random() + 1;
             let index = Math.random().toString(36).slice(-8);
             this.show = true;
+            let modelIcon= "";
+            switch (this.selectedModel) {
+            case 'claude-2':
+                modelIcon = this.claudeIcon;
+                break;
+            case 'chatGPT':
+                modelIcon = this.chatGptIcon;
+                break;
+            default:
+                modelIcon = this.defaultIcon;
+                break;
+            }
             let data = {
                 title: this.chatContent,
                 answer: new Array,
@@ -405,6 +423,7 @@ export default {
                 timeShow: false,
                 cid: "",
                 pid: "",
+                icon: modelIcon,
                 model: this.selectedModel,
             };
 
@@ -476,89 +495,15 @@ export default {
         },
         isOpenDay() {
             const main = document.querySelector(".main");
-            const asideIcon = document.querySelector(".ss-aside");
-            const answerTitle = document.querySelectorAll(".answer-title");
-            const answerLoop = document.querySelectorAll(".answer-loop");
-            const code = document.querySelectorAll(".code");
-            const codeP = document.querySelectorAll('code p');
-            const lang = document.querySelectorAll('code .lang-s');
-            const eli = document.querySelector('.el-divider')
-            const setBtn = document.querySelector('.el-popover__reference-wrapper button');
-            const contentInt = document.querySelector('.send-input input');
-            const sendBtn = document.querySelector('.el-input-group__append, .el-input-group__prepend');
-
             if (this.dnSwitch) {
                 main.style.backgroundColor = "#e5e5e5";
                 let data = {status: 1, color: "#e5e5e5"}
                 sessionStorage.setItem("day", JSON.stringify(data));
-                // asideIcon.style.color = "#409eff";
-                // setBtn.style.backgroundColor = "#fff";
-                // eli.style.backgroundColor = "#e1e1e1";
-                // contentInt.style.backgroundColor = "#ffffff";
-                // contentInt.style.borderColor = "#dcdfe6";
-                // sendBtn.style.backgroundColor = "#f5f7fa";
-                // sendBtn.style.borderColor = "#dcdfe6";
-                // sendBtn.style.borderLeft = "none";
-
-                // answerTitle.forEach(paragraph => {
-                //     paragraph.style.backgroundColor = "#f7fbf7";
-                //     paragraph.style.color = "#262626";
-                //     paragraph.style.borderColor = "#e1e1e1"
-                // });
-                
-                // answerLoop.forEach(paragraph => {
-                //     paragraph.style.backgroundColor = "#f7fbf7";
-                //     paragraph.style.borderColor = "#e1e1e1";
-                // });
-
-                // code.forEach(paragraph => {
-                //     paragraph.style.backgroundColor = "#f7fbf7";
-                // });
-
-                // codeP.forEach(paragraph => {
-                //     paragraph.classList.add('code-day');
-                // });
-
-                // lang.forEach(paragraph => {
-                //     paragraph.style.color = "#fff";
-                // });
-
             } else {
                 main.style.backgroundColor = "#262626";
                 let data = {status: 2, color: "#262626"}
                 sessionStorage.setItem("day", JSON.stringify(data));
-                // asideIcon.style.color = "#fff";
-                // setBtn.style.backgroundColor = "#262626";
-                // eli.style.backgroundColor = "#424242";
-                // contentInt.style.backgroundColor = "#262626";
-                // contentInt.style.borderColor = "#323232";
-                // sendBtn.style.backgroundColor = "#262626";
-                // sendBtn.style.borderColor = "#323232";
-
-                // answerTitle.forEach(paragraph => {
-                //     paragraph.style.backgroundColor = "#373737";
-                //     paragraph.style.color = "#fff";
-                //     paragraph.style.borderColor = "#424242"
-                // });
-
-                // answerLoop.forEach(paragraph => {
-                //     paragraph.style.backgroundColor = "#373737";
-                //     paragraph.style.borderColor = "#424242";
-                // });
-
-                // code.forEach(paragraph => {
-                //     paragraph.style.backgroundColor = "#373737";
-                // });
-
-                // codeP.forEach(paragraph => {
-                //     paragraph.classList.remove('code-day');
-                // });
-
-                // lang.forEach(paragraph => {
-                //     paragraph.style.color = "#fff";
-                // });
             }
-            
         },
         getMessage (msg) {
             let jd = JSON.parse(msg.data);
@@ -582,23 +527,6 @@ export default {
                     this.sendChatGpt();
                     break
             }
-            // let sendData = {};
-            // let lastData = [];
-            // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            // if (this.contextSwitch) {
-            //     if (cacheData.length > 1) {
-            //     //发送的信息关联上下文
-            //         lastData = cacheData[cacheData.length - 2];
-            //         sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel};
-            //     } else {
-            //         // lastData = cacheData[cacheData.length];
-            //         sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
-            //     }
-            // } else {
-            //     sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
-            // }
-            
-            // this.socket.send(JSON.stringify(sendData));
         },
         sendClaude() {
             let sendData = {};
@@ -621,7 +549,11 @@ export default {
                 if (cacheData.length > 1) {
                 //发送的信息关联上下文
                     lastData = cacheData[cacheData.length - 2];
-                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel};
+                    if (lastData.model == 'chatGPT') {
+                        sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel};
+                    } else {
+                        sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+                    }
                 } else {
                     // lastData = cacheData[cacheData.length];
                     sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
