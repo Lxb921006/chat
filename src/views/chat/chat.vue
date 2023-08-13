@@ -746,7 +746,7 @@ export default {
         this.defaultHideAside();
         this.checkDn();
         this.getContentLen();
-        this.modelSwitch();
+        // this.modelSwitch();
     },
     created () {
     }
