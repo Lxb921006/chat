@@ -46,7 +46,7 @@
                     </svg>
                 </div>
             </transition>
-            <!-- chatGPT回复内容 -->
+            <!-- Ai回复内容 -->
             <div class="content" ref="wrapper">
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
@@ -57,7 +57,7 @@
                     <div v-for="(data1, index1) in chatCache" :key="index1+1">
                         <!-- <markdown-code-block :code="data1.title" :cursor="data1.cursor"></markdown-code-block> -->
                         <transition name="el-zoom-in-top">
-                            <div class="platform" @click="chatGptUrl()" v-if="data1.answer.length > 0">
+                            <div class="platform" @click="chatGptUrl(data1.model)" v-if="data1.answer.length > 0">
                                 <p>
                                     <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-a-5_moxingtongbu"></use></svg> <span>{{ data1.model }}</span>
                                 </p>
@@ -77,8 +77,9 @@
                                     <use xlink:href="#icon-cankaodaan"></use>
                                 </svg>
                             </div>
-                            <!-- 自定义的代码高亮显示组件 -->
+                            <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
                             <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
+                            <!-- 光标 -->
                             <span class="cursor" v-else></span>
                             <transition name="el-zoom-in-center">
                                 <div class="finished-time" v-show="data1.timeShow">
@@ -122,9 +123,6 @@
                     </div>
                 </transition>
             </div>
-            <!-- <div class="jump-bottom">
-                <el-button circle mini @click="jumpFooter()"><span class="iconfont icon-cs-dw-xx-1"></span></el-button>
-            </div> -->
             <el-divider></el-divider>
             <div class="footer list-group"  id="sortable">
                 <div class="setting">
@@ -135,7 +133,7 @@
                         trigger="click"
                         >
                         <el-row :gutter="10" class="set-item set-item-1">
-                            <el-col :span="1" class="context-switch">是否开启上下文: </el-col>
+                            <el-col :span="1" class="context-switch col-font">是否开启上下文: </el-col>
                             <el-col :span="1">
                                 <el-switch
                                     @change="isOpenContext()"
@@ -146,7 +144,7 @@
                             </el-col>
                         </el-row>
                         <el-row :gutter="10" class="set-item">
-                            <el-col :span="1" class="context-switch">是否开启白天模式: </el-col>
+                            <el-col :span="1" class="context-switch col-font">是否开启白天模式: </el-col>
                             <el-col :span="1">
                                 <el-switch
                                     @change="isOpenDay()"
@@ -157,9 +155,9 @@
                             </el-col>
                         </el-row>
                         <el-row :gutter="10" class="set-item">
-                            <el-col :span="1" class="context-switch">模型选择: </el-col>
+                            <el-col :span="1" class="context-switch col-font">模型选择: </el-col>
                             <el-col :span="1">
-                                <el-select v-model="selectedModel" placeholder="请选择" class="c-select">
+                                <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
                                     <el-option
                                     v-for="item in modelAll"
                                     :key="item.value"
@@ -227,6 +225,7 @@ export default {
             contextSwitch: "",
             dnSwitch: false,
             showAsideView: false,
+            
             id: 0,
             wsUrl: "",
             editableTabsValue: '',
@@ -237,7 +236,7 @@ export default {
             code:"",
             value: "text-davinci-003",
             cc: "<span class='cursor' v-show='this.cursor'>|</span>",
-            selectedModel: "claude",
+            selectedModel: "claude-2",
             modelAll: [
                 {
                     value: 'claude-2',
@@ -248,7 +247,6 @@ export default {
                     label: 'chatGPT-3.5'
                 },
             ],
-            options: [{value: 'babbage', label: 'babbage'}, {value: 'davinci', label: 'davinci'}, {value: 'text-davinci-edit-001', label: 'text-davinci-edit-001'}, {value: 'babbage-code-search-code', label: 'babbage-code-search-code'}, {value: 'text-similarity-babbage-001', label: 'text-similarity-babbage-001'}, {value: 'code-davinci-edit-001', label: 'code-davinci-edit-001'}, {value: 'text-davinci-001', label: 'text-davinci-001'}, {value: 'ada', label: 'ada'}, {value: 'curie-instruct-beta', label: 'curie-instruct-beta'}, {value: 'babbage-code-search-text', label: 'babbage-code-search-text'}, {value: 'babbage-similarity', label: 'babbage-similarity'}, {value: 'whisper-1', label: 'whisper-1'}, {value: 'code-search-babbage-text-001', label: 'code-search-babbage-text-001'}, {value: 'text-curie-001', label: 'text-curie-001'}, {value: 'code-search-babbage-code-001', label: 'code-search-babbage-code-001'}, {value: 'text-ada-001', label: 'text-ada-001'}, {value: 'text-embedding-ada-002', label: 'text-embedding-ada-002'}, {value: 'text-similarity-ada-001', label: 'text-similarity-ada-001'}, {value: 'ada-code-search-code', label: 'ada-code-search-code'}, {value: 'ada-similarity', label: 'ada-similarity'}, {value: 'text-davinci-003', label: 'text-davinci-003'}, {value: 'code-search-ada-text-001', label: 'code-search-ada-text-001'}, {value: 'text-search-ada-query-001', label: 'text-search-ada-query-001'}, {value: 'davinci-search-document', label: 'davinci-search-document'}, {value: 'ada-code-search-text', label: 'ada-code-search-text'}, {value: 'text-search-ada-doc-001', label: 'text-search-ada-doc-001'}, {value: 'davinci-instruct-beta', label: 'davinci-instruct-beta'}, {value: 'text-similarity-curie-001', label: 'text-similarity-curie-001'}, {value: 'code-search-ada-code-001', label: 'code-search-ada-code-001'}, {value: 'ada-search-query', label: 'ada-search-query'}, {value: 'text-search-davinci-query-001', label: 'text-search-davinci-query-001'}, {value: 'curie-search-query', label: 'curie-search-query'}, {value: 'gpt-3.5-turbo-0301', label: 'gpt-3.5-turbo-0301'}, {value: 'davinci-search-query', label: 'davinci-search-query'}, {value: 'babbage-search-document', label: 'babbage-search-document'}, {value: 'ada-search-document', label: 'ada-search-document'}, {value: 'text-search-curie-query-001', label: 'text-search-curie-query-001'}, {value: 'text-search-babbage-doc-001', label: 'text-search-babbage-doc-001'}, {value: 'gpt-3.5-turbo', label: 'gpt-3.5-turbo'}, {value: 'curie-search-document', label: 'curie-search-document'}, {value: 'text-search-curie-doc-001', label: 'text-search-curie-doc-001'}, {value: 'babbage-search-query', label: 'babbage-search-query'}, {value: 'text-babbage-001', label: 'text-babbage-001'}, {value: 'text-search-davinci-doc-001', label: 'text-search-davinci-doc-001'}, {value: 'text-search-babbage-query-001', label: 'text-search-babbage-query-001'}, {value: 'curie-similarity', label: 'curie-similarity'}, {value: 'curie', label: 'curie'}, {value: 'text-similarity-davinci-001', label: 'text-similarity-davinci-001'}, {value: 'text-davinci-002', label: 'text-davinci-002'}, {value: 'davinci-similarity', label: 'davinci-similarity'}, {value: 'cushman:2020-05-03', label: 'cushman:2020-05-03'}, {value: 'ada:2020-05-03', label: 'ada:2020-05-03'}, {value: 'babbage:2020-05-03', label: 'babbage:2020-05-03'}, {value: 'curie:2020-05-03', label: 'curie:2020-05-03'}, {value: 'davinci:2020-05-03', label: 'davinci:2020-05-03'}, {value: 'if-davinci-v2', label: 'if-davinci-v2'}, {value: 'if-curie-v2', label: 'if-curie-v2'}, {value: 'if-davinci:3.0.0', label: 'if-davinci:3.0.0'}, {value: 'davinci-if:3.0.0', label: 'davinci-if:3.0.0'}, {value: 'davinci-instruct-beta:2.0.0', label: 'davinci-instruct-beta:2.0.0'}, {value: 'text-ada:001', label: 'text-ada:001'}, {value: 'text-davinci:001', label: 'text-davinci:001'}, {value: 'text-curie:001', label: 'text-curie:001'}, {value: 'text-babbage:001', label: 'text-babbage:001'}],
         }
     },
     watch: {
@@ -268,6 +266,16 @@ export default {
         MarkdownCodeBlock
     },
     methods: {
+        modelSwitch() {
+            switch (this.selectedModel) {
+                case 'claude-2':
+                    window.history.pushState({}, '', '/chat/claude-2');
+                    break
+                case 'chatGPT':
+                    window.history.pushState({}, '', '/chat/chatGPT');
+                    break
+            }
+        },
         getContentLen() {
             if (this.chatCache.length > 0) {
                 this.showhi = true;
@@ -275,8 +283,15 @@ export default {
                 this.showhi = false;
             }
         },
-        chatGptUrl() {
-            window.open('https://openai.com/');
+        chatGptUrl(model) {
+            switch (model) {
+                case 'claude-2':
+                    window.open('https://claude.ai/');
+                    break;
+                case 'chatGPT':
+                    window.open('https://openai.com/');
+                    break;
+            }   
         },
         stopChat(){
             if (this.socket) {
@@ -587,21 +602,16 @@ export default {
         },
         sendClaude() {
             let sendData = {};
-            let lastData = [];
             // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             if (this.contextSwitch) {
-                if (cacheData.length > 1) {
                 //发送的信息关联上下文
-                    // lastData = cacheData[cacheData.length - 2];
-                    sendData = {cid: "claude", pid: "", data: this.chatContent, model: this.selectedModel};
-                } else {
-                    // lastData = cacheData[cacheData.length];
-                    sendData = {cid: "claude", pid: "", data: this.chatContent, model: this.selectedModel};
-                }
+                sendData = {cid: "claude", pid: "", data: this.chatContent, model: this.selectedModel};
             } else {
                 sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
             }
+
             this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
         },
         sendChatGpt() {
             let sendData = {};
@@ -621,6 +631,7 @@ export default {
             }
             
             this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
         },
         close () {
             this.finished = false;
@@ -735,6 +746,7 @@ export default {
         this.defaultHideAside();
         this.checkDn();
         this.getContentLen();
+        this.modelSwitch();
     },
     created () {
     }

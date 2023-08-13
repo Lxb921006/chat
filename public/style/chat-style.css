@@ -53,9 +53,9 @@
     transform: rotate(360deg);
     }
 }
-.send-input input:hover {
+/* .send-input input:hover {
     border-color: #323232;
-}
+} */
 .send-input input:focus {
     border-color: #323232;
 }
@@ -584,7 +584,10 @@ pre code {
     height: 30px;
     width: 108px;
 }
-ol li p {
+ol li > p:first-child {
     position: relative;
     bottom: 20px;
+}
+.col-font {
+    font-size: 12px;
 }

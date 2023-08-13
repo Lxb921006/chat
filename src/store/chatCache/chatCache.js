@@ -26,9 +26,6 @@ const chatCache = {
       let filterData = [];
       let reg = new RegExp(data);
       let cd = state.editableTabs;
-      for (let i = 0;i < cd.length; i++) {
-
-      }
       let newChat = cd.filter(cd => cd.title.match(reg));
       state.editableTabs = newChat;
     },
