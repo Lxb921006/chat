@@ -165,7 +165,7 @@
                             </el-col>
                             <el-col :span="1" class="z-col-5 col-font">模型选择: </el-col>
                             <el-col :span="1" class="z-col-6">
-                                <el-select v-model="selectedModel" placeholder="请选择" class="c-select">
+                                <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
                                     <el-option
                                     v-for="item in modelAll"
                                     :key="item.value"
@@ -184,6 +184,7 @@
                         </el-button>
                     </el-popover>
                 </div>
+                <!-- 回收站 -->
                 <div class="rb">
                     <el-popover
                         placement="right"
@@ -233,6 +234,7 @@
                         </el-button>
                     </el-popover>
                 </div>
+                <!-- 用户管理 -->
                 <div class="user rb">
                     <el-popover
                         placement="right"
@@ -265,9 +267,25 @@
                 </div>
                 <div class="send-question">
                     <div class="send-input">
-                        <el-input clearable  v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
+                        <!-- <el-input clearable  v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
                             <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
                         </el-input>
+                         -->
+                         <el-input
+                            type="textarea"
+                            :rows="6"
+                            placeholder="请输入对话内容"
+                            v-model="chatContent"
+                            @keyup.enter.native="wsInit()"
+                            :disabled="finished"
+                            :loading="true"
+                            >
+                        </el-input>
+                        <el-button slot="reference" @click="wsInit()">
+                            <svg class="icon z-send-button" aria-hidden="true">
+                                <use xlink:href="#icon-send-01"></use>
+                            </svg>
+                        </el-button>
                     </div>
                 </div>
             </div>
@@ -325,7 +343,7 @@ export default {
             code:"",
             value: "text-davinci-003",
             cc: "<span class='cursor' v-show='this.cursor'>|</span>",
-            selectedModel: "claude-2",
+            selectedModel: "",
             claudeIcon: "#icon-Claude2",
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
@@ -336,7 +354,7 @@ export default {
                 },
                 {
                     value: 'chatGPT',
-                    label: 'chatGPT-3.5'
+                    label: 'chatGPT'
                 },
                 {
                     value: 'claude-instant-100k',
@@ -425,13 +443,27 @@ export default {
                 console.log("还没有回收站数据哟");
             }
         },
+        checkModel() {
+            let model = window.sessionStorage.getItem('modelSelect');
+            switch (model) {
+                case '1':
+                    this.selectedModel = 'claude-2';
+                    break
+                case '2':
+                    this.selectedModel = 'chatGPT';
+                    break;
+                default:
+                    this.selectedModel = 'claude-2';
+                    break;
+            }
+        },
         modelSwitch() {
             switch (this.selectedModel) {
                 case 'claude-2':
-                    window.history.pushState({}, '', '/chat/claude-2');
+                    window.sessionStorage.setItem('modelSelect', 1);
                     break
                 case 'chatGPT':
-                    window.history.pushState({}, '', '/chat/chatGPT');
+                    window.sessionStorage.setItem('modelSelect', 2);
                     break
             }
         },
@@ -846,6 +878,7 @@ export default {
         this.checkDn();
         this.getContentLen();
         this.getAllRbData();
+        this.checkModel();
     },
     created () {
     }

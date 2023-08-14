@@ -63,11 +63,32 @@
     background-color: #262626;
     border: 1px solid #323232;
 }
+.send-input button {
+    position: relative;
+    float: right;
+    bottom: 43px;
+    right: 19px;
+    /* width: 50ox; */
+    width: 30px;
+    height: 30px;
+    background-color: #262626;
+    border: none;
+}
 .send-input input:focus {
     border-color: #323232;
 }
 .send-input button:hover {
-    background-color: #3e3f3e!important;
+    background-color: #262626!important;
+}
+.send-input button:focus {
+    background-color: #262626!important;
+}
+.send-input textarea {
+    background-color: #262626;
+    border: 1px solid #323232;
+}
+.send-input textarea:hover {
+    border-color: #494949;
 }
 .copy-title {
     cursor: pointer;
@@ -176,7 +197,7 @@
 }
 .content {
     overflow: auto;
-    height: 76%;
+    height: 70%;
     margin: 0 auto;
     scrollbar-width: none;
 }
@@ -455,9 +476,9 @@ pre code {
     bottom: 3px;
     color: #fff;
 }
-@media only screen and (max-height: 700px) {
+@media only screen and (max-height: 800px) {
     .content {
-        height: 70%;
+        height: 63%;
     }
 }
 /* 适应手机 */
@@ -641,7 +662,7 @@ ol li > p:first-child {
 .rb button {
     position: relative!important;
     right: 0px!important;
-    bottom: 13px!important;
+    bottom: 15px!important;
     font-size: 11px;
     background-color: #262626;
     border: none;
@@ -675,4 +696,9 @@ ol li > p:first-child {
     font-size: 7px;
     top: 2px;
     right: 4px;
+}
+.z-send-button {
+    position: relative;
+    bottom: 11px;
+    right: 13px;
 }
