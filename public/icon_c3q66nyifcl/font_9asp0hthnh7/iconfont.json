@@ -6,6 +6,111 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "5390966",
+      "name": "删除",
+      "font_class": "shanchu2",
+      "unicode": "e705",
+      "unicode_decimal": 59141
+    },
+    {
+      "icon_id": "7783867",
+      "name": "恢复",
+      "font_class": "ziyuan",
+      "unicode": "e6b6",
+      "unicode_decimal": 59062
+    },
+    {
+      "icon_id": "8138849",
+      "name": "恢复",
+      "font_class": "huifu",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "13020593",
+      "name": "恢复",
+      "font_class": "huifu1",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "22083989",
+      "name": "恢复",
+      "font_class": "huifu2",
+      "unicode": "e67d",
+      "unicode_decimal": 59005
+    },
+    {
+      "icon_id": "15507100",
+      "name": "用户管理",
+      "font_class": "yonghuguanli",
+      "unicode": "e6db",
+      "unicode_decimal": 59099
+    },
+    {
+      "icon_id": "16216415",
+      "name": "用户帮助",
+      "font_class": "yonghubangzhu",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
+      "icon_id": "20173043",
+      "name": "用户维护",
+      "font_class": "yonghuweihu",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "32979167",
+      "name": "用户",
+      "font_class": "yonghu",
+      "unicode": "e7be",
+      "unicode_decimal": 59326
+    },
+    {
+      "icon_id": "8798057",
+      "name": "设置",
+      "font_class": "shezhi2",
+      "unicode": "e62a",
+      "unicode_decimal": 58922
+    },
+    {
+      "icon_id": "14774398",
+      "name": "设置",
+      "font_class": "shezhi3",
+      "unicode": "e6b9",
+      "unicode_decimal": 59065
+    },
+    {
+      "icon_id": "35514057",
+      "name": "设置",
+      "font_class": "shezhi4",
+      "unicode": "e764",
+      "unicode_decimal": 59236
+    },
+    {
+      "icon_id": "4399528",
+      "name": "回收站2",
+      "font_class": "huishouzhan",
+      "unicode": "e766",
+      "unicode_decimal": 59238
+    },
+    {
+      "icon_id": "5890844",
+      "name": "回收站",
+      "font_class": "huishouzhan1",
+      "unicode": "e708",
+      "unicode_decimal": 59144
+    },
+    {
+      "icon_id": "25400018",
+      "name": "回收站",
+      "font_class": "huishouzhan2",
+      "unicode": "e739",
+      "unicode_decimal": 59193
+    },
+    {
       "icon_id": "36677843",
       "name": "Claude2",
       "font_class": "Claude2",

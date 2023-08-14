@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4197599 */
-  src: url('iconfont.woff2?t=1691932361246') format('woff2'),
-       url('iconfont.woff?t=1691932361246') format('woff'),
-       url('iconfont.ttf?t=1691932361246') format('truetype');
+  src: url('iconfont.woff2?t=1692004720081') format('woff2'),
+       url('iconfont.woff?t=1692004720081') format('woff'),
+       url('iconfont.ttf?t=1692004720081') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,66 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-shanchu2:before {
+  content: "\e705";
+}
+
+.icon-ziyuan:before {
+  content: "\e6b6";
+}
+
+.icon-huifu:before {
+  content: "\e60a";
+}
+
+.icon-huifu1:before {
+  content: "\e60b";
+}
+
+.icon-huifu2:before {
+  content: "\e67d";
+}
+
+.icon-yonghuguanli:before {
+  content: "\e6db";
+}
+
+.icon-yonghubangzhu:before {
+  content: "\e618";
+}
+
+.icon-yonghuweihu:before {
+  content: "\e64a";
+}
+
+.icon-yonghu:before {
+  content: "\e7be";
+}
+
+.icon-shezhi2:before {
+  content: "\e62a";
+}
+
+.icon-shezhi3:before {
+  content: "\e6b9";
+}
+
+.icon-shezhi4:before {
+  content: "\e764";
+}
+
+.icon-huishouzhan:before {
+  content: "\e766";
+}
+
+.icon-huishouzhan1:before {
+  content: "\e708";
+}
+
+.icon-huishouzhan2:before {
+  content: "\e739";
 }
 
 .icon-Claude2:before {

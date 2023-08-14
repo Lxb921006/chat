@@ -51,10 +51,16 @@
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
+                        <p>
+                            <span>模型: 【{{ selectedModel }}】; </span>
+                            <span v-if="contextSwitch">上下文: 【开启】</span>
+                            <span v-else>上下文: 【关闭】</span>
+                        </p>
                     </div>
                 </transition>
+                <transition-group name="el-zoom-in-center">
                 <template v-if="show">
-                    <div v-for="(data1, index1) in chatCache" :key="index1+1">
+                    <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
                         <!-- <markdown-code-block :code="data1.title" :cursor="data1.cursor"></markdown-code-block> -->
                         <transition name="el-zoom-in-top">
                             <div class="platform" @click="chatGptUrl(data1.model)" v-if="data1.answer.length > 0">
@@ -102,9 +108,15 @@
                         </div>
                     </div>
                 </template>
+            </transition-group>
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>底部</span>
+                        <p>
+                            <span>模型: 【{{ selectedModel }}】; </span>
+                            <span v-if="contextSwitch">上下文: 【开启】</span>
+                            <span v-else>上下文: 【关闭】</span>
+                        </p>
                     </div>
                 </transition>
             </div>
@@ -167,7 +179,86 @@
                         </el-row>
                         <el-button slot="reference">
                             <svg class="icon sessing-svg" aria-hidden="true">
-                                <use xlink:href="#icon-shezhi"></use>
+                                <use xlink:href="#icon-shezhi3"></use>
+                            </svg>
+                        </el-button>
+                    </el-popover>
+                </div>
+                <div class="rb">
+                    <el-popover
+                        placement="right"
+                        width="400"
+                        trigger="click">
+                        <div class="z-rb-title">
+                            <h2>回收站</h2>
+                        </div>
+                        <el-row :gutter="20" class="z-rb-search">
+                            <el-col :span=10>
+                                <el-input v-model="rbData" size="mini" clearable @keyup.enter.native="getSearchRbData()" @clear="getAllRbData()"></el-input>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20" class="z-rb-clear">
+                            <el-col :span=10>
+                                <el-button type="danger" icon="el-icon-delete-solid" round size="mini" @click="clearRbData()">清空回收站</el-button>
+                            </el-col>
+                        </el-row>
+                        <el-table :data="chatRecycle" stripe height="249">
+                            <el-table-column type="selection" width="55"></el-table-column>
+                            <el-table-column width="150" property="title" show-overflow-tooltip label="title"></el-table-column>
+                            <el-table-column width="150" property="answer" show-overflow-tooltip label="答案">
+                                <template slot-scope="scope">
+                                    <el-link :underline="false">{{ scope.row.answer.join('') }}</el-link>
+                                </template>
+                            </el-table-column>
+                            <el-table-column property="model" label="模型"></el-table-column>
+                            <el-table-column prop="operate" label="操作" width="200">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" @click="restoreChat(scope.row)" type="primary">
+                                        <svg class="icon z-rb-restore-icon" aria-hidden="true">
+                                            <use xlink:href="#icon-huifu2"></use>
+                                        </svg>恢复
+                                    </el-button>
+                                    <el-button size="mini" @click="removeRbData(scope.row)" type="danger">
+                                        <svg class="icon z-rb-restore-icon" aria-hidden="true">
+                                            <use xlink:href="#icon-shanchu2"></use>
+                                        </svg>删除
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-button slot="reference">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-huishouzhan1"></use>
+                            </svg>
+                        </el-button>
+                    </el-popover>
+                </div>
+                <div class="user rb">
+                    <el-popover
+                        placement="right"
+                        width="400"
+                        trigger="click">
+                        <div class="z-rb-title">
+                            <h2>用户管理</h2>
+                        </div>
+                        <el-row :gutter="20">
+                            <el-col :span=10>
+                                <el-input v-model="rbData" size="mini" clearable></el-input>
+                            </el-col>
+                        </el-row>
+                        <el-table :data="userData" stripe height="249">
+                            <el-table-column type="selection" width="55"></el-table-column>
+                            <el-table-column width="150" property="user" show-overflow-tooltip label="用户"></el-table-column>
+                            <el-table-column width="150" property="answer" show-overflow-tooltip label="密码"></el-table-column>
+                            <el-table-column prop="operate" label="操作">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" @click="restoreChat(scope.row.id)" type="primary">更新</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-button slot="reference">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-yonghubangzhu"></use>
                             </svg>
                         </el-button>
                     </el-popover>
@@ -193,6 +284,7 @@ import wssUrl from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
 
+// 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
 export default {
     name: "chat",
     data()  {
@@ -217,12 +309,16 @@ export default {
             mh: true,
             ash: true,
             contextSwitch: "",
+            findChatData: "",
+            rbData: "",
             dnSwitch: false,
             showAsideView: false,
+            userData: [],
             id: 0,
             wsUrl: "",
             editableTabsValue: '',
             editableTabs: [],
+            editableTabsZ: [],
             finished: false,
             icon: "#icon-fuzhi2",
             but1Icon: "el-icon-arrow-right",
@@ -253,6 +349,13 @@ export default {
                     disabled: true,
                 },
             ],
+            chatTableDatas: [
+                {
+                    date: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                },
+            ]
         }
     },
     watch: {
@@ -261,17 +364,67 @@ export default {
                 this.getAllChatData();
             }
             this.getSearchData();
-        }
+        },
+        rbData: function(newVal, oldVal) {
+            if (newVal === "") {
+                this.getAllRbData();
+            }
+            this.getSearchRbData();
+        },
     },
     computed: {
         ...mapState({
             'chatCache': state => state.chatCache.editableTabs,
+            'chatRecycle': state => state.chatRecycle.editableTabsZ
         }),
     },
     components: {
-        MarkdownCodeBlock
+        MarkdownCodeBlock,
     },
     methods: {
+        // 清空回收站
+        clearRbData() {
+            store.commit("Z_CLEAR_CHAT_CACHE", 'clear');
+        },
+        // 回收站恢复数据
+        restoreChat(data) {
+            let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
+            for (let i = 0; i < chatRecycleData.length; i++) {
+                if (chatRecycleData[i].id == data.id) {
+                    store.commit("ADD_CHAT_CACHE", chatRecycleData[i]);
+                    this.removeRbData(data);
+                    break;
+                }
+            }
+            this.getContentLen();
+            Message.success(`【${data.title}】已从回收站恢复`);
+        },
+        // 删除回收站的数据
+        removeRbData(data) {
+            this.getAllRbData();
+            let tabs = this.chatRecycle;
+            let rbChat = tabs.filter(tab => tab.id != data.id);
+            store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
+            this.getContentLen();
+        },
+        // 回收站的所有数据
+        getAllRbData() {
+            if (sessionStorage.getItem("chatRecycle")) {
+                store.commit("Z_CLEAR_CHAT_CACHE");
+                let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
+                for (let i = 0; i < chatRecycleData.length; i++) {
+                    store.commit("Z_ADD_CHAT_CACHE", chatRecycleData[i]);
+                }
+            }
+        },
+        // 回收站搜索数据
+        getSearchRbData() {
+            if (this.chatRecycle.length != 0) {
+                store.commit("Z_GET_CHAT_CACHE", this.rbData);
+            } else {
+                console.log("还没有回收站数据哟");
+            }
+        },
         modelSwitch() {
             switch (this.selectedModel) {
                 case 'claude-2':
@@ -330,6 +483,7 @@ export default {
                 this.showCursor = !this.showCursor;
             }, 500);
         },
+        // 查找聊天记录
         getAllChatData () {
             if (sessionStorage.getItem("chatCache")) {
                 store.commit("CLEAR_CHAT_CACHE");
@@ -340,12 +494,14 @@ export default {
                 }
             }
         },
+        // 搜索聊天记录
         getSearchData() {
             if (this.chatCache.length != 0) {
                 store.commit("GET_CHAT_CACHE", this.input);
             } else {
                 console.log("还没有聊天数据哟");
             }
+            this.getContentLen();
         },
         showAside() {
             const asideEl = document.querySelector('.aside');
@@ -378,6 +534,7 @@ export default {
         showModels () {
             this.mh = true;
         },
+        // 复制
         copyAll (text) {
             this.$copyText(text).then(() => {
                 Message.info("已复制到粘贴板");
@@ -385,6 +542,7 @@ export default {
                 Message.error('复制失败');
             })
         },
+        // websocket前后端交互
         wsInit () {
             if (!this.chatContent) {
                 Message.error("请输入对话内容.")
@@ -453,12 +611,78 @@ export default {
             }
         },
         open () {
+            console.log('-----------websocket连接成功------------')
             this.stopResp = true;
             this.send()
         },
         error () {
             Message.error("websocket连接失败")
         },
+        // 发送数据
+        send () {
+            switch (this.selectedModel) {
+                case 'claude-2':
+                    this.sendClaude();
+                    break
+                case 'chatGPT':
+                    this.sendChatGpt();
+                    break
+            }
+        },
+        // 后端发来的数据
+        getMessage (msg) {
+            let jd = JSON.parse(msg.data);
+            let div = document.querySelector(".content")
+            for (let i = 0; i < this.chatCache.length; i++) {
+                if (this.chatCache[i].id == this.editableTabsValue) {
+                    this.chatCache[i].answer.push(jd.data);
+                    this.chatCache[i].cid = jd.cid;
+                    this.chatCache[i].pid = jd.pid;
+                } 
+                div.scrollTop = div.scrollHeight - div.clientHeight;
+            }
+            this.getContentLen();
+        },
+        // 选择claude
+        sendClaude() {
+            let sendData = {};
+            // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            if (this.contextSwitch) {
+                //发送的信息关联上下文
+                sendData = {cid: "claude", pid: "", data: this.chatContent, model: this.selectedModel};
+            } else {
+                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+            }
+
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        // 选择选择chatgpt
+        sendChatGpt() {
+            let sendData = {};
+            let lastData = [];
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.filter(cd => cd.model == 'chatGPT');
+            if (this.contextSwitch) {
+                if (gptData.length > 1) {
+                    //发送的信息关联上下文
+                    lastData = gptData[gptData.length - 2];
+                    if (lastData.model == 'chatGPT') {
+                        sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel};
+                    } else {
+                        sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+                    }
+                } else {
+                    sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+                }
+            } else {
+                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+            }
+            
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        // 上下文开关
         checkContextStatus() {
             let contextSwitch = sessionStorage.getItem('oc');
             if (contextSwitch == 1) {
@@ -505,66 +729,7 @@ export default {
                 sessionStorage.setItem("day", JSON.stringify(data));
             }
         },
-        getMessage (msg) {
-            let jd = JSON.parse(msg.data);
-            let div = document.querySelector(".content")
-            for (let i = 0; i < this.chatCache.length; i++) {
-                if (this.chatCache[i].id == this.editableTabsValue) {
-                    this.chatCache[i].answer.push(jd.data);
-                    this.chatCache[i].cid = jd.cid;
-                    this.chatCache[i].pid = jd.pid;
-                } 
-                div.scrollTop = div.scrollHeight - div.clientHeight;
-            }
-            this.getContentLen();
-        },
-        send () {
-            switch (this.selectedModel) {
-                case 'claude-2':
-                    this.sendClaude();
-                    break
-                case 'chatGPT':
-                    this.sendChatGpt();
-                    break
-            }
-        },
-        sendClaude() {
-            let sendData = {};
-            // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            if (this.contextSwitch) {
-                //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", data: this.chatContent, model: this.selectedModel};
-            } else {
-                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
-            }
-
-            this.socket.send(JSON.stringify(sendData));
-            this.jumpFooter();
-        },
-        sendChatGpt() {
-            let sendData = {};
-            let lastData = [];
-            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            if (this.contextSwitch) {
-                if (cacheData.length > 1) {
-                //发送的信息关联上下文
-                    lastData = cacheData[cacheData.length - 2];
-                    if (lastData.model == 'chatGPT') {
-                        sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel};
-                    } else {
-                        sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
-                    }
-                } else {
-                    // lastData = cacheData[cacheData.length];
-                    sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
-                }
-            } else {
-                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
-            }
-            
-            this.socket.send(JSON.stringify(sendData));
-            this.jumpFooter();
-        },
+        // 关闭websocket连接后需要保存下ai的回复
         close () {
             this.finished = false;
             // this.mh = false;
@@ -618,19 +783,11 @@ export default {
                 },0);
             }
         },
-        addChat(targetName, id) {
-            let newTabName = ++this.tabIndex + '';
-            this.editableTabs.push({
-                title: targetName,
-                name: newTabName,
-                id: id,
-                index: "index"+id
-            });
-            this.editableTabsValue = newTabName;
-        },
+        // 删除对话记录, 会现在回收站保存
         removeChat(targetName) {
             this.getAllChatData();
             let tabs = this.chatCache;
+            let rbChat = tabs.filter(tab => tab.id == targetName);
             let activeName = this.editableTabsValue;
             if (activeName == targetName) {
                 tabs.forEach((tab, index) => {
@@ -647,7 +804,17 @@ export default {
             let newChat = tabs.filter(tab => tab.id != targetName);
             store.commit("REMOVE_CHAT_CACHE", newChat);
             this.getContentLen();
-            
+
+            if (this.rbData) {
+                this.rbData = "";
+                this.getAllRbData();
+            }
+
+            console.log("rbChat >>>", rbChat);
+            store.commit("Z_ADD_CHAT_CACHE", rbChat[0]);
+            this.getContentLen();
+
+            Message.success(`【${rbChat[0].title}】已删除, 可在回收站恢复`);
         },
         jump(id) {
             location.hash = "#" + id;
@@ -678,7 +845,7 @@ export default {
         this.defaultHideAside();
         this.checkDn();
         this.getContentLen();
-        // this.modelSwitch();
+        this.getAllRbData();
     },
     created () {
     }

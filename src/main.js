@@ -30,6 +30,8 @@ import { Dropdown } from 'element-ui'
 import { DropdownMenu } from 'element-ui'
 import { DropdownItem } from 'element-ui'
 import { Switch } from 'element-ui'
+import { Table } from 'element-ui'
+import { TableColumn } from 'element-ui'
 import VuePageTransition from 'vue-page-transition'
 
 
@@ -55,6 +57,8 @@ Vue.use(DropdownMenu);
 Vue.use(DropdownItem);
 Vue.use(Popover);
 Vue.use(Switch);
+Vue.use(Table);
+Vue.use(TableColumn);
 Vue.use(VuePageTransition);
 
 //复制插件

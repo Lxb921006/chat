@@ -12,6 +12,7 @@ const chatCache = {
   },
   mutations: {
     ADD_CHAT_CACHE(state, data){
+      // 原始
       state.editableTabs.push(data);
       sessionStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
     },
@@ -23,10 +24,13 @@ const chatCache = {
       state.editableTabs = [];
     },
     GET_CHAT_CACHE(state, data) {
-      let filterData = [];
       let reg = new RegExp(data);
       let cd = state.editableTabs;
-      let newChat = cd.filter(cd => cd.title.match(reg));
+      let newChat = cd.filter(cd => {
+        if (cd.title.match(reg) || cd.model.match(data)) {
+          return cd
+        }
+      });
       state.editableTabs = newChat;
     },
     SAVE_CHAT_CACHE_ANSWER(state, data) {
@@ -45,7 +49,6 @@ const chatCache = {
         }
         state.editableTabs = fcd;
         let jd = JSON.stringify(fcd);
-
         sessionStorage.setItem("chatCache", jd);
     }
   },
