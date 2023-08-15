@@ -84,11 +84,23 @@
     background-color: #262626!important;
 }
 .send-input textarea {
-    background-color: #262626;
-    border: 1px solid #323232;
+    background-color: #262626!important;
+    border: 1px solid #323232!important;
+    color: rgb(238, 238, 238);
 }
+.send-input textarea::-webkit-scrollbar {
+    width: 8px!important; /* 设置滚动条宽度 */
+  }
+  .send-input textarea::-webkit-scrollbar-thumb {
+    background-color: #cecece!important; /* 设置滚动条滑块颜色 */
+    border-radius: 3px; /* 设置滑块的圆角 */
+    cursor: pointer;
+  }
+  .send-input textarea::-webkit-scrollbar-thumb:hover {
+    background-color: #eeeded!important; /* 设置滚动条滑块悬停时的颜色 */
+  }
 .send-input textarea:hover {
-    border-color: #494949;
+    border-color: #494949!important;
 }
 .copy-title {
     cursor: pointer;
@@ -654,7 +666,7 @@ ol li > p:first-child {
     border-radius: 9px;
 }
 .z-content {
-    margin-top: 20px;
+    margin-top: 26px;
 }
 .rb {
     display: inline-block;
@@ -701,4 +713,9 @@ ol li > p:first-child {
     position: relative;
     bottom: 11px;
     right: 13px;
+}
+.z-ques-icon {
+    position: relative;
+    right: 360px;
+    top: 28px;
 }

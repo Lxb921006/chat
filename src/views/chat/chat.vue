@@ -61,7 +61,6 @@
                 <transition-group name="el-zoom-in-center">
                 <template v-if="show">
                     <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
-                        <!-- <markdown-code-block :code="data1.title" :cursor="data1.cursor"></markdown-code-block> -->
                         <transition name="el-zoom-in-top">
                             <div class="platform" @click="chatGptUrl(data1.model)" v-if="data1.answer.length > 0">
                                 <p>
@@ -75,6 +74,7 @@
                                     <use xlink:href="#icon-changjianwenti"></use>
                                 </svg>
                                 {{ data1.title }}  <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
+                                <!-- <markdown-title :code="data1.title" :cursor="data1.cursor"></markdown-title> -->
                             </p>
                         </h2>
                         <div class="answer-loop">
@@ -274,11 +274,12 @@
                          <el-input
                             type="textarea"
                             :rows="6"
+                            :autosize="{ minRows: 2, maxRows: 6 }"
                             placeholder="请输入对话内容"
                             v-model="chatContent"
                             @keyup.enter.native="wsInit()"
                             :disabled="finished"
-                            :loading="true"
+                            resize="none"
                             >
                         </el-input>
                         <el-button slot="reference" @click="wsInit()">
@@ -301,6 +302,7 @@ import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
+import MarkdownTitle from './markdownCodeBlock';
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
 export default {
@@ -367,13 +369,6 @@ export default {
                     disabled: true,
                 },
             ],
-            chatTableDatas: [
-                {
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1518 弄'
-                },
-            ]
         }
     },
     watch: {
@@ -398,6 +393,7 @@ export default {
     },
     components: {
         MarkdownCodeBlock,
+        // MarkdownTitle,
     },
     methods: {
         // 清空回收站
@@ -554,7 +550,6 @@ export default {
                     document.querySelector(".main").setAttribute("style", "width:100%;background-color: #262626");
                 }
                 
-                // this.but1Icon = "el-icon-arrow-left";
             }
         },
         defaultHideAside() {
@@ -675,6 +670,32 @@ export default {
             }
             this.getContentLen();
         },
+        // 关闭websocket连接后需要保存下ai的回复
+        close () {
+            this.finished = false;
+            // this.mh = false;
+            let div = document.querySelector(".content");
+            for (let i = 0; i < this.chatCache.length; i++) {
+                if (this.chatCache[i].id == this.editableTabsValue) {
+                    let data = {
+                        id: this.chatCache[i].id, 
+                        answer: this.chatCache[i].answer, 
+                        time: this.getDate(), 
+                        timeShow: true,
+                        cid: this.chatCache[i].cid,
+                        pid: this.chatCache[i].pid,
+                    }
+                    store.commit("SAVE_CHAT_CACHE_ANSWER", data);
+                    break
+                } 
+                div.scrollTop = div.scrollHeight - div.clientHeight;
+            }
+
+            this.chatContent = "";
+            this.timeShow = true;
+            this.stopResp = false;
+            clearInterval(this.clearS);
+        },
         // 选择claude
         sendClaude() {
             let sendData = {};
@@ -761,31 +782,6 @@ export default {
                 sessionStorage.setItem("day", JSON.stringify(data));
             }
         },
-        // 关闭websocket连接后需要保存下ai的回复
-        close () {
-            this.finished = false;
-            // this.mh = false;
-            let div = document.querySelector(".content");
-            for (let i = 0; i < this.chatCache.length; i++) {
-                if (this.chatCache[i].id == this.editableTabsValue) {
-                    let data = {
-                        id: this.chatCache[i].id, 
-                        answer: this.chatCache[i].answer, 
-                        time: this.getDate(), 
-                        timeShow: true,
-                        cid: this.chatCache[i].cid,
-                        pid: this.chatCache[i].pid,
-                    }
-                    store.commit("SAVE_CHAT_CACHE_ANSWER", data);
-                    break
-                } 
-                div.scrollTop = div.scrollHeight - div.clientHeight;
-            }
-
-            this.timeShow = true;
-            this.stopResp = false;
-            clearInterval(this.clearS);
-        },
         jumpFooter () {
             let tab = document.getElementsByClassName('tab')[0];
             let content = document.getElementsByClassName('content')[0];
@@ -842,7 +838,6 @@ export default {
                 this.getAllRbData();
             }
 
-            console.log("rbChat >>>", rbChat);
             store.commit("Z_ADD_CHAT_CACHE", rbChat[0]);
             this.getContentLen();
 
