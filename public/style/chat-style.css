@@ -719,3 +719,9 @@ ol li > p:first-child {
     right: 360px;
     top: 28px;
 }
+.z-model-show {
+    position: relative;
+    color: #fff;
+    font-size: 12px;
+    bottom: 6px;
+}

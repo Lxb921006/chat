@@ -51,11 +51,11 @@
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
-                        <p>
+                        <!-- <p>
                             <span>模型: 【{{ selectedModel }}】; </span>
                             <span v-if="contextSwitch">上下文: 【开启】</span>
                             <span v-else>上下文: 【关闭】</span>
-                        </p>
+                        </p> -->
                     </div>
                 </transition>
                 <transition-group name="el-zoom-in-center">
@@ -112,11 +112,11 @@
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>底部</span>
-                        <p>
+                        <!-- <p>
                             <span>模型: 【{{ selectedModel }}】; </span>
                             <span v-if="contextSwitch">上下文: 【开启】</span>
                             <span v-else>上下文: 【关闭】</span>
-                        </p>
+                        </p> -->
                     </div>
                 </transition>
             </div>
@@ -266,6 +266,11 @@
                     </el-popover>
                 </div>
                 <div class="send-question">
+                    <div class="z-model-show">
+                        <span>模型: 【{{ selectedModel }}】; </span>
+                        <span v-if="contextSwitch">上下文: 【开启】</span>
+                        <span v-else>上下文: 【关闭】</span>
+                    </div>
                     <div class="send-input">
                         <!-- <el-input clearable  v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
                             <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
@@ -302,7 +307,7 @@ import store from '../../store/index'
 import wssUrl from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
-import MarkdownTitle from './markdownCodeBlock';
+import MarkdownTitle from './markdownCode';
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
 export default {
@@ -571,9 +576,10 @@ export default {
         },
         // websocket前后端交互
         wsInit () {
-            if (!this.chatContent) {
-                Message.error("请输入对话内容.")
-                return
+            if (!this.chatContent.replace(/[\r\n\s]+/g, '')) {
+                this.chatContent = "";
+                Message.error("请输入对话内容.");
+                return;
             }
 
             if (this.input) {
