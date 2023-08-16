@@ -51,11 +51,6 @@
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
-                        <!-- <p>
-                            <span>模型: 【{{ selectedModel }}】; </span>
-                            <span v-if="contextSwitch">上下文: 【开启】</span>
-                            <span v-else>上下文: 【关闭】</span>
-                        </p> -->
                     </div>
                 </transition>
                 <transition-group name="el-zoom-in-center">
@@ -112,11 +107,6 @@
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>底部</span>
-                        <!-- <p>
-                            <span>模型: 【{{ selectedModel }}】; </span>
-                            <span v-if="contextSwitch">上下文: 【开启】</span>
-                            <span v-else>上下文: 【关闭】</span>
-                        </p> -->
                     </div>
                 </transition>
             </div>
@@ -137,6 +127,7 @@
             </div>
             <el-divider></el-divider>
             <div class="footer list-group"  id="sortable">
+                <!-- 设置 -->
                 <div class="setting">
                     <el-popover
                         placement="right-start"
@@ -265,6 +256,7 @@
                         </el-button>
                     </el-popover>
                 </div>
+                <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
                         <span>模型: 【{{ selectedModel }}】; </span>
@@ -329,6 +321,7 @@ export default {
             input:"",
             contents: [],
             socket: null,
+            stopCursor: false,
             chatLoad: true,
             show: false,
             mh: true,
@@ -358,10 +351,12 @@ export default {
                 {
                     value: 'claude-2',
                     label: 'claude-2',
+                    disabled: false,
                 },
                 {
                     value: 'chatGPT',
-                    label: 'chatGPT'
+                    label: 'chatGPT',
+                    disabled: false,
                 },
                 {
                     value: 'claude-instant-100k',
@@ -454,7 +449,7 @@ export default {
                     this.selectedModel = 'chatGPT';
                     break;
                 default:
-                    this.selectedModel = 'claude-2';
+                    this.selectedModel = 'chatGPT';
                     break;
             }
         },
@@ -490,6 +485,7 @@ export default {
                 this.close();
                 this.socket.close();
                 this.socket = null;
+                this.stopCursor = false;
             }
         },
         getDate() {
@@ -645,6 +641,7 @@ export default {
         },
         open () {
             console.log('-----------websocket连接成功------------')
+            this.stopCursor = true;
             this.stopResp = true;
             this.send()
         },
@@ -699,6 +696,7 @@ export default {
 
             this.chatContent = "";
             this.timeShow = true;
+            this.stopCursor = false;
             this.stopResp = false;
             clearInterval(this.clearS);
         },
