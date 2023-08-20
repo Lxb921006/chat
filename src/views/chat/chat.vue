@@ -81,7 +81,8 @@
                             <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
                             <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
                             <!-- 光标 -->
-                            <span class="cursor" v-else></span>
+                            <span class="cursor" v-show="data1.cursor"></span>
+                            <!-- 对话完成时间 -->
                             <transition name="el-zoom-in-center">
                                 <div class="finished-time" v-show="data1.timeShow">
                                     <i class="el-icon-time time-2">{{ data1.time }}</i>
@@ -116,6 +117,7 @@
                         <el-button v-show="showhi" circle mini @click="juamTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
                     </div>
                 </transition>
+                <!-- 是否停止ai响应 -->
                 <transition name="el-zoom-in-center">
                     <el-button :style="{ visibility: stopResp ? 'visible' : 'hidden' }" round class="stop-b" @click="stopChat()" ><span class="iconfont icon-lujing"></span> 停止</el-button>
                 </transition>
@@ -264,10 +266,6 @@
                         <span v-else>上下文: 【关闭】</span>
                     </div>
                     <div class="send-input">
-                        <!-- <el-input clearable  v-model="chatContent" @keyup.enter.native="wsInit()" :disabled="finished" @click.native="showModels()">
-                            <el-button class="data-load" slot="append" icon="el-icon-position" @click="wsInit()" :loading="finished"></el-button>
-                        </el-input>
-                         -->
                          <el-input
                             type="textarea"
                             :rows="6"
@@ -296,7 +294,7 @@
 import { Message } from 'element-ui'
 import { mapState } from 'vuex'
 import store from '../../store/index'
-import wssUrl from "../../utils/wssUrl";
+import { wssSinUrl, wssUsUrl } from "../../utils/moduleUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
 import MarkdownTitle from './markdownCode';
@@ -570,6 +568,15 @@ export default {
                 Message.error('复制失败');
             })
         },
+        loadLatestId() {
+            let oid = sessionStorage.getItem('data_id');
+            if (oid) {
+                this.editableTabsValue = oid;
+            }
+        },
+        saveLatestId(id) {
+            sessionStorage.setItem('data_id', id);
+        },
         // websocket前后端交互
         wsInit () {
             if (!this.chatContent.replace(/[\r\n\s]+/g, '')) {
@@ -599,8 +606,9 @@ export default {
                 modelIcon = this.defaultIcon;
                 break;
             }
+
             let data = {
-                title: this.chatContent,
+                title: this.chatContent.replace(/[\r\n\s]+/g, ''),
                 answer: new Array,
                 id: Math.floor(id),
                 name: this.id++,
@@ -614,19 +622,26 @@ export default {
                 model: this.selectedModel,
             };
 
-            this.clearS = setInterval(() => {
-                data.cursor = !data.cursor;
-            }, 500);
-
+            // this.clearS = setInterval(() => {
+            //     data.cursor = !data.cursor;
+            // }, 300);
+            this.saveLatestId(data.id);
             this.editableTabsValue = data.id;
-
             store.commit("ADD_CHAT_CACHE", data);
 
             if (typeof(WebSocket) === "undefined") {
                 Message.error("您的浏览器不支持socket")
             } else {
                 // 实例化socket
-                this.wsUrl = `ws://${wssUrl.replace(/http:\/\//, '')}/ws/chat/${sessionStorage.getItem("user")}/`
+                switch (this.selectedModel) {
+                    case 'claude-2':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'chatGPT':
+                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                }
+                
                 this.socket = new WebSocket(this.wsUrl);
                 // 监听socket连接
                 this.socket.onopen = this.open;
@@ -675,18 +690,26 @@ export default {
         },
         // 关闭websocket连接后需要保存下ai的回复
         close () {
+            console.log('-----------websocket已关闭------------')
             this.finished = false;
+            let answer = "";
             // this.mh = false;
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
+                    if (this.chatCache[i].answer.length == 0) {
+                        answer = ['websocket连接超时'];
+                    } else {
+                        answer = this.chatCache[i].answer;
+                    }
                     let data = {
                         id: this.chatCache[i].id, 
-                        answer: this.chatCache[i].answer, 
+                        answer: answer, 
                         time: this.getDate(), 
                         timeShow: true,
                         cid: this.chatCache[i].cid,
                         pid: this.chatCache[i].pid,
+                        cursor: false,
                     }
                     store.commit("SAVE_CHAT_CACHE_ANSWER", data);
                     break
@@ -695,10 +718,10 @@ export default {
             }
 
             this.chatContent = "";
-            this.timeShow = true;
-            this.stopCursor = false;
+            // this.timeShow = true;
+            // this.stopCursor = false;
             this.stopResp = false;
-            clearInterval(this.clearS);
+            // clearInterval(this.clearS);
         },
         // 选择claude
         sendClaude() {
@@ -850,8 +873,12 @@ export default {
         jump(id) {
             location.hash = "#" + id;
             document.getElementById(id).setAttribute("style", "color: #d9d04b;");
-        }
+        },
+        refresh() {
+            this.close();
+        },
     },
+    
     filters: {
         getCode(data) {
             const regex = /```([\s\S]*?)```/g;
@@ -878,9 +905,9 @@ export default {
         this.getContentLen();
         this.getAllRbData();
         this.checkModel();
+        this.loadLatestId();
+        this.refresh();
     },
-    created () {
-    }
 }
 </script>
 
