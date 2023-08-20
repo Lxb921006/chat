@@ -25,7 +25,15 @@
                 <transition-group name="zoom" tag="ul">
                     <el-menu-item :index=data.index v-for="data in chatCache" :key="data.index" @click="jump(data.id)" v-show="true">
                         <i class="el-icon-delete delete" @click="removeChat(data.id)"></i>
-                        <span slot="title" class="cache-title">{{ data.title }}</span>
+                        <span slot="title" class="cache-title">
+                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT' || data.model == 'chatGPT-api-3.5'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
+                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'claude-2'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
+                            {{ data.title }}
+                        </span>
                     </el-menu-item>
                 </transition-group>
                 </el-menu>
@@ -57,7 +65,7 @@
                 <template v-if="show">
                     <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
                         <transition name="el-zoom-in-top">
-                            <div class="platform" @click="chatGptUrl(data1.model)" v-if="data1.answer.length > 0">
+                            <div class="platform" @click="chatGptUrl(data1.model)" v-if="data1.title">
                                 <p>
                                     <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span>{{ data1.model }}</span>
                                 </p>
@@ -73,7 +81,7 @@
                             </p>
                         </h2>
                         <div class="answer-loop">
-                            <div class="answer-icon">
+                            <div class="answer-icon" :style="{ visibility: data1.answer.length > 0 ? 'visible' : 'hidden' }">
                                 <svg class="icon-qa-2" aria-hidden="true">
                                     <use xlink:href="#icon-cankaodaan"></use>
                                 </svg>
@@ -81,7 +89,7 @@
                             <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
                             <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
                             <!-- 光标 -->
-                            <span class="cursor" v-show="data1.cursor"></span>
+                            <span class="cursor" id="loading" v-else>waiting{{ dots }}</span>
                             <!-- 对话完成时间 -->
                             <transition name="el-zoom-in-center">
                                 <div class="finished-time" v-show="data1.timeShow">
@@ -294,7 +302,7 @@
 import { Message } from 'element-ui'
 import { mapState } from 'vuex'
 import store from '../../store/index'
-import { wssSinUrl, wssUsUrl } from "../../utils/moduleUrl";
+import { wssSinUrl, wssUsUrl, wssSinApiUrl } from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
 import MarkdownTitle from './markdownCode';
@@ -304,6 +312,8 @@ export default {
     name: "chat",
     data()  {
         return {
+            loadTimer: null,
+            dots: '',
             text:"copy me",
             now: "",
             timeShow: false,
@@ -354,6 +364,11 @@ export default {
                 {
                     value: 'chatGPT',
                     label: 'chatGPT',
+                    disabled: false,
+                },
+                {
+                    value: 'chatGPT-api-3.5',
+                    label: 'chatGPT-api-3.5',
                     disabled: false,
                 },
                 {
@@ -446,6 +461,9 @@ export default {
                 case '2':
                     this.selectedModel = 'chatGPT';
                     break;
+                case '3':
+                    this.selectedModel = 'chatGPT-api-3.5';
+                    break;
                 default:
                     this.selectedModel = 'chatGPT';
                     break;
@@ -458,6 +476,9 @@ export default {
                     break
                 case 'chatGPT':
                     window.sessionStorage.setItem('modelSelect', 2);
+                    break
+                case 'chatGPT-api-3.5':
+                    window.sessionStorage.setItem('modelSelect', 3);
                     break
             }
         },
@@ -574,6 +595,14 @@ export default {
                 this.editableTabsValue = oid;
             }
         },
+        waitingData() {
+            this.loadTimer = setInterval(() => {
+            this.dots += '.';
+            if (this.dots.length > 3) {
+                this.dots = ''; 
+            }
+            }, 300);
+        },      
         saveLatestId(id) {
             sessionStorage.setItem('data_id', id);
         },
@@ -602,6 +631,9 @@ export default {
             case 'chatGPT':
                 modelIcon = this.chatGptIcon;
                 break;
+            case 'chatGPT-api-3.5':
+                modelIcon = this.chatGptIcon;
+                break;
             default:
                 modelIcon = this.defaultIcon;
                 break;
@@ -622,13 +654,12 @@ export default {
                 model: this.selectedModel,
             };
 
-            // this.clearS = setInterval(() => {
-            //     data.cursor = !data.cursor;
-            // }, 300);
+            this.waitingData();
             this.saveLatestId(data.id);
             this.editableTabsValue = data.id;
-            store.commit("ADD_CHAT_CACHE", data);
 
+            store.commit("ADD_CHAT_CACHE", data);
+            this.jumpFooter();
             if (typeof(WebSocket) === "undefined") {
                 Message.error("您的浏览器不支持socket")
             } else {
@@ -639,6 +670,9 @@ export default {
                         break
                     case 'chatGPT':
                         this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'chatGPT-api-3.5':
+                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                 }
                 
@@ -672,6 +706,9 @@ export default {
                 case 'chatGPT':
                     this.sendChatGpt();
                     break
+                case 'chatGPT-api-3.5':
+                    this.sendChatGpt();
+                    break
             }
         },
         // 后端发来的数据
@@ -698,7 +735,7 @@ export default {
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
                     if (this.chatCache[i].answer.length == 0) {
-                        answer = ['websocket连接超时'];
+                        answer = ['websocket连接已关闭'];
                     } else {
                         answer = this.chatCache[i].answer;
                     }
@@ -718,10 +755,8 @@ export default {
             }
 
             this.chatContent = "";
-            // this.timeShow = true;
-            // this.stopCursor = false;
+            clearInterval(this.loadTimer);
             this.stopResp = false;
-            // clearInterval(this.clearS);
         },
         // 选择claude
         sendClaude() {
@@ -876,6 +911,7 @@ export default {
         },
         refresh() {
             this.close();
+            clearInterval(this.loadTimer);
         },
     },
     
@@ -900,7 +936,7 @@ export default {
         }
         this.checkContextStatus();
         this.getAllChatData();
-        this.defaultHideAside();
+        // this.defaultHideAside();
         this.checkDn();
         this.getContentLen();
         this.getAllRbData();
