@@ -356,6 +356,7 @@ export default {
             claudeIcon: "#icon-Claude2",
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
+            xfIcon : "#icon-xunfeilogo",
             modelAll: [
                 {
                     value: 'claude-2',
@@ -370,6 +371,11 @@ export default {
                 {
                     value: 'chatGPT-api-3.5',
                     label: 'chatGPT-api-3.5',
+                    disabled: false,
+                },
+                {
+                    value: 'xf',
+                    label: '讯飞星火',
                     disabled: false,
                 },
                 {
@@ -466,6 +472,9 @@ export default {
                 case '3':
                     this.selectedModel = 'chatGPT-api-3.5';
                     break;
+                case '4':
+                    this.selectedModel = 'xf';
+                    break;
                 default:
                     this.selectedModel = 'chatGPT';
                     break;
@@ -482,6 +491,9 @@ export default {
                     break
                 case 'chatGPT-api-3.5':
                     window.sessionStorage.setItem('modelSelect', 3);
+                    break
+                case 'xf':
+                    window.sessionStorage.setItem('modelSelect', 4);
                     break
             }
         },
@@ -647,6 +659,9 @@ export default {
             case 'chatGPT-api-3.5':
                 modelIcon = this.chatGptIcon;
                 break;
+            case 'xf':
+                modelIcon = this.xfIcon;
+                break;    
             default:
                 modelIcon = this.defaultIcon;
                 break;
@@ -687,6 +702,9 @@ export default {
                     case 'chatGPT-api-3.5':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
+                    case 'xf':
+                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break    
                 }
                 
                 this.socket = new WebSocket(this.wsUrl);
@@ -721,6 +739,9 @@ export default {
                     break
                 case 'chatGPT-api-3.5':
                     this.sendChatGpt();
+                    break
+                case 'xf':
+                    this.sendXF();
                     break
             }
         },
@@ -782,6 +803,21 @@ export default {
                 sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
             }
 
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        // 选择讯飞星火
+        sendXF() {
+            let sendData = {};
+            // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            if (this.contextSwitch) {
+                //发送的信息关联上下文
+                sendData = {cid: "claude", pid: "", data: this.chatContent, model: this.selectedModel};
+            } else {
+                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+            }
+
+            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },

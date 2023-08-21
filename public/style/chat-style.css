@@ -282,6 +282,7 @@
     border-top: 1px solid #424242;
     border-left: 1px solid #424242;
     border-right: 1px solid #424242;
+    overflow-wrap: break-word;
 }
 .answer-title::-webkit-scrollbar {
     display: none;
@@ -291,6 +292,9 @@
 }
 .question-2 {
     text-align: left;
+}
+.question {
+    padding: 0 20px;
 }
 .answer-loop {
     text-align: justify;
