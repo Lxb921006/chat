@@ -96,4 +96,10 @@ export default {
     fill: currentColor;
     overflow: hidden;
 }
+//适应手机
+@media only screen and (max-width: 500px) {
+    .index {
+        width: 100%;
+    }
+}
 </style>

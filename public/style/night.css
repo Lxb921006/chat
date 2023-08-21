@@ -1,0 +1,51 @@
+.main {
+    background-color: #fff;
+}
+
+.ss-aside {
+    color: #409eff;
+}
+
+.el-popover__reference-wrapper button {
+    background-color: #fff;
+}
+
+.el-divider {
+    background-color: #e1e1e1;
+}
+
+.send-input input {
+    background-color: #ffffff;
+    border-color: #dcdfe6;
+}
+
+.el-input-group__append,
+.el-input-group__prepend {
+    background-color: #f5f7fa;
+    border-color: #dcdfe6;
+    border-left: none;
+}
+
+.answer-title {
+    background-color: #f7fbf7;
+    color: #262626;
+    border-color: #e1e1e1;
+}
+
+.answer-loop {
+    background-color: #f7fbf7;
+    border-color: #e1e1e1;
+}
+
+.code {
+    background-color: #f7fbf7;
+}
+
+/* 这个部分涉及到添加了一个新的类'code-day'，我们无法直接从JavaScript代码中推断出这个类的样式 */
+.code-day {
+    /* 在这里添加对应的样式 */
+}
+
+code .lang-s {
+    color: #fff;
+}

@@ -56,10 +56,10 @@
 </template>
 
 <script>
-import { Message, Loading } from 'element-ui'
-import { mapState } from 'vuex'
-import store from '../../store/index'
-import baseUrl from "../../utils/baseUrl";
+import { Message, Loading } from 'element-ui';
+import { mapState } from 'vuex';
+import store from '../../store/index';
+import wssUrl from "../../utils/wssUrl";
 
 
 
@@ -107,15 +107,14 @@ export default {
                 index: index,
             };
             this.editableTabsValue = data.id;
-            this.imgList.push(data);
-            store.commit("ADD_IMG_CACHE", this.imgList);
+            store.commit("ADD_IMG_CACHE", data);
 
             if (typeof(WebSocket) === "undefined") {
                 Message.error("您的浏览器不支持socket")
             } else {
                 // this.addTab(this.chatContent, data.id);
                 // 实例化socket
-                this.wsUrl = `ws://${baseUrl.replace(/http:\/\//, '')}/ws/img/lxb/`
+                this.wsUrl = `ws://${wssUrl.replace(/http:\/\//, '')}/ws/img/lxb/`
                 this.socket = new WebSocket(this.wsUrl);
                 // 监听socket连接
                 this.socket.onopen = this.open;
@@ -141,9 +140,10 @@ export default {
             for (let i = 0; i < this.imgList.length; i++) {
                 if (this.imgList[i].id == this.editableTabsValue) {
                     this.imgList[i].answer= jd;
+                    let div = document.querySelector(".content")
+                    div.scrollTop = div.scrollHeight - div.clientHeight;
                 } 
             }
-            window.scrollTo(0, document.body.scrollHeight);
         },
         send () {
             this.socket.send(this.chatContent);
@@ -198,7 +198,6 @@ export default {
             store.commit("REMOVE_IMG_CACHE", newChat);
         },
         jump(id) {
-            console.log(id);
             location.hash = "#" + id;
             document.getElementById(id).setAttribute("style", "color: #9fbb91;");
         },
@@ -207,15 +206,16 @@ export default {
         },
     },
     mounted() {
-        // console.log(document.body.scrollWidth);
         if (sessionStorage.getItem("imgList")) {
             this.show = true;
-            store.commit("ADD_IMG_CACHE", JSON.parse(sessionStorage.getItem("imgList")));
+            store.commit("CLEAR_IMG_CACHE");
+            let cacheData = JSON.parse(sessionStorage.getItem("imgList"));
+            for (let i = 0; i < cacheData.length; i++) {
+                store.commit("ADD_IMG_CACHE", cacheData[i]);
+            }
         }
-        
     },
     created () {
-        // this.wsInit();
     }
 }
 </script>
@@ -229,7 +229,7 @@ export default {
 }
 .tab {
     height: 73%;
-    overflow-y: hidden;
+    overflow-y: auto;
 }
 .tab::-webkit-scrollbar {
     display: none;
@@ -237,7 +237,7 @@ export default {
 .title h2 {
     display: inline-block;
     text-align: left;
-    padding-left: 17px;
+    padding-left: 8px;
     color: rgb(233, 236, 238);
 }
 .aside {
@@ -250,17 +250,18 @@ export default {
     float: left;
     height: 100%;
     width: calc(100% - 200px);
+    background-color: #262626;
 }
 .content {
     // padding: 20px;
-    overflow-y: auto;
+    // overflow-y: auto;
     // width: 700px;
     height: 76%;
     margin: 0 auto;
 }
 .footer {
     position: relative;
-    width: 400px;
+    width: 571px;
     margin: 0 auto;
     
 }
@@ -271,21 +272,28 @@ export default {
     right: 18px;
 }
 .answer-title {
-    height: 80px;
+    // height: 80px;
     margin: 0 auto;
-    background-color: #fff;
+    // background-color: #fff;
     border-radius: 3px;
     line-height: 80px;
     font-size: 1rem;
+    color: #fff;
+    overflow-y: auto;
+    white-space: nowrap;
+    padding: 0 11px;
+}
+.answer-title::-webkit-scrollbar {
+    display: none;
 }
 .answer-loop {
     // text-align: justify;
     font-size: 1rem;
     overflow: auto;
-    padding: 18px;
-    background-color: #f7fbff;
-    border-top: 1px solid #dee2de;
-    border-bottom: 1px solid #dee2de;
+    // padding: 18px;
+    // background-color: #f7fbff;
+    border-top: 1px solid #424242;
+    border-bottom: 1px solid #424242;
 }
 .cache-title {
     font-size: 1rem;
@@ -294,13 +302,30 @@ export default {
 .delete {
     z-index: 100000000;
 }
+.copy {
+    position: relative;
+    width: 681px;
+    height: 42px;
+    bottom: 32px;
+    /* top: -32px; */
+    border-radius: 3px;
+    margin: 0px auto;
+    /* z-index: 1000; */
+    background-color: #313542;
+}
 .code {
     white-space: pre-wrap;
     display: block;
-    margin: 0 auto;
-    width: 658px;
+    margin: 13px auto;
+    width: 659px;
     position: relative;
-    bottom: 49px;
+    bottom: 50px;
+    color: #fff;
+    background-color: #201f1f;
+    border-radius: 5px;
+    padding: 0 11px 5px 11px;
+    font-size: 14px;
+    font-style: oblique;
 }
 .icon-qa {
     width: 2em;
@@ -324,24 +349,89 @@ export default {
     width: 580px;
     position: relative;
     right: 373px;
-    top: 18px;
+    top: 0;
+    // bottom: 18px;
     height: 2em;
     fill: currentColor;
     overflow: hidden;
     
 }
+.icon-qa-copy {
+    width: 27px;
+    height: 39px;
+    line-height: 39px;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+    float: right;
+    cursor: pointer;
+    padding-right: 8px;
+}
+.icon-qa-copy-2 {
+    width: 27px;
+    height: 39px;
+    line-height: 39px;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+    float: left;
+    cursor: pointer;
+    padding-left: 8px;
+}
 .notice {
     margin-top: 40px;
     font-size: .75rem;
-    color: rgba(0,0,0,.5);
+    color: #bfbfbf;
 }
-.img {
-    cursor: pointer;
+/* 效果过程 */
+.zoom-enter-active,
+.zoom-leave-active {
+  transition: all 0.5s ease;
 }
-// element-ui css修改
-:deep .el-tabs__item {
-    display: block;
-    color: #fff;
+.zoom-enter {
+  transform: scale(0.5);
+  opacity: 0;
+}
+.zoom-leave-to {
+  transform: scale(0.5);
+  opacity: 0;
+}
+.data-load {
+    height: 58px;
+    width: 57px;
+}
+
+
+//适应手机
+@media only screen and (max-width: 500px) {
+    .aside {
+        display: none;
+    }
+    .main {
+        height: 100%;
+        width: 100%;
+    }
+    .footer {
+        width: 311px;
+    }
+    .copy, .icon-qa-2 {
+        width: 100%;
+    }
+    .code {
+        width: 95%;
+    }
+    .notice {
+        margin-top: 20px;
+    }
+    // .el-image {
+    //     left: 27%;
+    // }
+}
+
+
+// element-ui的css修改
+:deep .el-divider {
+    background-color: #424242;
 }
 :deep .el-tabs__nav {
     float: none;
@@ -379,7 +469,17 @@ export default {
     box-shadow: 0px 0px 20px 0px rgb(0 0 0 / 25%);
 }
 :deep .el-input__inner {
-    height: 50px;
-    line-height: 50px;
+    height: 57px;
+    line-height: 57px;
+    background-color: #262626;
+    border: 1px solid #323232;
+}
+:deep .el-input-group__append, .el-input-group__prepend {
+    background-color: #262626;
+    border: 1px solid #323232;
+}
+:deep .el-input.is-disabled .el-input__inner {
+    background-color: #262626;
+    border: 1px solid #323232;
 }
 </style>

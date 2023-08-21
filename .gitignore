@@ -22,3 +22,6 @@ pnpm-debug.log*
 *.sln
 *.sw?
 *.zip
+baseUrl.js
+wssUrl.js
+moduleUrl.js
