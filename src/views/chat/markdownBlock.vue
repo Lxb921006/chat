@@ -87,39 +87,6 @@ export default {
       };
       return md.render(this.code);
     },
-    renderMarkdownUpdate() {
-      // 使用MarkdownIt解析Markdown文本，并进行代码高亮
-      const md = new MarkdownIt({
-        highlight: function (str, lang) {
-          if (lang && hljs.getLanguage(lang)) {
-            try {
-              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${hljs.highlight(lang, str, true).value} </code></pre>`;
-            } catch (err) {
-              console.log("md1 err >>>", err);
-            }
-            try {
-              return `<div class="custom-code-block-dev"><p>${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block hljs"><code class="language-${lang} code-3">${md.utils.escapeHtml(str)} </code></pre>`;
-            } catch (err) {
-              console.log("md2 err >>>", err);
-            }  
-          } else {
-            try {
-              return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${hljs.highlight("text", str, true).value} </code></pre>`;
-            } catch (err) {
-              console.log("md3 err >>>", err);
-            }
-            try {
-              return `<div class="custom-code-block-dev"><p>text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(str.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(str)} </code></pre>`;
-            } catch (err) {
-              console.log("md4 err >>>", err);
-            }
-          }
-        }
-      });
-
-      // 将Markdown文本转换为HTML，并设置到renderedHtml中
-      return md.render(this.code);
-    },
   },
 };
 </script>

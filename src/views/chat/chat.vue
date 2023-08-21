@@ -64,6 +64,7 @@
                 <transition-group name="el-zoom-in-center">
                 <template v-if="show">
                     <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
+                        <!-- Ai模型 -->
                         <transition name="el-zoom-in-top">
                             <div class="platform" @click="chatGptUrl(data1.model)" v-if="data1.title">
                                 <p>
@@ -452,6 +453,7 @@ export default {
                 console.log("还没有回收站数据哟");
             }
         },
+        // 重新加载页面时显示已经切换的ai平台
         checkModel() {
             let model = window.sessionStorage.getItem('modelSelect');
             switch (model) {
@@ -469,6 +471,7 @@ export default {
                     break;
             }
         },
+        // ai平台切换
         modelSwitch() {
             switch (this.selectedModel) {
                 case 'claude-2':
@@ -482,6 +485,7 @@ export default {
                     break
             }
         },
+        // 检查chatCache的长度
         getContentLen() {
             if (this.chatCache.length > 0) {
                 this.showhi = true;
@@ -489,12 +493,16 @@ export default {
                 this.showhi = false;
             }
         },
+        // ai的链接
         chatGptUrl(model) {
             switch (model) {
                 case 'claude-2':
                     window.open('https://claude.ai/');
                     break;
                 case 'chatGPT':
+                    window.open('https://openai.com/');
+                    break;
+                case 'chatGPT-api-3.5':
                     window.open('https://openai.com/');
                     break;
             }   
@@ -507,6 +515,7 @@ export default {
                 this.stopCursor = false;
             }
         },
+        // 时间格式化
         getDate() {
             // 获取当前时间
             let now = new Date()
@@ -551,6 +560,7 @@ export default {
             }
             this.getContentLen();
         },
+        // 白天黑夜背景切换
         showAside() {
             const asideEl = document.querySelector('.aside');
             const asideSt = getComputedStyle(asideEl);
@@ -572,6 +582,7 @@ export default {
                 
             }
         },
+        // 是否隐藏左侧的菜单栏，默认不隐藏
         defaultHideAside() {
             if (!this.showAsideView) {
                 document.querySelector(".aside").setAttribute("style", "display:none");
@@ -589,12 +600,14 @@ export default {
                 Message.error('复制失败');
             })
         },
+        // 刷新页面时，保存最新一条数据
         loadLatestId() {
             let oid = sessionStorage.getItem('data_id');
             if (oid) {
                 this.editableTabsValue = oid;
             }
         },
+        // 等待ai回复时的loading
         waitingData() {
             this.loadTimer = setInterval(() => {
             this.dots += '.';
@@ -797,7 +810,7 @@ export default {
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
-        // 上下文开关
+        // 保存上下文开关状态
         checkContextStatus() {
             let contextSwitch = sessionStorage.getItem('oc');
             if (contextSwitch == 1) {
@@ -808,6 +821,7 @@ export default {
                 this.contextSwitch = true;
             }
         },
+        // 是否开启上下文，默认开启
         isOpenContext() {
             if (this.contextSwitch) {
                 Message.success('对话已启用上下文关联');
@@ -817,6 +831,7 @@ export default {
                 sessionStorage.setItem("oc", 2);
             }
         },
+        // 检查白天黑夜背景状态
         checkDn() {
             const main = document.querySelector(".main");
             let dn = JSON.parse(sessionStorage.getItem('day'));

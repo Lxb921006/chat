@@ -167,6 +167,7 @@
 }
 .chat-frame {
     height: 100%;
+    background-color: #262626;
 }
 .title {
     padding: 14px 0;
