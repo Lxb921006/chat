@@ -798,9 +798,9 @@ export default {
             // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             if (this.contextSwitch) {
                 //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", data: this.chatContent, model: this.selectedModel};
+                sendData = {cid: "claude", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
             }
 
             this.socket.send(JSON.stringify(sendData));
@@ -812,9 +812,9 @@ export default {
             // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             if (this.contextSwitch) {
                 //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", data: this.chatContent, model: this.selectedModel};
+                sendData = {cid: "claude", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
             }
 
             console.log(sendData);
@@ -832,15 +832,15 @@ export default {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
                     if (lastData.model == 'chatGPT') {
-                        sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel};
+                        sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
                     } else {
-                        sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+                        sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
                     }
                 } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
                 }
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel};
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
             }
             
             this.socket.send(JSON.stringify(sendData));
