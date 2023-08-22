@@ -613,7 +613,7 @@ pre code {
     margin: 0 auto;
     text-align: left;
     margin-bottom: 2px;
-    cursor: pointer;
+    /* cursor: pointer; */
 }
 .platform span {
     position: relative;
@@ -622,7 +622,11 @@ pre code {
     font-size: 14px;
     color: #fff;
 }
-.platform span:hover {
+/* .platform span:hover {
+    color: #0a4caf;
+} */
+.z-model-name:hover {
+    cursor: pointer;
     color: #0a4caf;
 }
 .reach span {

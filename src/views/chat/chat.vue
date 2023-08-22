@@ -69,9 +69,9 @@
                     <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
                         <!-- Ai模型 -->
                         <transition name="el-zoom-in-top">
-                            <div class="platform" @click="chatGptUrl(data1.model)" v-if="data1.title">
+                            <div class="platform">
                                 <p>
-                                    <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span>{{ data1.model }}</span>
+                                    <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model }}</span>
                                 </p>
                             </div>
                         </transition>
@@ -826,7 +826,7 @@ export default {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
                     if (lastData.model == 'xf') {
-                        sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.content, model: this.selectedModel};
+                        sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer.join(''), model: this.selectedModel};
                     } else {
                         sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
                     }
@@ -836,7 +836,7 @@ export default {
             } else {
                 sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
             }
-            
+            console.log('xf send >>>', sendData)
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
