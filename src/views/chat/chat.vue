@@ -32,6 +32,9 @@
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'claude-2'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
+                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'xf'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
                             {{ data.title }}
                         </span>
                     </el-menu-item>
@@ -371,11 +374,11 @@ export default {
                 {
                     value: 'chatGPT-api-3.5',
                     label: 'chatGPT-api-3.5',
-                    disabled: false,
+                    disabled: true,
                 },
                 {
                     value: 'xf',
-                    label: '讯飞星火',
+                    label: '讯飞星火2.0',
                     disabled: false,
                 },
                 {
@@ -517,6 +520,9 @@ export default {
                 case 'chatGPT-api-3.5':
                     window.open('https://openai.com/');
                     break;
+                case 'xf':
+                    window.open('https://xinghuo.xfyun.cn/');
+                    break;    
             }   
         },
         stopChat(){
@@ -679,6 +685,7 @@ export default {
                 cid: "",
                 pid: "",
                 icon: modelIcon,
+                content: "",
                 model: this.selectedModel,
             };
 
@@ -754,6 +761,7 @@ export default {
                     this.chatCache[i].answer.push(jd.data);
                     this.chatCache[i].cid = jd.cid;
                     this.chatCache[i].pid = jd.pid;
+                    this.chatCache[i].content = jd.content;
                 } 
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
@@ -778,6 +786,7 @@ export default {
                         answer: answer, 
                         time: this.getDate(), 
                         timeShow: true,
+                        content: this.chatCache[i].content,
                         cid: this.chatCache[i].cid,
                         pid: this.chatCache[i].pid,
                         cursor: false,
@@ -792,7 +801,7 @@ export default {
             clearInterval(this.loadTimer);
             this.stopResp = false;
         },
-        // 选择claude
+        // claude
         sendClaude() {
             let sendData = {};
             // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
@@ -806,22 +815,32 @@ export default {
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
-        // 选择讯飞星火
+        // 讯飞星火
         sendXF() {
             let sendData = {};
-            // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let lastData = [];
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.filter(cd => cd.model == 'xf');
             if (this.contextSwitch) {
-                //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                if (gptData.length > 1) {
+                    //发送的信息关联上下文
+                    lastData = gptData[gptData.length - 2];
+                    if (lastData.model == 'xf') {
+                        sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.content, model: this.selectedModel};
+                    } else {
+                        sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                    }
+                } else {
+                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                }
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
             }
-
-            console.log(sendData);
+            
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
-        // 选择选择chatgpt
+        // chatgpt
         sendChatGpt() {
             let sendData = {};
             let lastData = [];

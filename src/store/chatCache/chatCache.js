@@ -44,6 +44,7 @@ const chatCache = {
                 lfcd['timeShow'] = true;
                 lfcd['pid'] = data['pid'];
                 lfcd['cid'] = data['cid'];
+                lfcd['content'] = data['content'];
                 break
             }
         }

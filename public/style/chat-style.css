@@ -673,6 +673,10 @@ ol li > p:first-child {
 .model-icon {
     border-radius: 9px;
 }
+.model-icon:hover {
+    transform: scale(2); /* 放大到原来的多少倍 */
+    transition: transform 0.3s ease; /* 过渡效果，0.3秒平滑过渡 */
+}
 .z-content {
     margin-top: 26px;
 }
