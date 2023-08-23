@@ -14,11 +14,11 @@ const chatRecycle = {
     Z_ADD_CHAT_CACHE(state, data){
       // 原始
       state.editableTabsZ.push(data);
-      sessionStorage.setItem("chatRecycle", JSON.stringify(state.editableTabsZ));
+      localStorage.setItem("chatRecycle", JSON.stringify(state.editableTabsZ));
     },
     Z_REMOVE_CHAT_CACHE(state, data) {
       state.editableTabsZ = data;
-      sessionStorage.setItem("chatRecycle", JSON.stringify(data));
+      localStorage.setItem("chatRecycle", JSON.stringify(data));
     },
     Z_CLEAR_CHAT_CACHE(state, data) {
       state.editableTabsZ = [];

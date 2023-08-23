@@ -6,6 +6,55 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "12522775",
+      "name": "记录",
+      "font_class": "jilu",
+      "unicode": "e627",
+      "unicode_decimal": 58919
+    },
+    {
+      "icon_id": "14626477",
+      "name": "消息历史",
+      "font_class": "xiaoxilishi",
+      "unicode": "e6e1",
+      "unicode_decimal": 59105
+    },
+    {
+      "icon_id": "24645744",
+      "name": "历史记录",
+      "font_class": "lishijilu",
+      "unicode": "e63d",
+      "unicode_decimal": 58941
+    },
+    {
+      "icon_id": "29474814",
+      "name": "历史记录",
+      "font_class": "lishijilu1",
+      "unicode": "e69d",
+      "unicode_decimal": 59037
+    },
+    {
+      "icon_id": "34866676",
+      "name": "历史数据-copy",
+      "font_class": "lishishuju",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "35398266",
+      "name": "文心一言",
+      "font_class": "wenxinyiyan",
+      "unicode": "e77e",
+      "unicode_decimal": 59262
+    },
+    {
+      "icon_id": "10338535",
+      "name": "科大讯飞LOGO-01",
+      "font_class": "kedaxunfeiLOGO-",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
       "icon_id": "10342691",
       "name": "讯飞logo",
       "font_class": "xunfeilogo",

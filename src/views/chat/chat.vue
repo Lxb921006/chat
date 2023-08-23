@@ -208,7 +208,7 @@
                                 <el-button type="danger" icon="el-icon-delete-solid" round size="mini" @click="clearRbData()">清空回收站</el-button>
                             </el-col>
                         </el-row>
-                        <el-table :data="chatRecycle" stripe height="249">
+                        <el-table :data="chatRecycle" stripe height="166">
                             <el-table-column type="selection" width="55"></el-table-column>
                             <el-table-column width="150" property="title" show-overflow-tooltip label="title"></el-table-column>
                             <el-table-column width="150" property="answer" show-overflow-tooltip label="答案">
@@ -270,6 +270,18 @@
                         </el-button>
                     </el-popover>
                 </div>
+                <!-- 历史记录 -->
+                <!-- <div class="user rb">
+                    <el-popconfirm
+                        title="需要加载历史记录吗？"
+                        >
+                        <el-button slot="reference">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-xiaoxilishi"></use>
+                            </svg>
+                        </el-button>
+                    </el-popconfirm>
+                </div> -->
                 <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
@@ -425,7 +437,7 @@ export default {
         },
         // 回收站恢复数据
         restoreChat(data) {
-            let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
+            let chatRecycleData = JSON.parse(localStorage.getItem("chatRecycle"));
             for (let i = 0; i < chatRecycleData.length; i++) {
                 if (chatRecycleData[i].id == data.id) {
                     store.commit("ADD_CHAT_CACHE", chatRecycleData[i]);
@@ -446,9 +458,9 @@ export default {
         },
         // 回收站的所有数据
         getAllRbData() {
-            if (sessionStorage.getItem("chatRecycle")) {
+            if (localStorage.getItem("chatRecycle")) {
                 store.commit("Z_CLEAR_CHAT_CACHE");
-                let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
+                let chatRecycleData = JSON.parse(localStorage.getItem("chatRecycle"));
                 for (let i = 0; i < chatRecycleData.length; i++) {
                     store.commit("Z_ADD_CHAT_CACHE", chatRecycleData[i]);
                 }
@@ -464,7 +476,7 @@ export default {
         },
         // 重新加载页面时显示已经切换的ai平台
         checkModel() {
-            let model = window.sessionStorage.getItem('modelSelect');
+            let model = window.localStorage.getItem('modelSelect');
             switch (model) {
                 case '1':
                     this.selectedModel = 'claude-2';
@@ -487,16 +499,16 @@ export default {
         modelSwitch() {
             switch (this.selectedModel) {
                 case 'claude-2':
-                    window.sessionStorage.setItem('modelSelect', 1);
+                    window.localStorage.setItem('modelSelect', 1);
                     break
                 case 'chatGPT':
-                    window.sessionStorage.setItem('modelSelect', 2);
+                    window.localStorage.setItem('modelSelect', 2);
                     break
                 case 'chatGPT-api-3.5':
-                    window.sessionStorage.setItem('modelSelect', 3);
+                    window.localStorage.setItem('modelSelect', 3);
                     break
                 case 'xf':
-                    window.sessionStorage.setItem('modelSelect', 4);
+                    window.localStorage.setItem('modelSelect', 4);
                     break
             }
         },
@@ -550,7 +562,7 @@ export default {
             return formattedTime;
         },
         loginout() {
-            sessionStorage.removeItem('user');
+            localStorage.removeItem('user');
             this.$router.replace('/login').catch((err) => err);
         },
         addB() {
@@ -560,10 +572,10 @@ export default {
         },
         // 查找聊天记录
         getAllChatData () {
-            if (sessionStorage.getItem("chatCache")) {
+            if (localStorage.getItem("chatCache")) {
                 store.commit("CLEAR_CHAT_CACHE");
                 this.show = true;
-                let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+                let cacheData = JSON.parse(localStorage.getItem("chatCache"));
                 for (let i = 0; i < cacheData.length; i++) {
                     store.commit("ADD_CHAT_CACHE", cacheData[i]);
                 }
@@ -620,7 +632,7 @@ export default {
         },
         // 刷新页面时，保存最新一条数据
         loadLatestId() {
-            let oid = sessionStorage.getItem('data_id');
+            let oid = localStorage.getItem('data_id');
             if (oid) {
                 this.editableTabsValue = oid;
             }
@@ -635,7 +647,7 @@ export default {
             }, 300);
         },      
         saveLatestId(id) {
-            sessionStorage.setItem('data_id', id);
+            localStorage.setItem('data_id', id);
         },
         // websocket前后端交互
         wsInit () {
@@ -804,7 +816,7 @@ export default {
         // claude
         sendClaude() {
             let sendData = {};
-            // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            // let cacheData = JSON.parse(localStorage.getItem("chatCache"));
             if (this.contextSwitch) {
                 //发送的信息关联上下文
                 sendData = {cid: "claude", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
@@ -819,7 +831,7 @@ export default {
         sendXF() {
             let sendData = {};
             let lastData = [];
-            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == 'xf');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
@@ -844,7 +856,7 @@ export default {
         sendChatGpt() {
             let sendData = {};
             let lastData = [];
-            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == 'chatGPT');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
@@ -867,7 +879,7 @@ export default {
         },
         // 保存上下文开关状态
         checkContextStatus() {
-            let contextSwitch = sessionStorage.getItem('oc');
+            let contextSwitch = localStorage.getItem('oc');
             if (contextSwitch == 1) {
                 this.contextSwitch = true;
             } else if (contextSwitch == 2) {
@@ -880,16 +892,16 @@ export default {
         isOpenContext() {
             if (this.contextSwitch) {
                 Message.success('对话已启用上下文关联');
-                sessionStorage.setItem("oc", 1);
+                localStorage.setItem("oc", 1);
             } else {
                 Message.warning('对话已禁用上下文关联');
-                sessionStorage.setItem("oc", 2);
+                localStorage.setItem("oc", 2);
             }
         },
         // 检查白天黑夜背景状态
         checkDn() {
             const main = document.querySelector(".main");
-            let dn = JSON.parse(sessionStorage.getItem('day'));
+            let dn = JSON.parse(localStorage.getItem('day'));
             if (dn) {
                 if (dn.status == 1) {
                     this.dnSwitch = true;
@@ -907,11 +919,11 @@ export default {
             if (this.dnSwitch) {
                 main.style.backgroundColor = "#e5e5e5";
                 let data = {status: 1, color: "#e5e5e5"}
-                sessionStorage.setItem("day", JSON.stringify(data));
+                localStorage.setItem("day", JSON.stringify(data));
             } else {
                 main.style.backgroundColor = "#262626";
                 let data = {status: 2, color: "#262626"}
-                sessionStorage.setItem("day", JSON.stringify(data));
+                localStorage.setItem("day", JSON.stringify(data));
             }
         },
         jumpFooter () {
@@ -943,7 +955,7 @@ export default {
                 },0);
             }
         },
-        // 删除对话记录, 会现在回收站保存
+        // 删除对话记录, 会现在回收站保存, 最多保留200条数据
         removeChat(targetName) {
             this.getAllChatData();
             let tabs = this.chatCache;
@@ -982,21 +994,6 @@ export default {
         refresh() {
             this.close();
             clearInterval(this.loadTimer);
-        },
-        isLoadingHistoryChat() {
-            let data = Json.parse(localStorage.getItem("chatCache"));
-
-            if (!this.show) {
-                this.show = true;
-            };
-
-            if (data && data.length > 0) {
-                for (let i = 0; i < data.length; i++) {
-                    store.commit("ADD_CHAT_CACHE", data[i]);
-                }
-            } else {
-                Message.error('历史数据已被清空')
-            }
         },
     },
     

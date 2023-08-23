@@ -32,6 +32,7 @@ import { DropdownItem } from 'element-ui'
 import { Switch } from 'element-ui'
 import { Table } from 'element-ui'
 import { TableColumn } from 'element-ui'
+import { Popconfirm } from 'element-ui'
 import VuePageTransition from 'vue-page-transition'
 
 
@@ -59,6 +60,7 @@ Vue.use(Popover);
 Vue.use(Switch);
 Vue.use(Table);
 Vue.use(TableColumn);
+Vue.use(Popconfirm);
 Vue.use(VuePageTransition);
 
 //复制插件
