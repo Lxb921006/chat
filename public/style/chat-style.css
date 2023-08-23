@@ -753,3 +753,6 @@ ol li > p:first-child {
 .title-model-icon {
     font-size: 9px;
 }
+.el-textarea textarea {
+    padding-right: 50px!important;
+}
