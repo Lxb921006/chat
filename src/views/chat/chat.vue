@@ -674,7 +674,7 @@ export default {
             }
 
             let data = {
-                title: this.chatContent.replace(/[\r\n\s]+/g, ''),
+                title: this.chatContent.replace(/[\n]+/g, ''),
                 answer: new Array,
                 id: Math.floor(id),
                 name: this.id++,
