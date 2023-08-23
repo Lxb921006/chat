@@ -983,6 +983,21 @@ export default {
             this.close();
             clearInterval(this.loadTimer);
         },
+        isLoadingHistoryChat() {
+            let data = Json.parse(localStorage.getItem("chatCache"));
+
+            if (!this.show) {
+                this.show = true;
+            };
+
+            if (data && data.length > 0) {
+                for (let i = 0; i < data.length; i++) {
+                    store.commit("ADD_CHAT_CACHE", data[i]);
+                }
+            } else {
+                Message.error('历史数据已被清空')
+            }
+        },
     },
     
     filters: {
