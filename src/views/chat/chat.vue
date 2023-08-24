@@ -684,7 +684,7 @@ export default {
             if (this.dots.length > 3) {
                 this.dots = ''; 
             }
-            }, 300);
+            }, 500);
         },      
         saveLatestId(id) {
             localStorage.setItem('data_id', id);
@@ -798,7 +798,7 @@ export default {
                     this.sendChatGpt();
                     break
                 case 'chatGPT-api-3.5':
-                    this.sendChatGpt();
+                    this.sendGpt35();
                     break
                 case 'xf':
                     this.sendXF();
@@ -882,6 +882,30 @@ export default {
                     lastData = gptData[gptData.length - 2];
                     if (lastData.model == 'xf') {
                         sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer.join(''), model: this.selectedModel};
+                    } else {
+                        sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                    }
+                } else {
+                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                }
+            } else {
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+            }
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        // gpt-3.5-api
+        sendGpt35() {
+            let sendData = {};
+            let lastData = [];
+            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+            let gptData =  cacheData.filter(cd => cd.model == 'chatGPT-api-3.5');
+            if (this.contextSwitch) {
+                if (gptData.length > 1) {
+                    //发送的信息关联上下文
+                    lastData = gptData[gptData.length - 2];
+                    if (lastData.model == 'chatGPT-api-3.5') {
+                        sendData = {cid: 'chatGPT-api-3.5', pid: 'chatGPT-api-3.5', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer.join(''), model: this.selectedModel};
                     } else {
                         sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
                     }
