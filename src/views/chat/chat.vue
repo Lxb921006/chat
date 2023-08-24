@@ -272,6 +272,18 @@
                         </el-button>
                     </el-popover>
                 </div>
+                <!-- 历史记录 -->
+                <div class="user rb">
+                    <el-popconfirm
+                        title="是否加载历史记录?"
+                        >
+                        <el-button slot="reference">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-xiaoxilishi"></use>
+                            </svg>
+                        </el-button>
+                    </el-popconfirm>
+                </div>
                 <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
@@ -684,7 +696,7 @@ export default {
             if (this.dots.length > 3) {
                 this.dots = ''; 
             }
-            }, 500);
+            }, 800);
         },      
         saveLatestId(id) {
             localStorage.setItem('data_id', id);
@@ -830,7 +842,7 @@ export default {
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].id == this.editableTabsValue) {
                     if (this.chatCache[i].answer.length == 0) {
-                        answer = ['websocket连接已关闭'];
+                        answer = ['网络不佳, websocket连接已关闭'];
                     } else {
                         answer = this.chatCache[i].answer;
                     }
@@ -853,8 +865,15 @@ export default {
             this.claudeFile = "";
             this.fileList = [];
             this.chatContent = "";
-            clearInterval(this.loadTimer);
             this.stopResp = false;
+            this.saveChatData();
+            clearInterval(this.loadTimer);
+        },
+        saveChatData() {
+            let lastData = [];
+            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+            lastData = cacheData[cacheData.length - 1];
+            console.log(lastData);
         },
         // claude
         sendClaude() {
@@ -1093,7 +1112,7 @@ export default {
         this.getAllRbData();
         this.checkModel();
         this.loadLatestId();
-        this.refresh();
+        // this.refresh();
     },
 }
 </script>
