@@ -71,7 +71,7 @@
                         <transition name="el-zoom-in-top">
                             <div class="platform">
                                 <p>
-                                    <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model }}</span>
+                                    <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
                                 </p>
                             </div>
                         </transition>
@@ -270,18 +270,6 @@
                         </el-button>
                     </el-popover>
                 </div>
-                <!-- 历史记录 -->
-                <!-- <div class="user rb">
-                    <el-popconfirm
-                        title="需要加载历史记录吗？"
-                        >
-                        <el-button slot="reference">
-                            <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-xiaoxilishi"></use>
-                            </svg>
-                        </el-button>
-                    </el-popconfirm>
-                </div> -->
                 <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
@@ -848,7 +836,6 @@ export default {
             } else {
                 sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
             }
-            console.log('xf send >>>', sendData)
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -996,7 +983,6 @@ export default {
             clearInterval(this.loadTimer);
         },
     },
-    
     filters: {
         getCode(data) {
             const regex = /```([\s\S]*?)```/g;
@@ -1010,6 +996,10 @@ export default {
                 newContent = newContent.replace(match[0], formattedCode);
             }
             return newContent;
+        },
+        getModelLabel(data, allModel) {
+            let label = allModel.find(item => item.value == data);
+            return label.label
         },
     },
     mounted() {
