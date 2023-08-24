@@ -9,7 +9,7 @@ import store from './store'
 // element-ui
 import 'element-ui/lib/theme-chalk/index.css';
 import 'element-ui/lib/theme-chalk/base.css';
-import { Button, Popover } from 'element-ui'
+import { Button, Popover, Upload } from 'element-ui'
 import { Input } from 'element-ui'
 import { Divider } from 'element-ui'
 import { Tabs } from 'element-ui'
@@ -61,6 +61,7 @@ Vue.use(Switch);
 Vue.use(Table);
 Vue.use(TableColumn);
 Vue.use(Popconfirm);
+Vue.use(Upload);
 Vue.use(VuePageTransition);
 
 //复制插件

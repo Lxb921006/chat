@@ -67,7 +67,7 @@
     position: relative;
     float: right;
     bottom: 43px;
-    right: 19px;
+    right: 50px;
     /* width: 50ox; */
     width: 30px;
     height: 30px;
@@ -754,5 +754,20 @@ ol li > p:first-child {
     font-size: 9px;
 }
 .el-textarea textarea {
-    padding-right: 50px!important;
+    padding-right: 87px!important;
+}
+.upload-demo button {
+    position: relative;
+    /* float: right; */
+    bottom: 38px;
+    /* right: 47px; */
+    left: 282px;
+    width: 30px;
+    height: 30px;
+    background-color: #262626;
+    border: none;
+}
+.upload-demo ul {
+    position: relative;
+    bottom: 44px;
 }

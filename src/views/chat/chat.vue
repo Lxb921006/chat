@@ -80,7 +80,8 @@
                                 <svg class="icon-qa" aria-hidden="true">
                                     <use xlink:href="#icon-changjianwenti"></use>
                                 </svg>
-                                {{ data1.title }}  <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
+                                {{ data1.title }}  <el-link :underline="false" v-if="data1.file">{{ data1.file }}</el-link>
+                                <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
                                 <!-- <markdown-title :code="data1.title" :cursor="data1.cursor"></markdown-title> -->
                             </p>
                         </h2>
@@ -123,6 +124,7 @@
                     </div>
                 </transition>
             </div>
+            <!-- 是否停止ai响应 -->
             <div class="stop">
                 <transition name="el-zoom-in-top">
                     <div class="jump-top">
@@ -294,6 +296,27 @@
                                 <use xlink:href="#icon-send-01"></use>
                             </svg>
                         </el-button>
+                        <!-- 目前只支持claude上传附件 -->
+                        <el-upload
+                            :style="{ visibility: selectedModel=='1111' ? 'visible' : 'hidden' }"
+                            class="upload-demo"
+                            :action=uploadUrl()
+                            :on-preview="handlePreview"
+                            :before-upload="checkUploadFileType"
+                            :on-success="successUpload"
+                            multiple
+                            :limit="1"
+                            :data="fileData"
+                            :on-exceed="handleExceed"
+                            :file-list="fileList">
+                            <el-tooltip class="item" effect="dark" content="只能上传.pdf .doc  .docs  .txt  .py文件" placement="top-start">
+                                <el-button size="small" type="primary">
+                                    <svg class="icon z-send-button" aria-hidden="true">
+                                        <use xlink:href="#icon-fujian"></use>
+                                    </svg>
+                                </el-button>
+                            </el-tooltip>
+                        </el-upload>
                     </div>
                 </div>
             </div>
@@ -310,6 +333,7 @@ import { wssSinUrl, wssUsUrl, wssSinApiUrl } from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
 import MarkdownTitle from './markdownCode';
+import baseUrl from "../../utils/baseUrl";
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
 export default {
@@ -349,7 +373,9 @@ export default {
             editableTabsValue: '',
             editableTabs: [],
             editableTabsZ: [],
+            fileList: [],
             finished: false,
+            claudeFile: "",
             icon: "#icon-fuzhi2",
             but1Icon: "el-icon-arrow-right",
             code:"",
@@ -360,6 +386,7 @@ export default {
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
             xfIcon : "#icon-xunfeilogo",
+            fileData: {},
             modelAll: [
                 {
                     value: 'claude-2',
@@ -392,6 +419,7 @@ export default {
                     disabled: true,
                 },
             ],
+            allowFile: ['.doc', '.docs', '.txt', '.pdf', '.py'],
         }
     },
     watch: {
@@ -419,6 +447,30 @@ export default {
         // MarkdownTitle,
     },
     methods: {
+        uploadUrl () {
+            return `${baseUrl}/claude/`
+        },
+        successUpload(response, file, fileList) {
+            this.claudeFile = file.name;
+        },
+        checkUploadFileType(file) {
+            this.fileData.user = sessionStorage.getItem('user');
+            var filePath = file.name;
+            //获取最后一个.的位置
+            var index= filePath.lastIndexOf(".");
+            //获取后缀
+            var ext = '.'+filePath.substr(index+1);
+            if (!this.allowFile.includes(ext)) {
+                Message.error(`只能上传${this.allowFile.join(',  ')}`);
+                return false
+            }
+        },
+        handleExceed(files, fileList) {
+            Message.error('每次只能上传一个文件');
+        },
+        handlePreview(file) {
+            console.log(file);
+        },
         // 清空回收站
         clearRbData() {
             store.commit("Z_CLEAR_CHAT_CACHE", 'clear');
@@ -687,6 +739,7 @@ export default {
                 icon: modelIcon,
                 content: "",
                 model: this.selectedModel,
+                file: this.claudeFile,
             };
 
             this.waitingData();
@@ -790,13 +843,15 @@ export default {
                         cid: this.chatCache[i].cid,
                         pid: this.chatCache[i].pid,
                         cursor: false,
+                        file: this.claudeFile,
                     }
                     store.commit("SAVE_CHAT_CACHE_ANSWER", data);
                     break
                 } 
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
-
+            this.claudeFile = "";
+            this.fileList = [];
             this.chatContent = "";
             clearInterval(this.loadTimer);
             this.stopResp = false;
@@ -807,9 +862,9 @@ export default {
             // let cacheData = JSON.parse(localStorage.getItem("chatCache"));
             if (this.contextSwitch) {
                 //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
             }
 
             this.socket.send(JSON.stringify(sendData));
