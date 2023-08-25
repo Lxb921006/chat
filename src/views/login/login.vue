@@ -74,7 +74,6 @@ export default {
 
             this.submitLoad = true;
             const resp = await gaLogin({code: this.gacode, user: this.user}, this.user, this.callMethod).catch(err => {this.submitLoad = false;})
-            console.log(resp);
 
             if (resp.data.status !== 10000) {
                 this.submitLoad = false;

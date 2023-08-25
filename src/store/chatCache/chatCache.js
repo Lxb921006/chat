@@ -37,7 +37,7 @@ const chatCache = {
         let chatData = localStorage.getItem("chatCache");
         let fcd = JSON.parse(chatData);
         for (let i = 0;i < fcd.length; i++) {
-            if (fcd[i].id == data.id) {
+            if (fcd[i].uuid == data.uuid) {
                 let lfcd = fcd[i];
                 lfcd['answer'] = data['answer'];
                 lfcd['cursor'] = false;

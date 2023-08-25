@@ -22,6 +22,7 @@ const chatRecycle = {
     },
     Z_CLEAR_CHAT_CACHE(state, data) {
       state.editableTabsZ = [];
+      localStorage.setItem("chatRecycle", JSON.stringify(state.editableTabsZ));
     },
     Z_GET_CHAT_CACHE(state, data) {
       let reg = new RegExp(data);

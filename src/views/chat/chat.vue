@@ -23,8 +23,8 @@
                     active-text-color="#ffd04b"
                 >
                 <transition-group name="zoom" tag="ul">
-                    <el-menu-item :index=data.index v-for="data in chatCache" :key="data.index" @click="jump(data.id)" v-show="true">
-                        <i class="el-icon-delete delete" @click="removeChat(data.id)"></i>
+                    <el-menu-item :index=data.index v-for="data in chatCache" :key="data.index" @click="jump(data.uuid)" v-show="true">
+                        <i class="el-icon-delete delete" @click="removeChat(data.uuid)"></i>
                         <span slot="title" class="cache-title">
                             <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT' || data.model == 'chatGPT-api-3.5'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
@@ -58,7 +58,7 @@
                 </div>
             </transition>
             <!-- Ai回复内容 -->
-            <div class="content" ref="wrapper">
+            <div class="content" ref="wrapper" @scroll="handleScroll">
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
@@ -75,7 +75,7 @@
                                 </p>
                             </div>
                         </transition>
-                        <h2 class="answer-title" :id=data1.id>
+                        <h2 class="answer-title" :id=data1.uuid>
                             <p class="question" ref="title">
                                 <svg class="icon-qa" aria-hidden="true">
                                     <use xlink:href="#icon-changjianwenti"></use>
@@ -98,7 +98,7 @@
                             <!-- 对话完成时间 -->
                             <transition name="el-zoom-in-center">
                                 <div class="finished-time" v-show="data1.timeShow">
-                                    <i class="el-icon-time time-2">{{ data1.time }}</i>
+                                    <i class="el-icon-time time-2">{{ data1.date }}</i>
                                     <div class="whole-answer">
                                         <el-dropdown>
                                             <span class="el-dropdown-link">
@@ -108,7 +108,7 @@
                                             </span>
                                             <el-dropdown-menu slot="dropdown">
                                                 <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer.join(''))">复制整个对话</el-dropdown-item>
-                                                <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.id)">删改该对话</el-dropdown-item>
+                                                <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.uuid)">删改该对话</el-dropdown-item>
                                             </el-dropdown-menu>
                                         </el-dropdown>
                                     </div>
@@ -261,7 +261,7 @@
                             <el-table-column width="150" property="answer" show-overflow-tooltip label="密码"></el-table-column>
                             <el-table-column prop="operate" label="操作">
                                 <template slot-scope="scope">
-                                    <el-button size="mini" @click="restoreChat(scope.row.id)" type="primary">更新</el-button>
+                                    <el-button size="mini" @click="restoreChat(scope.row.uuid)" type="primary">更新</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -276,6 +276,7 @@
                 <div class="user rb">
                     <el-popconfirm
                         title="是否加载历史记录?"
+                        @confirm="getChatList(100)"
                         >
                         <el-button slot="reference">
                             <svg class="icon z-rb-icon" aria-hidden="true">
@@ -346,6 +347,7 @@ import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样�
 import MarkdownCodeBlock from './markdownBlock';
 import MarkdownTitle from './markdownCode';
 import baseUrl from "../../utils/baseUrl";
+import { chatList, chatSave } from '../../api'
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
 export default {
@@ -432,6 +434,13 @@ export default {
                 },
             ],
             allowFile: ['.doc', '.docs', '.txt', '.pdf', '.py'],
+            loadCount: 0,
+            historyDataLoading: false,
+            pages: {
+                page: 0,
+                size: 20,
+                totals: 0,
+            },
         }
     },
     watch: {
@@ -459,6 +468,112 @@ export default {
         // MarkdownTitle,
     },
     methods: {
+        mergeUniqueByUUid(arr1, arr2) {
+            const idMap = new Map();
+            const mergedArray = [];
+            for (const item of arr1) {
+                if (!idMap.has(item.uuid)) {
+                idMap.set(item.uuid, true);
+                mergedArray.push(item);
+                }
+            }
+            for (const item of arr2) {
+                if (!idMap.has(item.uuid)) {
+                idMap.set(item.uuid, true);
+                mergedArray.push(item);
+                }
+            }
+
+            return mergedArray;
+        },
+        handleScroll() {
+            let content = document.getElementsByClassName('content')[0];
+            if (content.scrollTop + content.clientHeight >= content.scrollHeight && this.loadCount <= this.pages.totals) {
+                console.log("已经滚动到底部");
+                this.loadChatList();
+            } else {
+                console.log("还没到底");
+            }
+        },
+        async getChatList(ac) {
+            const resp = await chatList({page: this.pages.page+=1, size: this.pages.size})
+            if (resp.data.status != 666) {
+                Message.error('加载历史数据失败.')
+                return
+            }
+
+            if (ac == 100) {
+                this.loadCount = resp.data.totals;
+                let historyData = this.mergeUniqueByUUid(this.chatCache, resp.data.data);
+                for (let i = 0; i < historyData.length; i++) {
+                    historyData[i]["answer"] = JSON.parse(historyData[i]["answer"]);
+                    store.commit("ADD_CHAT_CACHE", historyData[i]);
+                }
+            }
+            
+
+            return resp
+        },
+        saveLoadingOffset() {
+            sessionStorage.setItem('page', this.pages.page);
+            sessionStorage.setItem('loadCount', this.loadCount);
+        },
+        checkLoadingOffset() {
+            let td = sessionStorage.getItem('loadCount');
+            let page = sessionStorage.getItem('page');
+            if (!td) {
+                sessionStorage.setItem('loadCount', 0);
+            } else {
+                this.loadCount = td;
+            }
+
+            if (!page) {
+                sessionStorage.setItem('page', 0);
+            } else {
+                this.pages.page = page;
+            }
+        },
+        async loadChatList() {
+            let cache_loadCount = sessionStorage.getItem('loadCount');
+            if (cache_loadCount == 0) {
+                this.loadCount = 1;
+            }
+
+            if (cache_loadCount) {
+                if (this.loadCount != cache_loadCount) {
+                    if (cache_loadCount == 0) {
+                        this.loadCount = 0;
+                    }
+                    const resp = await this.getChatList(200);
+                    let totalData = resp.data.data;
+                    this.pages.totals = resp.data.totals;
+                    this.loadCount += totalData.length;
+                    this.saveLoadingOffset();
+                    console.log('总的历史数据>>> ', this.pages.totals);
+                    let historyData = this.mergeUniqueByUUid(this.chatCache, totalData);
+                    // for (let i = 0; i < historyData.length; i++) {
+                    //     store.commit("ADD_CHAT_CACHE", historyData[i]);
+                    // }
+
+                }
+            } else {
+                if (this.loadCount != cache_loadCount) {
+                    if (cache_loadCount == 0) {
+                        this.loadCount = 0;
+                    }
+                    const resp = await this.getChatList(200);
+                    let totalData = resp.data.data;
+                    this.pages.totals = resp.data.totals;
+                    this.loadCount += totalData.length;
+                    this.saveLoadingOffset();
+                    console.log('总的历史数据>>> ', this.pages.totals);
+                    let historyData = this.mergeUniqueByUUid(this.chatCache, totalData);
+                    // for (let i = 0; i < historyData.length; i++) {
+                    //     store.commit("ADD_CHAT_CACHE", historyData[i]);
+                    // }
+                }
+            }
+        },
         uploadUrl () {
             return `${baseUrl}/claude/`
         },
@@ -491,7 +606,7 @@ export default {
         restoreChat(data) {
             let chatRecycleData = JSON.parse(localStorage.getItem("chatRecycle"));
             for (let i = 0; i < chatRecycleData.length; i++) {
-                if (chatRecycleData[i].id == data.id) {
+                if (chatRecycleData[i].uuid == data.uuid) {
                     store.commit("ADD_CHAT_CACHE", chatRecycleData[i]);
                     this.removeRbData(data);
                     break;
@@ -504,7 +619,7 @@ export default {
         removeRbData(data) {
             this.getAllRbData();
             let tabs = this.chatRecycle;
-            let rbChat = tabs.filter(tab => tab.id != data.id);
+            let rbChat = tabs.filter(tab => tab.uuid != data.uuid);
             store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
             this.getContentLen();
         },
@@ -740,11 +855,11 @@ export default {
             let data = {
                 title: this.chatContent.replace(/[\n]+/g, ''),
                 answer: new Array,
-                id: Math.floor(id),
+                uuid: Math.floor(id),
                 name: this.id++,
                 index: index,
                 cursor: true,
-                time: this.getDate(),
+                date: this.getDate(),
                 timeShow: false,
                 cid: "",
                 pid: "",
@@ -755,8 +870,8 @@ export default {
             };
 
             this.waitingData();
-            this.saveLatestId(data.id);
-            this.editableTabsValue = data.id;
+            this.saveLatestId(data.uuid);
+            this.editableTabsValue = data.uuid;
 
             store.commit("ADD_CHAT_CACHE", data);
             this.jumpFooter();
@@ -822,7 +937,7 @@ export default {
             let jd = JSON.parse(msg.data);
             let div = document.querySelector(".content")
             for (let i = 0; i < this.chatCache.length; i++) {
-                if (this.chatCache[i].id == this.editableTabsValue) {
+                if (this.chatCache[i].uuid == this.editableTabsValue) {
                     this.chatCache[i].answer.push(jd.data);
                     this.chatCache[i].cid = jd.cid;
                     this.chatCache[i].pid = jd.pid;
@@ -837,19 +952,18 @@ export default {
             console.log('-----------websocket已关闭------------')
             this.finished = false;
             let answer = "";
-            // this.mh = false;
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
-                if (this.chatCache[i].id == this.editableTabsValue) {
+                if (this.chatCache[i].uuid == this.editableTabsValue) {
                     if (this.chatCache[i].answer.length == 0) {
-                        answer = ['网络不佳, websocket连接已关闭'];
+                        answer = ['抱歉, 网络不佳, ai回复失败, 请重新提问'];
                     } else {
                         answer = this.chatCache[i].answer;
                     }
                     let data = {
-                        id: this.chatCache[i].id, 
+                        uuid: this.chatCache[i].uuid, 
                         answer: answer, 
-                        time: this.getDate(), 
+                        date: this.getDate(), 
                         timeShow: true,
                         content: this.chatCache[i].content,
                         cid: this.chatCache[i].cid,
@@ -866,14 +980,22 @@ export default {
             this.fileList = [];
             this.chatContent = "";
             this.stopResp = false;
+            this.socket = null;
             this.saveChatData();
+            this.getChatList();
             clearInterval(this.loadTimer);
         },
-        saveChatData() {
+        async saveChatData() {
             let lastData = [];
             let cacheData = JSON.parse(localStorage.getItem("chatCache"));
             lastData = cacheData[cacheData.length - 1];
-            console.log(lastData);
+            let data = {data: JSON.stringify(lastData)};
+            const resp = await chatSave(data, this.callMethod);
+            if (resp.data.status != 666) {
+                console.log('保存数据失败>>>', resp.data.msg);
+            } else {
+                console.log(resp.data.msg);
+            }
         },
         // claude
         sendClaude() {
@@ -1044,21 +1166,21 @@ export default {
         removeChat(targetName) {
             this.getAllChatData();
             let tabs = this.chatCache;
-            let rbChat = tabs.filter(tab => tab.id == targetName);
+            let rbChat = tabs.filter(tab => tab.uuid == targetName);
             let activeName = this.editableTabsValue;
             if (activeName == targetName) {
                 tabs.forEach((tab, index) => {
-                    if (tab.id == targetName) {
+                    if (tab.uuid == targetName) {
                         let nextTab = tabs[index + 1] || tabs[index - 1];
                         if (nextTab) {
-                            activeName = nextTab.id;
+                            activeName = nextTab.uuid;
                         }
                     }
                 });
             }
             
             this.editableTabsValue = activeName;
-            let newChat = tabs.filter(tab => tab.id != targetName);
+            let newChat = tabs.filter(tab => tab.uuid != targetName);
             store.commit("REMOVE_CHAT_CACHE", newChat);
             this.getContentLen();
 
@@ -1080,6 +1202,7 @@ export default {
             this.close();
             clearInterval(this.loadTimer);
         },
+        callMethod() {},
     },
     filters: {
         getCode(data) {
@@ -1111,8 +1234,7 @@ export default {
         this.getContentLen();
         this.getAllRbData();
         this.checkModel();
-        this.loadLatestId();
-        // this.refresh();
+        this.checkLoadingOffset();
     },
 }
 </script>
