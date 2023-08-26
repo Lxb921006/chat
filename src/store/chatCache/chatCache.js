@@ -22,6 +22,7 @@ const chatCache = {
     },
     CLEAR_CHAT_CACHE(state, data) {
       state.editableTabs = [];
+      // sessionStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
     },
     GET_CHAT_CACHE(state, data) {
       let reg = new RegExp(data);
@@ -55,11 +56,6 @@ const chatCache = {
     }
   },
   actions: {},
-  plugins: [createPersistedState({
-    key: 'chatsessionStorage',
-    storage: window.sessionStorage,
-    paths: ['editableTabs']
-  })],
 };
 
 export default chatCache

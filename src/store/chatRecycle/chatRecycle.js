@@ -36,10 +36,6 @@ const chatRecycle = {
     },
   },
   actions: {},
-  plugins: [createPersistedState({
-    storage: window.sessionStorage,
-    paths: ['editableTabsZ']
-  })],
 };
 
 export default chatRecycle

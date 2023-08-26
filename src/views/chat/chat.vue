@@ -92,7 +92,7 @@
                                 </svg>
                             </div>
                             <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
-                            <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
+                            <markdown-code-block :code="data1.answer" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
                             <!-- 光标 -->
                             <span class="cursor" id="loading" v-else>waiting{{ dots }}</span>
                             <!-- 对话完成时间 -->
@@ -107,7 +107,7 @@
                                                 </svg>
                                             </span>
                                             <el-dropdown-menu slot="dropdown">
-                                                <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer.join(''))">复制整个对话</el-dropdown-item>
+                                                <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer)">复制整个对话</el-dropdown-item>
                                                 <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.uuid)">删改该对话</el-dropdown-item>
                                             </el-dropdown-menu>
                                         </el-dropdown>
@@ -215,7 +215,7 @@
                             <el-table-column width="150" property="title" show-overflow-tooltip label="title"></el-table-column>
                             <el-table-column width="150" property="answer" show-overflow-tooltip label="答案">
                                 <template slot-scope="scope">
-                                    <el-link :underline="false">{{ scope.row.answer.join('') }}</el-link>
+                                    <el-link :underline="false">{{ scope.row.answer }}</el-link>
                                 </template>
                             </el-table-column>
                             <el-table-column property="model" label="模型"></el-table-column>
@@ -437,7 +437,7 @@ export default {
             loadCount: 0,
             historyDataLoading: false,
             pages: {
-                page: 0,
+                page: 1,
                 size: 20,
                 totals: 0,
             },
@@ -496,17 +496,23 @@ export default {
             }
         },
         async getChatList(ac) {
-            const resp = await chatList({page: this.pages.page+=1, size: this.pages.size})
+            const resp = await chatList({page: this.pages.page, size: this.pages.size})
             if (resp.data.status != 666) {
                 Message.error('加载历史数据失败.')
                 return
             }
 
             if (ac == 100) {
+                let respData = resp.data.data;
+                console.log("respData >>> ", respData);
                 this.loadCount = resp.data.totals;
-                let historyData = this.mergeUniqueByUUid(this.chatCache, resp.data.data);
+                let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
+                console.log("historyData >>> ", historyData);
+                this.show = true;
+                
                 for (let i = 0; i < historyData.length; i++) {
-                    historyData[i]["answer"] = JSON.parse(historyData[i]["answer"]);
+                    // let answer = JSON.parse(historyData[i]["answer"]);
+                    // historyData[i]["answer"] = answer;
                     store.commit("ADD_CHAT_CACHE", historyData[i]);
                 }
             }
@@ -542,6 +548,7 @@ export default {
                     if (cache_loadCount == 0) {
                         this.loadCount = 0;
                     }
+                    this.pages.page+=1
                     const resp = await this.getChatList(200);
                     let totalData = resp.data.data;
                     this.pages.totals = resp.data.totals;
@@ -559,6 +566,7 @@ export default {
                     if (cache_loadCount == 0) {
                         this.loadCount = 0;
                     }
+                    this.pages.page+=1
                     const resp = await this.getChatList(200);
                     let totalData = resp.data.data;
                     this.pages.totals = resp.data.totals;
@@ -735,7 +743,7 @@ export default {
                 this.showCursor = !this.showCursor;
             }, 500);
         },
-        // 查找聊天记录
+        // 所有聊天记录
         getAllChatData () {
             if (sessionStorage.getItem("chatCache")) {
                 store.commit("CLEAR_CHAT_CACHE");
@@ -852,7 +860,7 @@ export default {
 
             let data = {
                 title: this.chatContent.replace(/[\n]+/g, ''),
-                answer: new Array,
+                answer: "",
                 uuid: Math.floor(id),
                 name: this.id++,
                 index: index,
@@ -936,7 +944,8 @@ export default {
             let div = document.querySelector(".content")
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].uuid == this.editableTabsValue) {
-                    this.chatCache[i].answer.push(jd.data);
+                    // this.chatCache[i].answer.push(jd.data);
+                    this.chatCache[i].answer += jd.data
                     this.chatCache[i].cid = jd.cid;
                     this.chatCache[i].pid = jd.pid;
                     this.chatCache[i].content = jd.content;
@@ -954,7 +963,7 @@ export default {
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].uuid == this.editableTabsValue) {
                     if (this.chatCache[i].answer.length == 0) {
-                        answer = ['抱歉, 网络不佳, ai回复失败, 请重新提问'];
+                        answer = '抱歉, 网络不佳, ai回复失败, 请重新提问';
                     } else {
                         answer = this.chatCache[i].answer;
                     }
@@ -988,7 +997,7 @@ export default {
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             lastData = cacheData[cacheData.length - 1];
-            lastData['answer'] = JSON.stringify(lastData['answer']);
+            // lastData['answer'] = JSON.stringify(lastData['answer']);
             let data = {data: JSON.stringify(lastData)};
             const resp = await chatSave(data, this.callMethod);
             if (resp.data.status != 666) {
@@ -1022,7 +1031,7 @@ export default {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
                     if (lastData.model == 'xf') {
-                        sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer.join(''), model: this.selectedModel};
+                        sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer, model: this.selectedModel};
                     } else {
                         sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
                     }
@@ -1046,7 +1055,7 @@ export default {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
                     if (lastData.model == 'chatGPT-api-3.5') {
-                        sendData = {cid: 'chatGPT-api-3.5', pid: 'chatGPT-api-3.5', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer.join(''), model: this.selectedModel};
+                        sendData = {cid: 'chatGPT-api-3.5', pid: 'chatGPT-api-3.5', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer, model: this.selectedModel};
                     } else {
                         sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
                     }
@@ -1140,11 +1149,11 @@ export default {
                 setTimeout(function(){
                     //设置滚动条到最底部
                     content.scrollTop = content.scrollHeight;
-                },0);
+                },200);
                 setTimeout(function(){
                     //设置滚动条到最底部
                     tab.scrollTop = tab.scrollHeight;
-                },0);
+                },200);
             }
         },
         juamTop() {
@@ -1155,11 +1164,11 @@ export default {
                 setTimeout(function(){
                     //设置滚动条到最顶部
                     content.scrollTop = 0;
-                },0);
+                },200);
                 setTimeout(function(){
                     //设置滚动条到最顶部
                     tab.scrollTop = 0;
-                },0);
+                },200);
             }
         },
         // 删除对话记录, 会现在回收站保存, 最多保留200条数据
@@ -1235,6 +1244,7 @@ export default {
         this.getAllRbData();
         this.checkModel();
         this.checkLoadingOffset();
+        // this.getChatList(100);
     },
 }
 </script>
