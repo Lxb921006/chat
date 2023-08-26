@@ -510,8 +510,6 @@ export default {
                     store.commit("ADD_CHAT_CACHE", historyData[i]);
                 }
             }
-            
-
             return resp
         },
         saveLoadingOffset() {
@@ -604,7 +602,7 @@ export default {
         },
         // 回收站恢复数据
         restoreChat(data) {
-            let chatRecycleData = JSON.parse(localStorage.getItem("chatRecycle"));
+            let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
             for (let i = 0; i < chatRecycleData.length; i++) {
                 if (chatRecycleData[i].uuid == data.uuid) {
                     store.commit("ADD_CHAT_CACHE", chatRecycleData[i]);
@@ -625,9 +623,9 @@ export default {
         },
         // 回收站的所有数据
         getAllRbData() {
-            if (localStorage.getItem("chatRecycle")) {
+            if (sessionStorage.getItem("chatRecycle")) {
                 store.commit("Z_CLEAR_CHAT_CACHE");
-                let chatRecycleData = JSON.parse(localStorage.getItem("chatRecycle"));
+                let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
                 for (let i = 0; i < chatRecycleData.length; i++) {
                     store.commit("Z_ADD_CHAT_CACHE", chatRecycleData[i]);
                 }
@@ -643,7 +641,7 @@ export default {
         },
         // 重新加载页面时显示已经切换的ai平台
         checkModel() {
-            let model = window.localStorage.getItem('modelSelect');
+            let model = window.sessionStorage.getItem('modelSelect');
             switch (model) {
                 case '1':
                     this.selectedModel = 'claude-2';
@@ -666,16 +664,16 @@ export default {
         modelSwitch() {
             switch (this.selectedModel) {
                 case 'claude-2':
-                    window.localStorage.setItem('modelSelect', 1);
+                    window.sessionStorage.setItem('modelSelect', 1);
                     break
                 case 'chatGPT':
-                    window.localStorage.setItem('modelSelect', 2);
+                    window.sessionStorage.setItem('modelSelect', 2);
                     break
                 case 'chatGPT-api-3.5':
-                    window.localStorage.setItem('modelSelect', 3);
+                    window.sessionStorage.setItem('modelSelect', 3);
                     break
                 case 'xf':
-                    window.localStorage.setItem('modelSelect', 4);
+                    window.sessionStorage.setItem('modelSelect', 4);
                     break
             }
         },
@@ -729,7 +727,7 @@ export default {
             return formattedTime;
         },
         loginout() {
-            localStorage.removeItem('user');
+            sessionStorage.removeItem('user');
             this.$router.replace('/login').catch((err) => err);
         },
         addB() {
@@ -739,10 +737,10 @@ export default {
         },
         // 查找聊天记录
         getAllChatData () {
-            if (localStorage.getItem("chatCache")) {
+            if (sessionStorage.getItem("chatCache")) {
                 store.commit("CLEAR_CHAT_CACHE");
                 this.show = true;
-                let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+                let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
                 for (let i = 0; i < cacheData.length; i++) {
                     store.commit("ADD_CHAT_CACHE", cacheData[i]);
                 }
@@ -799,7 +797,7 @@ export default {
         },
         // 刷新页面时，保存最新一条数据
         loadLatestId() {
-            let oid = localStorage.getItem('data_id');
+            let oid = sessionStorage.getItem('data_id');
             if (oid) {
                 this.editableTabsValue = oid;
             }
@@ -814,7 +812,7 @@ export default {
             }, 800);
         },      
         saveLatestId(id) {
-            localStorage.setItem('data_id', id);
+            sessionStorage.setItem('data_id', id);
         },
         // websocket前后端交互
         wsInit () {
@@ -985,10 +983,12 @@ export default {
             this.getChatList();
             clearInterval(this.loadTimer);
         },
+        // 保存提问记录
         async saveChatData() {
             let lastData = [];
-            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             lastData = cacheData[cacheData.length - 1];
+            lastData['answer'] = JSON.stringify(lastData['answer']);
             let data = {data: JSON.stringify(lastData)};
             const resp = await chatSave(data, this.callMethod);
             if (resp.data.status != 666) {
@@ -1000,7 +1000,7 @@ export default {
         // claude
         sendClaude() {
             let sendData = {};
-            // let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+            // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             if (this.contextSwitch) {
                 //发送的信息关联上下文
                 sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
@@ -1015,7 +1015,7 @@ export default {
         sendXF() {
             let sendData = {};
             let lastData = [];
-            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == 'xf');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
@@ -1039,7 +1039,7 @@ export default {
         sendGpt35() {
             let sendData = {};
             let lastData = [];
-            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == 'chatGPT-api-3.5');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
@@ -1063,7 +1063,7 @@ export default {
         sendChatGpt() {
             let sendData = {};
             let lastData = [];
-            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == 'chatGPT');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
@@ -1086,7 +1086,7 @@ export default {
         },
         // 保存上下文开关状态
         checkContextStatus() {
-            let contextSwitch = localStorage.getItem('oc');
+            let contextSwitch = sessionStorage.getItem('oc');
             if (contextSwitch == 1) {
                 this.contextSwitch = true;
             } else if (contextSwitch == 2) {
@@ -1099,16 +1099,16 @@ export default {
         isOpenContext() {
             if (this.contextSwitch) {
                 Message.success('对话已启用上下文关联');
-                localStorage.setItem("oc", 1);
+                sessionStorage.setItem("oc", 1);
             } else {
                 Message.warning('对话已禁用上下文关联');
-                localStorage.setItem("oc", 2);
+                sessionStorage.setItem("oc", 2);
             }
         },
         // 检查白天黑夜背景状态
         checkDn() {
             const main = document.querySelector(".main");
-            let dn = JSON.parse(localStorage.getItem('day'));
+            let dn = JSON.parse(sessionStorage.getItem('day'));
             if (dn) {
                 if (dn.status == 1) {
                     this.dnSwitch = true;
@@ -1126,11 +1126,11 @@ export default {
             if (this.dnSwitch) {
                 main.style.backgroundColor = "#e5e5e5";
                 let data = {status: 1, color: "#e5e5e5"}
-                localStorage.setItem("day", JSON.stringify(data));
+                sessionStorage.setItem("day", JSON.stringify(data));
             } else {
                 main.style.backgroundColor = "#262626";
                 let data = {status: 2, color: "#262626"}
-                localStorage.setItem("day", JSON.stringify(data));
+                sessionStorage.setItem("day", JSON.stringify(data));
             }
         },
         jumpFooter () {
