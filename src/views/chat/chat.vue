@@ -559,6 +559,7 @@ export default {
 
                 Message.success('历史对话加载完毕')
             }
+            this.chatTitleFormat();
 
             return resp
         },
