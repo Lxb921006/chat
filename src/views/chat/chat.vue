@@ -76,7 +76,7 @@
                             </div>
                         </transition>
                         <h2 class="answer-title" :id=data1.uuid>
-                            <p class="question" ref="title">
+                            <p class="question" ref="title" :style="monitorHeight">
                                 <svg class="icon-qa" aria-hidden="true">
                                     <use xlink:href="#icon-changjianwenti"></use>
                                 </svg>
@@ -462,12 +462,46 @@ export default {
             'chatCache': state => state.chatCache.editableTabs,
             'chatRecycle': state => state.chatRecycle.editableTabsZ
         }),
+        monitorHeight() {
+            if (this.addTitleStyle()) {
+                return {whiteSpace: "break-spaces", textAlign: "justify"}
+            } else {
+                return {}
+            }
+        },
     },
     components: {
         MarkdownCodeBlock,
         // MarkdownTitle,
     },
     methods: {
+        chatTitleFormat() {
+            this.$nextTick(function() {
+                const nt = this.$refs.title;
+                if (nt) {
+                    if (nt.length != 0) {
+                        for (let i = 0; i < nt.length; i++) {
+                            if (nt[i].scrollHeight  <= nt[i].clientHeight) {
+                                nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
+                            }
+                        }
+                    }
+                }
+            }); 
+        },
+        addTitleStyle () {
+            this.$nextTick(function() {
+                const nt = this.$refs.title;
+                if (nt) {
+                    if (nt.length != 0) {
+                        let lastTitle = nt.length - 1;
+                        return lastTitle.scrollHeight  <= lastTitle.clientHeight;
+                    }
+                }
+                return false;
+            });
+        },
+        // 加载数据的时候过滤掉重复的
         mergeUniqueByUUid(arr1, arr2) {
             const idMap = new Map();
             const mergedArray = [];
@@ -493,6 +527,7 @@ export default {
                 this.scrollLoadChatData();
             }
         },
+        // 拉取保存在服务端的历史对话
         async getChatList(ac) {
             if (ac==100) {
                 this.pages.page = 1;
@@ -852,7 +887,7 @@ export default {
             }
 
             let data = {
-                title: this.chatContent.replace(/[\n]+/g, ''),
+                title: this.chatContent,
                 answer: "",
                 uuid: Math.floor(id),
                 name: this.id++,
@@ -983,6 +1018,7 @@ export default {
             this.socket = null;
             this.saveChatData();
             this.getChatList();
+            this.chatTitleFormat();
             clearInterval(this.loadTimer);
         },
         // 保存对话记录
@@ -1143,7 +1179,7 @@ export default {
             let scroll = content.scrollTop;
             let tabScroll = tab.scrollTop;
 
-            const distance = 500;
+            const distance = 1000;
 
             // 使用setInterval平滑滚动content
             const timer2 = setInterval(() => {
@@ -1191,7 +1227,7 @@ export default {
             let scroll = content.scrollTop;
             let tabScroll = tab.scrollTop;
 
-            const distance = 500;
+            const distance = 1000;
 
             // 使用setInterval平滑滚动content
             const timer2 = setInterval(() => {
@@ -1307,6 +1343,7 @@ export default {
         this.checkModel();
         this.checkLoadingOffset();
         // this.getChatList(100);
+        this.chatTitleFormat();
     },
 }
 </script>
