@@ -142,8 +142,8 @@
                 </transition>
             </div>
             <el-divider></el-divider>
+            <!-- 设置 -->
             <div class="footer list-group"  id="sortable">
-                <!-- 设置 -->
                 <div class="setting">
                     <el-popover
                         placement="right-start"
@@ -295,8 +295,8 @@
                     <div class="send-input">
                          <el-input
                             type="textarea"
-                            :rows="6"
-                            :autosize="{ minRows: 2, maxRows: 6 }"
+                            
+                            :autosize="{ minRows: 2, maxRows: 4 }"
                             placeholder="请输入对话内容"
                             v-model="chatContent"
                             @keyup.enter.native="wsInit()"
@@ -488,35 +488,47 @@ export default {
         },
         handleScroll() {
             let content = document.getElementsByClassName('content')[0];
-            if (content.scrollTop + content.clientHeight >= content.scrollHeight && this.loadCount <= this.pages.totals) {
-                console.log("已经滚动到底部");
-                this.loadChatList();
-            } else {
-                console.log("还没到底");
+            if (content.scrollTop + content.clientHeight >= content.scrollHeight) {
+                console.log('--------------正在检测是否有数据加载----------------');
+                this.scrollLoadChatData();
             }
         },
         async getChatList(ac) {
+            if (ac==100) {
+                this.pages.page = 1;
+            }
+
             const resp = await chatList({page: this.pages.page, size: this.pages.size})
             if (resp.data.status != 666) {
-                Message.error('加载历史数据失败.')
+                Message.error('加载历史对话失败')
                 return
             }
 
             if (ac == 100) {
                 let respData = resp.data.data;
-                console.log("respData >>> ", respData);
-                this.loadCount = resp.data.totals;
+                if (resp.data.totals == 0) {
+                    Message.warning('没有历史数据可加载')
+                    return
+                }
+                this.pages.totals = resp.data.totals;
+                this.loadCount = respData.length;
+                this.saveChatListTotal();
+                this.saveLoadingOffset();
                 let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
-                console.log("historyData >>> ", historyData);
                 this.show = true;
-                
+                this.showhi = true;
+                store.commit("CLEAR_CHAT_CACHE");
                 for (let i = 0; i < historyData.length; i++) {
-                    // let answer = JSON.parse(historyData[i]["answer"]);
-                    // historyData[i]["answer"] = answer;
                     store.commit("ADD_CHAT_CACHE", historyData[i]);
                 }
+
+                Message.success('历史对话加载完毕')
             }
+
             return resp
+        },
+        saveChatListTotal() {
+            sessionStorage.setItem('totals', this.pages.totals);
         },
         saveLoadingOffset() {
             sessionStorage.setItem('page', this.pages.page);
@@ -525,6 +537,7 @@ export default {
         checkLoadingOffset() {
             let td = sessionStorage.getItem('loadCount');
             let page = sessionStorage.getItem('page');
+            let totals = sessionStorage.getItem('totals');
             if (!td) {
                 sessionStorage.setItem('loadCount', 0);
             } else {
@@ -536,48 +549,27 @@ export default {
             } else {
                 this.pages.page = page;
             }
-        },
-        async loadChatList() {
-            let cache_loadCount = sessionStorage.getItem('loadCount');
-            if (cache_loadCount == 0) {
-                this.loadCount = 1;
+
+            if (totals) {
+                this.pages.totals = totals;
             }
-
-            if (cache_loadCount) {
-                if (this.loadCount != cache_loadCount) {
-                    if (cache_loadCount == 0) {
-                        this.loadCount = 0;
-                    }
-                    this.pages.page+=1
-                    const resp = await this.getChatList(200);
-                    let totalData = resp.data.data;
-                    this.pages.totals = resp.data.totals;
-                    this.loadCount += totalData.length;
-                    this.saveLoadingOffset();
-                    console.log('总的历史数据>>> ', this.pages.totals);
-                    let historyData = this.mergeUniqueByUUid(this.chatCache, totalData);
-                    // for (let i = 0; i < historyData.length; i++) {
-                    //     store.commit("ADD_CHAT_CACHE", historyData[i]);
-                    // }
-
+        },
+        // 滚动到底部就加载数据
+        async scrollLoadChatData() {
+            let totals = sessionStorage.getItem('totals');
+            this.loadCount = sessionStorage.getItem('loadCount');
+            this.pages.page = sessionStorage.getItem('page');
+            if (this.loadCount != totals) {
+                this.pages.page += 1;
+                const resp = await this.getChatList(200);
+                let respData = resp.data.data;
+                let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
+                for (let i = 0; i < historyData.length; i++) {
+                    store.commit("ADD_CHAT_CACHE", historyData[i]);
                 }
-            } else {
-                if (this.loadCount != cache_loadCount) {
-                    if (cache_loadCount == 0) {
-                        this.loadCount = 0;
-                    }
-                    this.pages.page+=1
-                    const resp = await this.getChatList(200);
-                    let totalData = resp.data.data;
-                    this.pages.totals = resp.data.totals;
-                    this.loadCount += totalData.length;
-                    this.saveLoadingOffset();
-                    console.log('总的历史数据>>> ', this.pages.totals);
-                    let historyData = this.mergeUniqueByUUid(this.chatCache, totalData);
-                    // for (let i = 0; i < historyData.length; i++) {
-                    //     store.commit("ADD_CHAT_CACHE", historyData[i]);
-                    // }
-                }
+                loadOffset += respData.length;
+                sessionStorage.setItem('loadCount', this.loadCount);
+                sessionStorage.setItem('page', this.pages.page);
             }
         },
         uploadUrl () {
@@ -736,7 +728,7 @@ export default {
         },
         loginout() {
             sessionStorage.removeItem('user');
-            this.$router.replace('/login').catch((err) => err);
+            location.reload();
         },
         addB() {
             this.clearS = setInterval(() => {
@@ -992,7 +984,7 @@ export default {
             this.getChatList();
             clearInterval(this.loadTimer);
         },
-        // 保存提问记录
+        // 保存对话记录
         async saveChatData() {
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
@@ -1031,7 +1023,7 @@ export default {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
                     if (lastData.model == 'xf') {
-                        sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer, model: this.selectedModel};
+                        sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer, lastQue: lastData.title, model: this.selectedModel};
                     } else {
                         sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
                     }
@@ -1041,6 +1033,7 @@ export default {
             } else {
                 sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
             }
+            console.log('xf >>>', sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1142,34 +1135,101 @@ export default {
                 sessionStorage.setItem("day", JSON.stringify(data));
             }
         },
+        // 滚动到最底部
         jumpFooter () {
             let tab = document.getElementsByClassName('tab')[0];
             let content = document.getElementsByClassName('content')[0];
-            if(content.scrollHeight > content.clientHeight) {
-                setTimeout(function(){
-                    //设置滚动条到最底部
-                    content.scrollTop = content.scrollHeight;
-                },200);
-                setTimeout(function(){
-                    //设置滚动条到最底部
-                    tab.scrollTop = tab.scrollHeight;
-                },200);
-            }
+            let scroll = content.scrollTop;
+            let tabScroll = tab.scrollTop;
+
+            const distance = 500;
+
+            // 使用setInterval平滑滚动content
+            const timer2 = setInterval(() => {
+                scroll += distance
+
+                // 滚动到底部时停止
+                if(scroll >= content.scrollHeight){
+                    clearInterval(timer2);
+                }
+
+                // 滚动指定距离
+                content.scrollTop = scroll;
+            }, 8)
+
+
+            // 使用setInterval平滑滚动tab
+            const timer3 = setInterval(() => {
+                tabScroll += distance
+
+                // 滚动到底部时停止
+                if(tabScroll >= tab.scrollHeight){
+                    clearInterval(timer3);
+                }
+
+                // 滚动指定距离
+                tab.scrollTop = tabScroll;
+            }, 8)
+
+            // if(content.scrollHeight > content.clientHeight) {
+            //     setTimeout(function(){
+            //         //设置滚动条到最底部
+            //         content.scrollTop = content.scrollHeight;
+            //     },0);
+            //     setTimeout(function(){
+            //         //设置滚动条到最底部
+            //         tab.scrollTop = tab.scrollHeight;
+            //     },0);
+            // }
         },
+        // 滚动到最顶部
         juamTop() {
             let content = document.getElementsByClassName('content')[0]
             let tab = document.getElementsByClassName('tab')[0];
-            if(content.scrollHeight > content.clientHeight) {
+            
+            let scroll = content.scrollTop;
+            let tabScroll = tab.scrollTop;
+
+            const distance = 500;
+
+            // 使用setInterval平滑滚动content
+            const timer2 = setInterval(() => {
+                scroll -= distance
+
+                // 滚动到顶部时停止
+                if(scroll <= 0){
+                    clearInterval(timer2);
+                }
+
+                // 滚动指定距离
+                content.scrollTop = scroll;
+            }, 8)
+
+            // 使用setInterval平滑滚动tab
+            const timer3 = setInterval(() => {
+                tabScroll -= distance
+
+                // 滚动到顶部时停止
+                if(tabScroll <= 0){
+                    clearInterval(timer3);
+                }
+
+                // 滚动指定距离
+                tab.scrollTop = tabScroll;
+            }, 8)
+
+
+            // if(content.scrollHeight > content.clientHeight) {
                 
-                setTimeout(function(){
-                    //设置滚动条到最顶部
-                    content.scrollTop = 0;
-                },200);
-                setTimeout(function(){
-                    //设置滚动条到最顶部
-                    tab.scrollTop = 0;
-                },200);
-            }
+            //     setTimeout(function(){
+            //         //设置滚动条到最顶部
+            //         content.scrollTop = 0;
+            //     },0);
+            //     setTimeout(function(){
+            //         //设置滚动条到最顶部
+            //         tab.scrollTop = 0;
+            //     },0);
+            // }
         },
         // 删除对话记录, 会现在回收站保存, 最多保留200条数据
         removeChat(targetName) {
@@ -1203,6 +1263,7 @@ export default {
 
             Message.success(`【${rbChat[0].title}】已删除, 可在回收站恢复`);
         },
+        // 锚点
         jump(id) {
             location.hash = "#" + id;
             document.getElementById(id).setAttribute("style", "color: #d9d04b;");

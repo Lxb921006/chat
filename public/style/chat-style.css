@@ -343,6 +343,9 @@
     padding: 0 11px 5px 11px;
     font-size: 14px;
 }
+.code img {
+    width: 400px;
+}
 .time-2 {
     display: inline-block;
     position: relative;
@@ -770,4 +773,7 @@ ol li > p:first-child {
 .upload-demo ul {
     position: relative;
     bottom: 44px;
+}
+.el-popconfirm__action {
+    padding-top: 8px;
 }
