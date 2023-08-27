@@ -557,17 +557,18 @@ export default {
         // 滚动到底部就加载数据
         async scrollLoadChatData() {
             let totals = sessionStorage.getItem('totals');
-            this.loadCount = sessionStorage.getItem('loadCount');
-            this.pages.page = sessionStorage.getItem('page');
+            this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
+            this.pages.page = parseInt(sessionStorage.getItem('page'));
             if (this.loadCount != totals) {
                 this.pages.page += 1;
                 const resp = await this.getChatList(200);
                 let respData = resp.data.data;
                 let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
+                store.commit("CLEAR_CHAT_CACHE");
                 for (let i = 0; i < historyData.length; i++) {
                     store.commit("ADD_CHAT_CACHE", historyData[i]);
                 }
-                loadOffset += respData.length;
+                this.loadCount += respData.length;
                 sessionStorage.setItem('loadCount', this.loadCount);
                 sessionStorage.setItem('page', this.pages.page);
             }

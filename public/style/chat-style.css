@@ -507,6 +507,9 @@ pre code {
     .content {
         height: 63%;
     }
+    .tab {
+        height: 54%;
+    }
 }
 /* 适应手机 */
 @media only screen and (max-width: 500px) {
