@@ -402,7 +402,7 @@ export default {
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
             xfIcon : "#icon-xunfeilogo",
-            scrollLoading: true,
+            scrollLoading: false,
             fileData: {},
             modelAll: [
                 {
@@ -527,7 +527,7 @@ export default {
             let content = document.getElementsByClassName('content')[0];
             if (content.scrollTop + content.clientHeight >= content.scrollHeight) {
                 // console.log('--------------正在检测是否有数据加载----------------');
-                this.scrollLoadChatDataStatus();
+                // this.scrollLoadChatDataStatus();
                 this.scrollLoadChatData();
             }
         },
@@ -609,6 +609,7 @@ export default {
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
             this.pages.page = parseInt(sessionStorage.getItem('page'));
             if (this.loadCount != totals) {
+                this.scrollLoading = true;
                 this.pages.page += 1;
                 const resp = await this.getChatList(200);
                 let respData = resp.data.data;
@@ -621,6 +622,7 @@ export default {
                 sessionStorage.setItem('loadCount', this.loadCount);
                 sessionStorage.setItem('page', this.pages.page);
             }
+            this.scrollLoading = false;
         },
         uploadUrl () {
             return `${baseUrl}/claude/`
@@ -1091,7 +1093,7 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet:'open', content: gptData.slice(-4), model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet:'open', content: gptData.slice(-2), model: this.selectedModel};
                 } else {
                     sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet:'', model: this.selectedModel};
                 }
