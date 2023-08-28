@@ -108,6 +108,7 @@
     top: 1px;
     left: 13px;
     font-size: 10px;
+    color: #5b9d66;
 }
 .copy-title:hover {
     color: #58ce6c;
@@ -344,7 +345,7 @@
     font-size: 14px;
 }
 .code img {
-    width: 400px;
+    width: 680px;
 }
 .time-2 {
     display: inline-block;
@@ -651,7 +652,7 @@ pre code {
     background-color: #fff;
     border: 1px solid #d7d7d7;
     height: 30px;
-    width: 108px;
+    width: 126px;
 }
 ol li > p:first-child {
     position: relative;
@@ -779,4 +780,7 @@ ol li > p:first-child {
 }
 .el-popconfirm__action {
     padding-top: 8px;
+}
+.z-model-s {
+    color: #28c66f;
 }

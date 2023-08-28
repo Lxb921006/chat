@@ -161,7 +161,7 @@
                                     inactive-color="#ff4949">
                                 </el-switch>
                             </el-col>
-                            <el-col :span="1" class="z-col-3 col-font">是否开启白天模式: </el-col>
+                            <el-col :span="1" class="z-col-3 col-font">是否开启预设模式: </el-col>
                             <el-col :span="1" class="z-col-4">
                                 <el-switch
                                     @change="isOpenDay()"
@@ -288,18 +288,18 @@
                 <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
-                        <span>模型: 【{{ selectedModel }}】; </span>
-                        <span v-if="contextSwitch">上下文: 【开启】</span>
-                        <span v-else>上下文: 【关闭】</span>
+                        <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
+                        <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】</span>
+                        <span v-else>上下文: 【<span class="z-model-s">关闭</span>】</span>
                     </div>
                     <div class="send-input">
                          <el-input
                             type="textarea"
-                            
+                            show-word-limit
                             :autosize="{ minRows: 2, maxRows: 4 }"
-                            placeholder="请输入对话内容"
+                            placeholder="请输入对话内容, 先按住ctrl再按enter键提交"
                             v-model="chatContent"
-                            @keyup.enter.native="wsInit()"
+                            @keyup.ctrl.enter.native="wsInit()"
                             :disabled="finished"
                             resize="none"
                             >
@@ -415,7 +415,7 @@ export default {
                 {
                     value: 'chatGPT-api-3.5',
                     label: 'chatGPT-api-3.5',
-                    disabled: true,
+                    disabled: false,
                 },
                 {
                     value: 'xf',
@@ -523,7 +523,7 @@ export default {
         handleScroll() {
             let content = document.getElementsByClassName('content')[0];
             if (content.scrollTop + content.clientHeight >= content.scrollHeight) {
-                console.log('--------------正在检测是否有数据加载----------------');
+                // console.log('--------------正在检测是否有数据加载----------------');
                 this.scrollLoadChatData();
             }
         },
@@ -739,14 +739,6 @@ export default {
                     break;    
             }   
         },
-        stopChat(){
-            if (this.socket) {
-                this.close();
-                this.socket.close();
-                this.socket = null;
-                this.stopCursor = false;
-            }
-        },
         // 时间格式化
         getDate() {
             // 获取当前时间
@@ -851,7 +843,15 @@ export default {
         saveLatestId(id) {
             sessionStorage.setItem('data_id', id);
         },
-        // websocket前后端交互
+        // 手动停止ai响应
+        stopChat(){
+            if (this.socket) {
+                this.socket.close();
+                this.socket = null;
+                this.stopCursor = false;
+            }
+        },
+        // 建立websocket连接
         wsInit () {
             if (!this.chatContent.replace(/[\r\n\s]+/g, '')) {
                 this.chatContent = "";
@@ -1017,6 +1017,7 @@ export default {
             this.chatContent = "";
             this.stopResp = false;
             this.socket = null;
+            this.jumpFooter();
             this.saveChatData();
             this.getChatList();
             this.chatTitleFormat();
@@ -1053,49 +1054,40 @@ export default {
         // 讯飞星火
         sendXF() {
             let sendData = {};
-            let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == 'xf');
+            let xfData =  cacheData.filter(cd => cd.model == 'xf');
             if (this.contextSwitch) {
-                if (gptData.length > 1) {
+                if (xfData.length > 1) {
                     //发送的信息关联上下文
-                    lastData = gptData[gptData.length - 2];
-                    if (lastData.model == 'xf') {
-                        sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer, lastQue: lastData.title, model: this.selectedModel};
-                    } else {
-                        sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
-                    }
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: xfData.slice(-4), model: this.selectedModel};
                 } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
                 }
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
             }
-            console.log('xf >>>', sendData);
+            
+            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
         // gpt-3.5-api
         sendGpt35() {
             let sendData = {};
-            let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == 'chatGPT-api-3.5');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    lastData = gptData[gptData.length - 2];
-                    if (lastData.model == 'chatGPT-api-3.5') {
-                        sendData = {cid: 'chatGPT-api-3.5', pid: 'chatGPT-api-3.5', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer, model: this.selectedModel};
-                    } else {
-                        sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
-                    }
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet:'open', content: gptData.slice(-4), model: this.selectedModel};
                 } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet:'', model: this.selectedModel};
                 }
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet:'open', model: this.selectedModel};
             }
+
+            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1180,7 +1172,7 @@ export default {
             let scroll = content.scrollTop;
             let tabScroll = tab.scrollTop;
 
-            const distance = 1000;
+            const distance = 1500;
 
             // 使用setInterval平滑滚动content
             const timer2 = setInterval(() => {
@@ -1228,7 +1220,7 @@ export default {
             let scroll = content.scrollTop;
             let tabScroll = tab.scrollTop;
 
-            const distance = 1000;
+            const distance = 1500;
 
             // 使用setInterval平滑滚动content
             const timer2 = setInterval(() => {
@@ -1328,7 +1320,14 @@ export default {
         },
         getModelLabel(data, allModel) {
             let label = allModel.find(item => item.value == data);
-            return label.label
+            return label.label;
+        },
+        getModelLabel2(data, allModel) {
+            if (allModel && Array.isArray(allModel)) {
+                let label = allModel.find(item => item.value == data);
+                return label ? label.label : "";
+            }
+            return data;
         },
     },
     mounted() {
