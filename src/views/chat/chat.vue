@@ -120,7 +120,8 @@
             </transition-group>
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
-                        <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>底部</span>
+                        <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span v-loading="scrollLoading" v-if="scrollLoading"></span>
+                        <span v-else>底部</span>
                     </div>
                 </transition>
             </div>
@@ -349,6 +350,7 @@ import MarkdownTitle from './markdownCode';
 import baseUrl from "../../utils/baseUrl";
 import { chatList, chatSave } from '../../api'
 
+
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
 export default {
     name: "chat",
@@ -400,6 +402,7 @@ export default {
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
             xfIcon : "#icon-xunfeilogo",
+            scrollLoading: true,
             fileData: {},
             modelAll: [
                 {
@@ -524,6 +527,7 @@ export default {
             let content = document.getElementsByClassName('content')[0];
             if (content.scrollTop + content.clientHeight >= content.scrollHeight) {
                 // console.log('--------------正在检测是否有数据加载----------------');
+                this.scrollLoadChatDataStatus();
                 this.scrollLoadChatData();
             }
         },
@@ -588,6 +592,15 @@ export default {
 
             if (totals) {
                 this.pages.totals = totals;
+            }
+        },
+        scrollLoadChatDataStatus() {
+            let td = sessionStorage.getItem('loadCount');
+            let totals = sessionStorage.getItem('totals');
+            if (td == totals) {
+                this.scrollLoading = false;
+            } else {
+                this.scrollLoading = true;
             }
         },
         // 滚动到底部就加载数据
@@ -1067,7 +1080,6 @@ export default {
                 sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
             }
             
-            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1087,7 +1099,6 @@ export default {
                 sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet:'open', model: this.selectedModel};
             }
 
-            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1344,6 +1355,7 @@ export default {
         this.checkLoadingOffset();
         // this.getChatList(100);
         this.chatTitleFormat();
+        this.scrollLoadChatDataStatus();
     },
 }
 </script>
