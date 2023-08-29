@@ -1176,6 +1176,11 @@ export default {
         },
         // 滚动到最底部
         jumpFooter () {
+            if (!this.setTimer) {
+                Message.error('不要着急, 先等数据加载完再点击滚动到最底部按钮');
+                return;
+            }
+
             let tab = document.getElementsByClassName('tab')[0];
             let content = document.getElementsByClassName('content')[0];
             let scroll = content.scrollTop;
