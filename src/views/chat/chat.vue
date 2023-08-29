@@ -290,8 +290,10 @@
                 <div class="send-question">
                     <div class="z-model-show">
                         <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
-                        <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】</span>
-                        <span v-else>上下文: 【<span class="z-model-s">关闭</span>】</span>
+                        <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>上下文: 【<span class="z-model-s">关闭</span>】; </span>
+                        <span v-if="dnSwitch">预设: 【<span class="z-model-s">开启</span>】</span>
+                        <span v-else>预设: 【<span class="z-model-s">关闭</span>】</span>
                     </div>
                     <div class="send-input">
                          <el-input
@@ -1093,12 +1095,12 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet:'open', content: gptData.slice(-2), model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-3), model: this.selectedModel};
                 } else {
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet:'', model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
                 }
             } else {
-                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet:'open', model: this.selectedModel};
+                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
             }
 
             this.socket.send(JSON.stringify(sendData));
@@ -1114,11 +1116,7 @@ export default {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
-                    if (lastData.model == 'chatGPT') {
-                        sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
-                    } else {
-                        sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
-                    }
+                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
                 } else {
                     sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
                 }
@@ -1150,32 +1148,25 @@ export default {
                 sessionStorage.setItem("oc", 2);
             }
         },
-        // 检查白天黑夜背景状态
+        // 检查预设状态
         checkDn() {
-            const main = document.querySelector(".main");
-            let dn = JSON.parse(sessionStorage.getItem('day'));
-            if (dn) {
-                if (dn.status == 1) {
-                    this.dnSwitch = true;
-                    main.style.backgroundColor = dn.color;
-                } else if (dn.status == 2) {
-                    this.dnSwitch = false;
-                    main.style.backgroundColor = dn.color;
-                } else {
-                    this.dnSwitch = false;
-                }
+            let dnSwitch = sessionStorage.getItem('ss');
+            if (dnSwitch == 1) {
+                this.dnSwitch = true;
+            } else if (dnSwitch == 2) {
+                this.dnSwitch = false;
+            } else {
+                this.dnSwitch = true;
             }
         },
+        // 预设开关
         isOpenDay() {
-            const main = document.querySelector(".main");
             if (this.dnSwitch) {
-                main.style.backgroundColor = "#e5e5e5";
-                let data = {status: 1, color: "#e5e5e5"}
-                sessionStorage.setItem("day", JSON.stringify(data));
+                Message.success('已启用预设角色回复');
+                sessionStorage.setItem("ss", 1);
             } else {
-                main.style.backgroundColor = "#262626";
-                let data = {status: 2, color: "#262626"}
-                sessionStorage.setItem("day", JSON.stringify(data));
+                Message.warning('已关闭预设角色回复');
+                sessionStorage.setItem("ss", 2);
             }
         },
         // 滚动到最底部
