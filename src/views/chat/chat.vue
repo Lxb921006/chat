@@ -528,8 +528,9 @@ export default {
         },
         handleScroll() {
             let content = document.getElementsByClassName('content')[0];
-            if (content.scrollTop + content.clientHeight >= content.scrollHeight && this.setTimer) {
-                // console.log('--------------正在检测是否有数据加载----------------');
+            console.log(content.scrollTop + content.clientHeight, content.scrollHeight, this.setTimer);
+            if (content.scrollTop + content.clientHeight + 0.5 >= content.scrollHeight && this.setTimer) {
+                
                 // this.scrollLoadChatDataStatus();
                 this.scrollLoadChatData();
             }
@@ -612,6 +613,7 @@ export default {
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
             this.pages.page = parseInt(sessionStorage.getItem('page'));
             if (this.loadCount != totals) {
+                console.log('--------------正在加载数据----------------');
                 this.setTimer = false;
                 this.scrollLoading = true;
                 this.pages.page += 1;
@@ -1176,10 +1178,10 @@ export default {
         },
         // 滚动到最底部
         jumpFooter () {
-            if (!this.setTimer) {
-                Message.error('不要着急, 先等数据加载完再点击滚动到最底部按钮');
-                return;
-            }
+            // if (!this.setTimer) {
+            //     Message.error('不要着急, 先等数据加载完再点击滚动到最底部按钮');
+            //     return;
+            // }
 
             let tab = document.getElementsByClassName('tab')[0];
             let content = document.getElementsByClassName('content')[0];
