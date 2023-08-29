@@ -42,7 +42,7 @@
                 </el-menu>
             </div>
             <div class="logout">
-                <el-button class="btu0" type="primary" round  @click="loginout()"><span class="iconfont icon-tuichu3 icon-size"></span></el-button>
+                <el-button class="btu0" type="primary" round  @click="logout()"><span class="iconfont icon-tuichu3 icon-size"></span></el-button>
             </div>
             <div class="item-url">
                 <span class="iconfont icon-githubb icon-git"></span>
@@ -405,6 +405,7 @@ export default {
             chatGptIcon: "#icon-a-Chatgpt35",
             xfIcon : "#icon-xunfeilogo",
             scrollLoading: false,
+            setTimer: true,
             fileData: {},
             modelAll: [
                 {
@@ -527,7 +528,7 @@ export default {
         },
         handleScroll() {
             let content = document.getElementsByClassName('content')[0];
-            if (content.scrollTop + content.clientHeight >= content.scrollHeight) {
+            if (content.scrollTop + content.clientHeight >= content.scrollHeight && this.setTimer) {
                 // console.log('--------------正在检测是否有数据加载----------------');
                 // this.scrollLoadChatDataStatus();
                 this.scrollLoadChatData();
@@ -611,6 +612,7 @@ export default {
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
             this.pages.page = parseInt(sessionStorage.getItem('page'));
             if (this.loadCount != totals) {
+                this.setTimer = false;
                 this.scrollLoading = true;
                 this.pages.page += 1;
                 const resp = await this.getChatList(200);
@@ -623,7 +625,9 @@ export default {
                 this.loadCount += respData.length;
                 sessionStorage.setItem('loadCount', this.loadCount);
                 sessionStorage.setItem('page', this.pages.page);
+                
             }
+            this.setTimer = true; // 必须等数据加载完才能让handleScroll继续监听滚动条
             this.scrollLoading = false;
         },
         uploadUrl () {
@@ -772,8 +776,9 @@ export default {
             let formattedTime = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
             return formattedTime;
         },
-        loginout() {
-            sessionStorage.removeItem('user');
+        logout() {
+            // sessionStorage.removeItem('user');
+            sessionStorage.clear();
             location.reload();
         },
         addB() {
