@@ -172,12 +172,14 @@
                             </el-col>
                             <el-col :span="1" class="z-col-3 col-font">是否开启预设模式: </el-col>
                             <el-col :span="1" class="z-col-4">
-                                <el-switch
-                                    @change="isOpenDay()"
-                                    v-model="dnSwitch"
-                                    active-color="#13ce66"
-                                    inactive-color="#ff4949">
-                                </el-switch>
+                                <el-tooltip content="只对chatGPT有效" placement="top">
+                                    <el-switch
+                                        @change="isOpenDay()"
+                                        v-model="dnSwitch"
+                                        active-color="#13ce66"
+                                        inactive-color="#ff4949">
+                                    </el-switch>
+                                </el-tooltip>
                             </el-col>
                             <el-col :span="1" class="z-col-5 col-font">模型选择: </el-col>
                             <el-col :span="1" class="z-col-6">
@@ -322,7 +324,7 @@
                         </el-button>
                         <!-- 目前只支持claude上传附件 -->
                         <el-upload
-                            :style="{ visibility: selectedModel=='1111' ? 'visible' : 'hidden' }"
+                            :style="{ visibility: selectedModel=='claude-2' ? 'visible' : 'hidden' }"
                             class="upload-demo"
                             :action=uploadUrl()
                             :on-preview="handlePreview"
@@ -333,7 +335,7 @@
                             :data="fileData"
                             :on-exceed="handleExceed"
                             :file-list="fileList">
-                            <el-tooltip class="item" effect="dark" content="只能上传.pdf .doc  .docs  .txt  .py文件" placement="top-start">
+                            <el-tooltip class="item" effect="dark" content="只能上传.pdf .doc  .docs  .txt  .py文件;目前只支持claude上传附件" placement="top-start">
                                 <el-button size="small" type="primary">
                                     <svg class="icon z-send-button" aria-hidden="true">
                                         <use xlink:href="#icon-fujian"></use>
@@ -341,6 +343,7 @@
                                 </el-button>
                             </el-tooltip>
                         </el-upload>
+                    
                     </div>
                 </div>
             </div>
@@ -449,7 +452,7 @@ export default {
                     disabled: true,
                 },
             ],
-            allowFile: ['.doc', '.docs', '.txt', '.pdf', '.py'],
+            allowFile: ['.txt'],
             loadCount: 0,
             historyDataLoading: false,
             pages: {
