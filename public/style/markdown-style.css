@@ -22,10 +22,10 @@
 }
 */
 .custom-code-block-dev p {
-  padding-left: 10px;
+    padding-left: 10px;
 }
 .code-3 {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
 }
 .code {
   white-space: pre-wrap;
@@ -44,7 +44,7 @@
     line-height: 1.5;
 }
 .title-block {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
     display: block;
     margin: 0 auto;
     width: 659px;
@@ -59,4 +59,16 @@
 }
 .code-day {
     color: #262626
+}
+.cursor-2 {
+    position: relative;
+    left: 81px;
+    bottom: 12px;
+    color: #fff;
+    background-color: #fff;
+    width: 9px;
+    height: 19px;
+    display: inline-block;
+    margin-left: 1px;
+    animation: blink 1s infinite;
 }

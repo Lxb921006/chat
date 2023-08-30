@@ -460,13 +460,22 @@ pre code {
 }
 .logout {
     position: fixed;
-    bottom: 68px;
+    bottom: 115px;
     width: 200px;
 }
 .item-url {
     position: fixed;
     bottom: 34px;
     width: 200px;
+}
+.z-user {
+    position: fixed;
+    bottom: 71px;
+    width: 200px;
+    left: -14px;
+}
+.z-user-style {
+    color: #909399
 }
 .btu0 {
     width: 70%;
@@ -783,4 +792,7 @@ ol li > p:first-child {
 }
 .z-model-s {
     color: #28c66f;
+}
+.z-model-s-c {
+    color: #da341f;
 }

@@ -26,13 +26,16 @@
                     <el-menu-item :index=data.index v-for="data in chatCache" :key="data.index" @click="jump(data.uuid)" v-show="true">
                         <i class="el-icon-delete delete" @click="removeChat(data.uuid)"></i>
                         <span slot="title" class="cache-title">
-                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT' || data.model == 'chatGPT-api-3.5'">
+                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'claude-2'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'xf'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
+                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'ai-assistant'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
                             {{ data.title }}
@@ -43,6 +46,10 @@
             </div>
             <div class="logout">
                 <el-button class="btu0" type="primary" round  @click="logout()"><span class="iconfont icon-tuichu3 icon-size"></span></el-button>
+            </div>
+            <div class="z-user">
+                <span class="iconfont icon-githubb icon-git"></span>
+                <span class="z-user-style">{{ currentUser }}</span>
             </div>
             <div class="item-url">
                 <span class="iconfont icon-githubb icon-git"></span>
@@ -143,8 +150,9 @@
                 </transition>
             </div>
             <el-divider></el-divider>
-            <!-- 设置 -->
+            <!-- 所有设置 -->
             <div class="footer list-group"  id="sortable">
+                <!-- 设置 -->
                 <div class="setting">
                     <el-popover
                         placement="right-start"
@@ -291,9 +299,9 @@
                     <div class="z-model-show">
                         <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
                         <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>上下文: 【<span class="z-model-s">关闭</span>】; </span>
+                        <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="dnSwitch">预设: 【<span class="z-model-s">开启</span>】</span>
-                        <span v-else>预设: 【<span class="z-model-s">关闭</span>】</span>
+                        <span v-else>预设: 【<span class="z-model-s-c">关闭</span>】</span>
                     </div>
                     <div class="send-input">
                          <el-input
@@ -358,6 +366,7 @@ export default {
     name: "chat",
     data()  {
         return {
+            currentUser: '',
             loadTimer: null,
             dots: '',
             text:"copy me",
@@ -398,11 +407,12 @@ export default {
             but1Icon: "el-icon-arrow-right",
             code:"",
             value: "text-davinci-003",
-            cc: "<span class='cursor' v-show='this.cursor'>|</span>",
+            cc: "<span class='.cursor-2' v-show='this.cursor'>|</span>",
             selectedModel: "",
             claudeIcon: "#icon-Claude2",
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
+            assistantIcon: "#icon-moxingtongbu",
             xfIcon : "#icon-xunfeilogo",
             scrollLoading: false,
             setTimer: true,
@@ -419,8 +429,8 @@ export default {
                     disabled: false,
                 },
                 {
-                    value: 'chatGPT-api-3.5',
-                    label: 'chatGPT-api-3.5',
+                    value: 'ai-assistant',
+                    label: 'ai-assistant',
                     disabled: false,
                 },
                 {
@@ -481,6 +491,9 @@ export default {
         // MarkdownTitle,
     },
     methods: {
+        getCurrentUser() {
+            this.currentUser = sessionStorage.getItem('user');
+        },
         chatTitleFormat() {
             this.$nextTick(function() {
                 const nt = this.$refs.title;
@@ -528,7 +541,7 @@ export default {
         },
         handleScroll() {
             let content = document.getElementsByClassName('content')[0];
-            console.log(content.scrollTop + content.clientHeight, content.scrollHeight, this.setTimer);
+            // console.log(content.scrollTop + content.clientHeight, content.scrollHeight, this.setTimer);
             if (content.scrollTop + content.clientHeight + 0.5 >= content.scrollHeight && this.setTimer) {
                 
                 // this.scrollLoadChatDataStatus();
@@ -594,7 +607,9 @@ export default {
                 this.pages.page = page;
             }
 
-            if (totals) {
+            if (!totals) {
+                sessionStorage.setItem('totals', 0);
+            } else {
                 this.pages.totals = totals;
             }
         },
@@ -710,7 +725,7 @@ export default {
                     this.selectedModel = 'chatGPT';
                     break;
                 case '3':
-                    this.selectedModel = 'chatGPT-api-3.5';
+                    this.selectedModel = 'ai-assistant';
                     break;
                 case '4':
                     this.selectedModel = 'xf';
@@ -729,7 +744,7 @@ export default {
                 case 'chatGPT':
                     window.sessionStorage.setItem('modelSelect', 2);
                     break
-                case 'chatGPT-api-3.5':
+                case 'ai-assistant':
                     window.sessionStorage.setItem('modelSelect', 3);
                     break
                 case 'xf':
@@ -754,7 +769,7 @@ export default {
                 case 'chatGPT':
                     window.open('https://openai.com/');
                     break;
-                case 'chatGPT-api-3.5':
+                case 'ai-assistant':
                     window.open('https://openai.com/');
                     break;
                 case 'xf':
@@ -869,11 +884,9 @@ export default {
         },
         // 手动停止ai响应
         stopChat(){
-            if (this.socket) {
-                this.socket.close();
-                this.socket = null;
-                this.stopCursor = false;
-            }
+            this.socket.close();
+            this.socket = null;
+            this.stopCursor = false;
         },
         // 建立websocket连接
         wsInit () {
@@ -900,8 +913,8 @@ export default {
             case 'chatGPT':
                 modelIcon = this.chatGptIcon;
                 break;
-            case 'chatGPT-api-3.5':
-                modelIcon = this.chatGptIcon;
+            case 'ai-assistant':
+                modelIcon = this.assistantIcon;
                 break;
             case 'xf':
                 modelIcon = this.xfIcon;
@@ -943,9 +956,9 @@ export default {
                         this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'chatGPT':
-                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
-                    case 'chatGPT-api-3.5':
+                    case 'ai-assistant':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'xf':
@@ -983,8 +996,8 @@ export default {
                 case 'chatGPT':
                     this.sendChatGpt();
                     break
-                case 'chatGPT-api-3.5':
-                    this.sendGpt35();
+                case 'ai-assistant':
+                    this.Assistant();
                     break
                 case 'xf':
                     this.sendXF();
@@ -1094,11 +1107,11 @@ export default {
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
-        // gpt-3.5-api
-        sendGpt35() {
+        // assistant(第三方提供的api)
+        Assistant() {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == 'chatGPT-api-3.5');
+            let gptData =  cacheData.filter(cd => cd.model == 'ai-assistant');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
@@ -1123,12 +1136,12 @@ export default {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
-                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, systemSet: this.dnSwitch ? 'open' : ''};
                 } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, systemSet: this.dnSwitch ? 'open' : ''};
                 }
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, systemSet: this.dnSwitch ? 'open' : ''};
             }
             
             this.socket.send(JSON.stringify(sendData));
@@ -1156,7 +1169,7 @@ export default {
             }
         },
         // 检查预设状态
-        checkDn() {
+        checkSystemSet() {
             let dnSwitch = sessionStorage.getItem('ss');
             if (dnSwitch == 1) {
                 this.dnSwitch = true;
@@ -1353,7 +1366,7 @@ export default {
         this.checkContextStatus();
         this.getAllChatData();
         // this.defaultHideAside();
-        this.checkDn();
+        this.checkSystemSet();
         this.getContentLen();
         this.getAllRbData();
         this.checkModel();
@@ -1361,6 +1374,7 @@ export default {
         // this.getChatList(100);
         this.chatTitleFormat();
         this.scrollLoadChatDataStatus();
+        this.getCurrentUser();
     },
 }
 </script>

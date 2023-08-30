@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "15455915",
+      "name": "model",
+      "font_class": "moxing",
+      "unicode": "e61b",
+      "unicode_decimal": 58907
+    },
+    {
+      "icon_id": "29474261",
+      "name": "模型同步",
+      "font_class": "moxingtongbu",
+      "unicode": "e681",
+      "unicode_decimal": 59009
+    },
+    {
+      "icon_id": "16214637",
+      "name": "AI模型-01",
+      "font_class": "AImoxing-01",
+      "unicode": "e61a",
+      "unicode_decimal": 58906
+    },
+    {
       "icon_id": "11334068",
       "name": "附件",
       "font_class": "fujian",
