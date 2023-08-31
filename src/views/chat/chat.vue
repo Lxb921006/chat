@@ -605,7 +605,7 @@ export default {
                     this.isScrollLoadDataStatus = true;
                     break;
             }
-            this.saveScrollLoadDataStatus();
+            // this.saveScrollLoadDataStatus();
         },
         // 拖动
         dialogDrag(event) {
