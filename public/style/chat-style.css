@@ -796,3 +796,35 @@ ol li > p:first-child {
 .z-model-s-c {
     color: #da341f;
 }
+.ft {
+    white-space: break-spaces;
+    height: 600px;
+    overflow-y: auto;
+}
+.el-dialog__header {
+    background-color: #204f7f;
+    border-radius: 3px 3px 0 0;
+}
+.el-dialog__header span {
+    color: #fff;
+}
+.el-dialog--center {
+    border-radius: 5px 5px 0 0;
+}
+.el-collapse {
+    border-color: #262626;
+    background-color: #262626;
+}
+.el-collapse-item__header {
+    background-color: #262626;
+    color: #fff;
+    width: 819px;
+    margin: 0 auto;
+    border-bottom-color: #262626;
+}
+.el-collapse-item__content {
+    background-color: #262626;
+}
+.el-collapse-item__wrap {
+    border-bottom-color: #262626;
+}

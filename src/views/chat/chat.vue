@@ -72,59 +72,61 @@
                     </div>
                 </transition>
                 <transition-group name="el-zoom-in-center">
-                <template v-if="show">
-                    <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
-                        <!-- Ai模型 -->
-                        <transition name="el-zoom-in-top">
-                            <div class="platform">
-                                <p>
-                                    <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
-                                </p>
-                            </div>
-                        </transition>
-                        <h2 class="answer-title" :id=data1.uuid>
-                            <p class="question" ref="title" :style="monitorHeight">
-                                <svg class="icon-qa" aria-hidden="true">
-                                    <use xlink:href="#icon-changjianwenti"></use>
-                                </svg>
-                                {{ data1.title }}  <el-link :underline="false" v-if="data1.file">{{ data1.file }}</el-link>
-                                <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
-                                <!-- <markdown-title :code="data1.title" :cursor="data1.cursor"></markdown-title> -->
-                            </p>
-                        </h2>
-                        <div class="answer-loop">
-                            <div class="answer-icon" :style="{ visibility: data1.answer.length > 0 ? 'visible' : 'hidden' }">
-                                <svg class="icon-qa-2" aria-hidden="true">
-                                    <use xlink:href="#icon-cankaodaan"></use>
-                                </svg>
-                            </div>
-                            <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
-                            <markdown-code-block :code="data1.answer" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
-                            <!-- 光标 -->
-                            <span class="cursor" id="loading" v-else>waiting{{ dots }}</span>
-                            <!-- 对话完成时间 -->
-                            <transition name="el-zoom-in-center">
-                                <div class="finished-time" v-show="data1.timeShow">
-                                    <i class="el-icon-time time-2">{{ data1.date }}</i>
-                                    <div class="whole-answer">
-                                        <el-dropdown>
-                                            <span class="el-dropdown-link">
-                                                <svg class="icon" aria-hidden="true">
-                                                    <use xlink:href="#icon-shenglvehao"></use>
-                                                </svg>
-                                            </span>
-                                            <el-dropdown-menu slot="dropdown">
-                                                <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer)">复制整个对话</el-dropdown-item>
-                                                <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.uuid)">删改该对话</el-dropdown-item>
-                                            </el-dropdown-menu>
-                                        </el-dropdown>
-                                    </div>
+                    <template v-if="show">
+                        <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
+                            <!-- Ai模型 -->
+                            <transition name="el-zoom-in-top">
+                                <div class="platform">
+                                    <p>
+                                        <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
+                                    </p>
                                 </div>
                             </transition>
+                            <!-- 标题 -->
+                            <h2 class="answer-title" :id=data1.uuid>
+                                <p class="question" ref="title" :style="monitorHeight">
+                                    <svg class="icon-qa" aria-hidden="true">
+                                        <use xlink:href="#icon-changjianwenti"></use>
+                                    </svg>
+                                    {{ data1.title }}  <el-link :underline="false" v-if="data1.file" @click="getFileText(data1.file)">{{ data1.file }}</el-link>
+                                    <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
+                                    <!-- <markdown-title :code="data1.title" :cursor="data1.cursor"></markdown-title> -->
+                                </p>
+                            </h2>
+                            <!-- 回复内容 -->
+                            <div class="answer-loop">
+                                <div class="answer-icon" :style="{ visibility: data1.answer.length > 0 ? 'visible' : 'hidden' }">
+                                    <svg class="icon-qa-2" aria-hidden="true">
+                                        <use xlink:href="#icon-cankaodaan"></use>
+                                    </svg>
+                                </div>
+                                <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
+                                <markdown-code-block :code="data1.answer" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
+                                <!-- 光标 -->
+                                <span class="cursor" id="loading" v-else>waiting{{ dots }}</span>
+                                <!-- 对话完成时间 -->
+                                <transition name="el-zoom-in-center">
+                                    <div class="finished-time" v-show="data1.timeShow">
+                                        <i class="el-icon-time time-2">{{ data1.date }}</i>
+                                        <div class="whole-answer">
+                                            <el-dropdown>
+                                                <span class="el-dropdown-link">
+                                                    <svg class="icon" aria-hidden="true">
+                                                        <use xlink:href="#icon-shenglvehao"></use>
+                                                    </svg>
+                                                </span>
+                                                <el-dropdown-menu slot="dropdown">
+                                                    <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer)">复制整个对话</el-dropdown-item>
+                                                    <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.uuid)">删改该对话</el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </el-dropdown>
+                                        </div>
+                                    </div>
+                                </transition>
+                            </div>
                         </div>
-                    </div>
-                </template>
-            </transition-group>
+                    </template>
+                </transition-group>
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span v-loading="scrollLoading" v-if="scrollLoading"></span>
@@ -335,7 +337,7 @@
                             :data="fileData"
                             :on-exceed="handleExceed"
                             :file-list="fileList">
-                            <el-tooltip class="item" effect="dark" content="只能上传.pdf .doc  .docs  .txt  .py文件;目前只支持claude上传附件" placement="top-start">
+                            <el-tooltip class="item" effect="dark" content="只能上传.txt文件; 目前只支持claude上传附件" placement="top-start">
                                 <el-button size="small" type="primary">
                                     <svg class="icon z-send-button" aria-hidden="true">
                                         <use xlink:href="#icon-fujian"></use>
@@ -348,7 +350,25 @@
                 </div>
             </div>
         </div>
-        
+        <div class="file-text">
+            <el-dialog
+                title="文本内容"
+                :visible.sync="fileTextVisible"
+                :close-on-click-modal="false"
+                width="600px"
+                v-loading="fileTextLoad"
+                :append-to-body="true"
+                center
+                v-draggable
+                >
+                <p class="ft">{{ fileText }}</p>
+                <!-- <Markdown-title :code="fileText" :cursor="true"></Markdown-title> -->
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="fileTextVisible = false">取 消</el-button>
+                    <el-button type="primary"  @click="copyAll(fileText)">复制文本</el-button>
+                </span>
+            </el-dialog>
+        </div>
     </div>
 </template>
 
@@ -361,14 +381,62 @@ import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样�
 import MarkdownCodeBlock from './markdownBlock';
 import MarkdownTitle from './markdownCode';
 import baseUrl from "../../utils/baseUrl";
-import { chatList, chatSave } from '../../api'
+import { chatList, chatSave, getFileText } from '../../api'
 
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
 export default {
     name: "chat",
+    // 弹窗可拖拽
+    directives: {
+        draggable: {
+            bind(el, binding, vnode) {
+                el.style.position = 'fixed';
+                el.style.zIndex = 1000;
+
+                el.dragging = false;
+                el.startX = 0;
+                el.startY = 0;
+                el.left = 0;
+                el.top = 0;
+
+                el.addEventListener('mousedown', function (event) {
+                    el.dragging = true;
+                    el.startX = event.clientX;
+                    el.startY = event.clientY;
+
+                    const rect = el.getBoundingClientRect();
+                    el.left = rect.left;
+                    el.top = rect.top;
+
+                    document.addEventListener('mousemove', mouseMove);
+                    document.addEventListener('mouseup', mouseUp);
+                });
+
+                function mouseMove(event) {
+                    if (el.dragging) {
+                        const left = event.clientX - el.startX + el.left;
+                        const top = event.clientY - el.startY + el.top;
+                        el.style.left = `${left}px`;
+                        el.style.top = `${top}px`;
+                    }
+                }
+
+                function mouseUp() {
+                    if (el.dragging) {
+                        el.dragging = false;
+                        document.removeEventListener('mousemove', mouseMove);
+                        document.removeEventListener('mouseup', mouseUp);
+                    }
+                }
+            },
+        },
+    },
     data()  {
         return {
+            fileText: '',
+            fileTextVisible: false,
+            fileTextLoad: true,
             currentUser: '',
             loadTimer: null,
             dots: '',
@@ -493,7 +561,66 @@ export default {
         MarkdownCodeBlock,
         // MarkdownTitle,
     },
+    
     methods: {
+        dialogDrag(event) {
+            if (!this.dragDialog.dragging) {
+                return;
+            }
+            // 计算拖拽距离
+            const left = event.clientX - this.dragDialog.startX + this.dragDialog.left;
+            const top = event.clientY - this.dragDialog.startY + this.dragDialog.top;
+            // 更新对话框位置
+            this.$refs.dialog.$el.style.left = `${left}px`;
+            this.$refs.dialog.$el.style.top = `${top}px`;
+        },
+        dialogMouseDown(event) {
+            // 开始拖拽
+            this.dragDialog.dragging = true;
+            // 记录起始位置
+            this.dragDialog.startX = event.clientX;
+            this.dragDialog.startY = event.clientY;
+            // 记录当前位置
+            const { left, top } = this.$refs.dialog.$el.getBoundingClientRect();
+            this.dragDialog.left = left;
+            this.dragDialog.top = top;
+            // 添加事件监听器
+            document.addEventListener('mousemove', this.dialogDrag);
+            document.addEventListener('mouseup', this.dialogMouseUp);
+        },
+        dialogMouseUp() {
+            // 结束拖拽
+            this.dragDialog.dragging = false;
+            // 移除事件监听器
+            document.removeEventListener('mousemove', this.dialogDrag);
+            document.removeEventListener('mouseup', this.dialogMouseUp);
+        },
+        onDragEnd(event) {  
+            // 获取对话框的当前位置和鼠标位置  
+            
+            const dialogRect = this.$refs.dialog.getBoundingClientRect();  
+            const mouseX = event.clientX;  
+            const mouseY = event.clientY;  
+            console.log(dialogRect);
+                
+            // 计算对话框应该移动到的位置  
+            const newLeft = mouseX - (dialogRect.width - this.$refs.dialog.offsetWidth) / 2;  
+            const newTop = mouseY - (dialogRect.height - this.$refs.dialog.offsetHeight) / 2;  
+                
+            // 移动对话框到计算得到的位置  
+            this.$refs.dialog.style.left = `${newLeft}px`;  
+            this.$refs.dialog.style.top = `${newTop}px`;  
+        },
+        async getFileText(file) {
+            this.fileTextVisible = true;
+            const resp = await getFileText({file: file, user: this.currentUser})
+            if (resp.data.status == 666) {
+                this.fileText = resp.data.data;
+                this.fileTextLoad = false;
+            } else {
+                Message.error(resp.data.msg);
+            }
+        },
         getCurrentUser() {
             this.currentUser = sessionStorage.getItem('user');
         },
@@ -651,7 +778,7 @@ export default {
             this.scrollLoading = false;
         },
         uploadUrl () {
-            return `${baseUrl}/claude/`
+            return `${baseUrl}/claude/upload/`
         },
         successUpload(response, file, fileList) {
             this.claudeFile = file.name;
@@ -909,6 +1036,7 @@ export default {
             let index = Math.random().toString(36).slice(-8);
             this.show = true;
             let modelIcon= "";
+
             switch (this.selectedModel) {
             case 'claude-2':
                 modelIcon = this.claudeIcon;
