@@ -183,6 +183,17 @@
                                     </el-switch>
                                 </el-tooltip>
                             </el-col>
+                            <el-col :span="1" class="z-col-3 col-font">是否开启滚动加载: </el-col>
+                            <el-col :span="1" class="z-col-4">
+                                <el-tooltip content="建议关闭" placement="top">
+                                    <el-switch
+                                        @change="saveScrollLoadDataStatus()"
+                                        v-model="isScrollLoadDataStatus"
+                                        active-color="#13ce66"
+                                        inactive-color="#ff4949">
+                                    </el-switch>
+                                </el-tooltip>
+                            </el-col>
                             <el-col :span="1" class="z-col-5 col-font">模型选择: </el-col>
                             <el-col :span="1" class="z-col-6">
                                 <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
@@ -304,8 +315,10 @@
                         <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
                         <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <span v-if="dnSwitch">预设: 【<span class="z-model-s">开启</span>】</span>
-                        <span v-else>预设: 【<span class="z-model-s-c">关闭</span>】</span>
+                        <span v-if="dnSwitch">预设: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>预设: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】</span>
+                        <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】</span>
                     </div>
                     <div class="send-input">
                          <el-input
@@ -487,6 +500,7 @@ export default {
             xfIcon : "#icon-xunfeilogo",
             scrollLoading: false,
             setTimer: true,
+            isScrollLoadDataStatus: true,
             fileData: {},
             modelAll: [
                 {
@@ -563,6 +577,37 @@ export default {
     },
     
     methods: {
+        // 滚动加载数据开关
+        saveScrollLoadDataStatus() {
+            if (this.isScrollLoadDataStatus) {
+                sessionStorage.setItem("sds", 1);
+                this.getChatList(100);
+            } else {
+                sessionStorage.setItem("sds", 2);
+                let loadCount = sessionStorage.getItem('loadCount');
+                let totals = sessionStorage.getItem('totals');
+                if (loadCount != totals) {
+                    sessionStorage.setItem('totals', loadCount);
+                }
+            }
+        },
+        // 滚动加载数据开关状态
+        checkisOpenScrollLoadData() {
+            let sds = window.sessionStorage.getItem('sds');
+            switch (sds) {
+                case '1':
+                    this.isScrollLoadDataStatus = true;
+                    break
+                case '2':
+                    this.isScrollLoadDataStatus = false;
+                    break
+                default:
+                    this.isScrollLoadDataStatus = true;
+                    break;
+            }
+            this.saveScrollLoadDataStatus();
+        },
+        // 拖动
         dialogDrag(event) {
             if (!this.dragDialog.dragging) {
                 return;
@@ -611,6 +656,7 @@ export default {
             this.$refs.dialog.style.left = `${newLeft}px`;  
             this.$refs.dialog.style.top = `${newTop}px`;  
         },
+        // 查看附件内容
         async getFileText(file) {
             this.fileTextVisible = true;
             const resp = await getFileText({file: file, user: this.currentUser})
@@ -638,6 +684,7 @@ export default {
                 }
             }); 
         },
+        // 格式化标题
         addTitleStyle () {
             this.$nextTick(function() {
                 const nt = this.$refs.title;
@@ -669,16 +716,14 @@ export default {
 
             return mergedArray;
         },
+        // 监听滚动条是否已经滚动到底部
         handleScroll() {
             let content = document.getElementsByClassName('content')[0];
-            // console.log(content.scrollTop + content.clientHeight, content.scrollHeight, this.setTimer);
             if (content.scrollTop + content.clientHeight + 0.5 >= content.scrollHeight && this.setTimer) {
-                
-                // this.scrollLoadChatDataStatus();
                 this.scrollLoadChatData();
             }
         },
-        // 拉取保存在服务端的历史对话
+        // 拉取保存在服务端的历史对话-建议关闭，如果数据过多，滚动加载会比较慢
         async getChatList(ac) {
             if (ac==100) {
                 this.pages.page = 1;
@@ -800,6 +845,7 @@ export default {
         },
         handlePreview(file) {
             console.log(file);
+            this.getFileText(file.name);
         },
         // 清空回收站
         clearRbData() {
@@ -953,28 +999,6 @@ export default {
             }
             this.getContentLen();
         },
-        // 白天黑夜背景切换
-        showAside() {
-            const asideEl = document.querySelector('.aside');
-            const asideSt = getComputedStyle(asideEl);
-            if (asideSt.display == 'none') {
-                document.querySelector(".aside").setAttribute("style", "display:block");
-                if (this.dnSwitch) {
-                    document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px);background-color: #e5e5e5");
-                } else {
-                    document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px);background-color: #262626");
-                }
-                // this.but1Icon = "el-icon-arrow-right";
-            } else {
-                document.querySelector(".aside").setAttribute("style", "display:none");
-                if (this.dnSwitch) {
-                    document.querySelector(".main").setAttribute("style", "width:100%;;background-color: #e5e5e5");
-                } else {
-                    document.querySelector(".main").setAttribute("style", "width:100%;background-color: #262626");
-                }
-                
-            }
-        },
         // 是否隐藏左侧的菜单栏，默认不隐藏
         defaultHideAside() {
             if (!this.showAsideView) {
@@ -1007,7 +1031,7 @@ export default {
             if (this.dots.length > 3) {
                 this.dots = ''; 
             }
-            }, 800);
+            }, 500);
         },      
         saveLatestId(id) {
             sessionStorage.setItem('data_id', id);
@@ -1307,7 +1331,7 @@ export default {
             } else if (dnSwitch == 2) {
                 this.dnSwitch = false;
             } else {
-                this.dnSwitch = true;
+                this.dnSwitch = false; //预设默认关闭
             }
         },
         // 预设开关
@@ -1506,6 +1530,7 @@ export default {
         this.chatTitleFormat();
         this.scrollLoadChatDataStatus();
         this.getCurrentUser();
+        this.checkisOpenScrollLoadData();
     },
 }
 </script>
