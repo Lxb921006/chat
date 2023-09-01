@@ -38,6 +38,9 @@
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'ai-assistant'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
+                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'bd'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
                             {{ data.title }}
                         </span>
                     </el-menu-item>
@@ -497,7 +500,8 @@ export default {
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
             assistantIcon: "#icon-moxingtongbu",
-            xfIcon : "#icon-xunfeilogo",
+            xfIcon: "#icon-xunfeilogo",
+            wxIcon: "#icon-baidu",
             scrollLoading: false,
             setTimer: true,
             isScrollLoadDataStatus: true,
@@ -524,14 +528,9 @@ export default {
                     disabled: false,
                 },
                 {
-                    value: 'claude-instant-100k',
-                    label: 'claude-instant-100k',
-                    disabled: true,
-                },
-                {
-                    value: 'GPT-4',
-                    label: 'GPT-4',
-                    disabled: true,
+                    value: 'bd',
+                    label: '文心一言',
+                    disabled: false,
                 },
             ],
             allowFile: ['.txt'],
@@ -606,7 +605,7 @@ export default {
                     this.isScrollLoadDataStatus = false;
                     break
                 default:
-                    this.isScrollLoadDataStatus = true;
+                    this.isScrollLoadDataStatus = false;
                     break;
             }
             // this.saveScrollLoadDataStatus();
@@ -912,6 +911,7 @@ export default {
         // 重新加载页面时显示已经切换的ai平台
         checkModel() {
             let model = window.sessionStorage.getItem('modelSelect');
+            
             switch (model) {
                 case '1':
                     this.selectedModel = 'claude-2';
@@ -924,6 +924,9 @@ export default {
                     break;
                 case '4':
                     this.selectedModel = 'xf';
+                    break;
+                case '5':
+                    this.selectedModel = 'bd';
                     break;
                 default:
                     this.selectedModel = 'chatGPT';
@@ -945,6 +948,9 @@ export default {
                 case 'xf':
                     window.sessionStorage.setItem('modelSelect', 4);
                     break
+                case 'bd':
+                    window.sessionStorage.setItem('modelSelect', 5);
+                    break    
             }
         },
         // 检查chatCache的长度
@@ -964,6 +970,9 @@ export default {
                 case 'chatGPT':
                     window.open('https://openai.com/');
                     break;
+                case 'bd':
+                    window.open('https://yiyan.baidu.com/');
+                    break;    
                 case 'ai-assistant':
                     window.open('https://openai.com/');
                     break;
@@ -1095,6 +1104,9 @@ export default {
             case 'ai-assistant':
                 modelIcon = this.assistantIcon;
                 break;
+            case 'bd':
+                modelIcon = this.wxIcon;
+                break;    
             case 'xf':
                 modelIcon = this.xfIcon;
                 break;    
@@ -1140,6 +1152,9 @@ export default {
                     case 'ai-assistant':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
+                    case 'bd':
+                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break    
                     case 'xf':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
@@ -1177,6 +1192,9 @@ export default {
                     break
                 case 'ai-assistant':
                     this.Assistant();
+                    break
+                case 'bd':
+                    this.sendBd();
                     break
                 case 'xf':
                     this.sendXF();
@@ -1262,6 +1280,27 @@ export default {
                 sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
             } else {
                 sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+            }
+
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        // 文心一言
+        sendBd() {
+            let sendData = {};
+            let lastData = [];
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.filter(cd => cd.model == 'bd');
+            if (this.contextSwitch) {
+                if (gptData.length > 1) {
+                    //发送的信息关联上下文
+                    lastData = gptData[gptData.length - 2];
+                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: lastData.title};
+                } else {
+                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: ''};
+                }
+            } else {
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: ''};
             }
 
             this.socket.send(JSON.stringify(sendData));
@@ -1513,19 +1552,6 @@ export default {
         callMethod() {},
     },
     filters: {
-        getCode(data) {
-            const regex = /```([\s\S]*?)```/g;
-            const content = data;
-            let newContent = content;
-            let match;
-            while ((match = regex.exec(content)) !== null) {
-                // 将代码块用 <pre> 和 <code> 标签包裹起来
-                const code = match[1].trim();
-                const formattedCode = `<pre><code class="code">${code}</code></pre>`;
-                newContent = newContent.replace(match[0], formattedCode);
-            }
-            return newContent;
-        },
         getModelLabel(data, allModel) {
             let label = allModel.find(item => item.value == data);
             return label.label;

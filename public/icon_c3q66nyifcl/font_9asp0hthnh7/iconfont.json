@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "14055556",
+      "name": "百度",
+      "font_class": "baidu",
+      "unicode": "e61c",
+      "unicode_decimal": 58908
+    },
+    {
+      "icon_id": "20774422",
+      "name": "letter-chinese-a",
+      "font_class": "letter-chinese-a",
+      "unicode": "e6bd",
+      "unicode_decimal": 59069
+    },
+    {
       "icon_id": "15455915",
       "name": "model",
       "font_class": "moxing",
