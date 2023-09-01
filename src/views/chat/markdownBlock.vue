@@ -74,7 +74,10 @@ export default {
                 if (lang) {
                     if (lang == "vue") { // 没有找到对vue.js的代码高亮支持，只能匹配到vue就让它显示js的高亮
                         lang = "javascript";
+                    } else if (lang == "" || lang == null) {
+                        lang = "bash"
                     }
+
                     try {
                         return `<div class="custom-code-block-dev"><p class="lang-s">${langOld}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${hljs.highlight(lang, code).value} </code></pre>`;
                     } catch (err) {

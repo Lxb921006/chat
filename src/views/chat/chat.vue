@@ -327,7 +327,7 @@
                             :autosize="{ minRows: 2, maxRows: 4 }"
                             placeholder="请输入对话内容, 先按住ctrl再按enter键提交"
                             v-model="chatContent"
-                            @keyup.ctrl.enter.native="wsInit()"
+                            @keyup.native="handleKeyUp"
                             :disabled="finished"
                             resize="none"
                             >
@@ -394,7 +394,7 @@ import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样�
 import MarkdownCodeBlock from './markdownBlock';
 import MarkdownTitle from './markdownCode';
 import baseUrl from "../../utils/baseUrl";
-import { chatList, chatSave, getFileText } from '../../api'
+import { chatList, chatSave, getFileText, chatDel } from '../../api'
 
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
@@ -539,7 +539,7 @@ export default {
             historyDataLoading: false,
             pages: {
                 page: 1,
-                size: 20,
+                size: 10,
                 totals: 0,
             },
         }
@@ -577,6 +577,10 @@ export default {
     },
     
     methods: {
+        async chatDel(data) {
+            const resp = await chatDel({uuid: JSON.stringify(data)}, this.callMethod);
+            return resp
+        },
         // 滚动加载数据开关
         saveScrollLoadDataStatus() {
             if (this.isScrollLoadDataStatus) {
@@ -743,7 +747,7 @@ export default {
                 }
                 this.pages.totals = resp.data.totals;
                 this.loadCount = respData.length;
-                this.saveChatListTotal();
+                this.saveChatListTotal(this.loadCount);
                 this.saveLoadingOffset();
                 let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
                 this.show = true;
@@ -753,14 +757,18 @@ export default {
                     store.commit("ADD_CHAT_CACHE", historyData[i]);
                 }
 
-                Message.success('历史对话加载完毕')
+                // Message.success('历史对话加载完成');
             }
             this.chatTitleFormat();
 
             return resp
         },
-        saveChatListTotal() {
-            sessionStorage.setItem('totals', this.pages.totals);
+        saveChatListTotal(loadCount) {
+            if (this.isScrollLoadDataStatus) {
+                sessionStorage.setItem('totals', this.pages.totals);
+            } else {
+                sessionStorage.setItem('totals', loadCount);
+            }
         },
         saveLoadingOffset() {
             sessionStorage.setItem('page', this.pages.page);
@@ -848,8 +856,13 @@ export default {
             this.getFileText(file.name);
         },
         // 清空回收站
-        clearRbData() {
-            store.commit("Z_CLEAR_CHAT_CACHE", 'clear');
+        async clearRbData() {
+            let uuids = this.chatRecycle.map(uuid => uuid.uuid);
+            const resp = await this.chatDel(uuids);
+            if (resp.data.status == 666) {
+                store.commit("Z_CLEAR_CHAT_CACHE", 'clear');
+            }
+            
         },
         // 回收站恢复数据
         restoreChat(data) {
@@ -865,12 +878,18 @@ export default {
             Message.success(`【${data.title}】已从回收站恢复`);
         },
         // 删除回收站的数据
-        removeRbData(data) {
+        async removeRbData(data) {
             this.getAllRbData();
             let tabs = this.chatRecycle;
             let rbChat = tabs.filter(tab => tab.uuid != data.uuid);
-            store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
-            this.getContentLen();
+            let fd = [data.uuid]
+            const resp = await this.chatDel(fd);
+            if (resp.data.status == 666) {
+                store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
+                this.getContentLen();
+            }
+            // store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
+            // this.getContentLen();
         },
         // 回收站的所有数据
         getAllRbData() {
@@ -1041,6 +1060,11 @@ export default {
             this.socket.close();
             this.socket = null;
             this.stopCursor = false;
+        },
+        handleKeyUp(event) {
+            if (event.ctrlKey && event.keyCode === 13) {
+                this.wsInit();
+            }
         },
         // 建立websocket连接
         wsInit () {
@@ -1334,7 +1358,7 @@ export default {
                 this.dnSwitch = false; //预设默认关闭
             }
         },
-        // 预设开关
+        // 预设开关-仅对chatGPT有效
         isOpenDay() {
             if (this.dnSwitch) {
                 Message.success('已启用预设角色回复');
