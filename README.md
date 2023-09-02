@@ -1,5 +1,5 @@
 # chatAI
-This is an AI website that aggregates mainstream large models on the market, making it easy for you to seamlessly access websites such as Chatgpt, Claude, Wenxin Yiyu, iFlytek Spark, third-party AI assistants, etc
+这是一个聚合了市面上主流大模型AI网站，方便你无缝访问如：chatgpt，claude, 文心一语，讯飞星火，第三方ai助手等
 
 ## 安装
 ```
