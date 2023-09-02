@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "4398156",
+      "name": "用户管理",
+      "font_class": "yonghuguanli1",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
+      "icon_id": "8289047",
+      "name": "用户",
+      "font_class": "yonghu1",
+      "unicode": "e873",
+      "unicode_decimal": 59507
+    },
+    {
       "icon_id": "14055556",
       "name": "百度",
       "font_class": "baidu",

@@ -51,7 +51,7 @@
                 <el-button class="btu0" type="primary" round  @click="logout()"><span class="iconfont icon-tuichu3 icon-size"></span></el-button>
             </div>
             <div class="z-user">
-                <span class="iconfont icon-githubb icon-git"></span>
+                <span class="iconfont icon-yonghuguanli1 icon-git"></span>
                 <span class="z-user-style">{{ currentUser }}</span>
             </div>
             <div class="item-url">
@@ -175,6 +175,8 @@
                                     inactive-color="#ff4949">
                                 </el-switch>
                             </el-col>
+                        </el-row>
+                        <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="z-col-3 col-font">是否开启预设模式: </el-col>
                             <el-col :span="1" class="z-col-4">
                                 <el-tooltip content="只对chatGPT有效" placement="top">
@@ -186,6 +188,8 @@
                                     </el-switch>
                                 </el-tooltip>
                             </el-col>
+                        </el-row>
+                        <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="z-col-3 col-font">是否开启滚动加载: </el-col>
                             <el-col :span="1" class="z-col-4">
                                 <el-tooltip content="建议关闭" placement="top">
@@ -197,6 +201,8 @@
                                     </el-switch>
                                 </el-tooltip>
                             </el-col>
+                        </el-row>
+                        <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="z-col-5 col-font">模型选择: </el-col>
                             <el-col :span="1" class="z-col-6">
                                 <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
@@ -294,7 +300,7 @@
                         </el-table>
                         <el-button slot="reference">
                             <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-yonghubangzhu"></use>
+                                <use xlink:href="#icon-yonghuguanli"></use>
                             </svg>
                         </el-button>
                     </el-popover>
@@ -1277,11 +1283,10 @@ export default {
             // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             if (this.contextSwitch) {
                 //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: 'open'};
             } else {
-                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: ''};
             }
-
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },

@@ -663,9 +663,14 @@ pre code {
     height: 30px;
     width: 126px;
 }
+/* ol li {
+    height: 30px;
+    padding-bottom: 17px;
+} */
 ol li > p:first-child {
     position: relative;
     bottom: 20px;
+    /* overflow-wrap: break-word; */
 }
 .col-font {
     font-size: 12px;
@@ -677,20 +682,22 @@ ol li > p:first-child {
 }
 .z-col-3 {
     width: 121px;
-    padding-left: 16px!important;
+    padding-left: 6px!important;
 }
 .z-col-4 {
     position: relative;
     width: 47px;
     bottom: 2px;
+    right: 12px;
 }
 .z-col-5 {
     width: 75px;
-    padding-left: 16px!important;
+    padding-left: 6px!important;
 }
 .z-col-6 {
     position: relative;
     bottom: 7px;
+    right: 14px;
 }
 .el-popover__title {
     font-weight: 900!important;
@@ -798,12 +805,13 @@ ol li > p:first-child {
 }
 .ft {
     white-space: break-spaces;
-    height: 600px;
+    height: 460px;
     overflow-y: auto;
 }
 .el-dialog__header {
     background-color: #204f7f;
     border-radius: 3px 3px 0 0;
+    cursor: all-scroll;
 }
 .el-dialog__header span {
     color: #fff;
