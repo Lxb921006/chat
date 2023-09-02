@@ -302,7 +302,7 @@
                 <!-- 历史记录 -->
                 <div class="user rb">
                     <el-popconfirm
-                        title="是否加载历史记录?"
+                        title="是否加载历史记录?(只加载最新的10条, 如需加载更多请把滚动加载打开)"
                         @confirm="getChatList(100)"
                         >
                         <el-button slot="reference">
@@ -748,10 +748,10 @@ export default {
                 this.loadCount = respData.length;
                 this.saveChatListTotal(this.loadCount);
                 this.saveLoadingOffset();
+                store.commit("CLEAR_CHAT_CACHE");
                 let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
                 this.show = true;
                 this.showhi = true;
-                store.commit("CLEAR_CHAT_CACHE");
                 for (let i = 0; i < historyData.length; i++) {
                     store.commit("ADD_CHAT_CACHE", historyData[i]);
                 }
