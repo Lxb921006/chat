@@ -836,3 +836,9 @@ ol li > p:first-child {
 .el-collapse-item__wrap {
     border-bottom-color: #262626;
 }
+.z-notice-word .el-link--inner{
+    color: #28c66f;
+}
+.z-notice-word .el-link--inner:hover {
+    color: #01fa71;
+}

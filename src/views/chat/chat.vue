@@ -326,8 +326,11 @@
                         <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="dnSwitch">预设: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>预设: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】</span>
-                        <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】</span>
+                        <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <span class="z-notice-word">
+                            <el-link type="info" target="_blank" class="addr-size" :underline="false" href="https://xn--o0uq09burn.com/?tags=tool">提示词</el-link>
+                        </span>
                     </div>
                     <div class="send-input">
                          <el-input
