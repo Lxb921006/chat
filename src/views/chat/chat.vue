@@ -1310,7 +1310,6 @@ export default {
             } else {
                 sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: ''};
             }
-
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
