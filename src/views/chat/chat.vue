@@ -704,7 +704,8 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            if (nt[i].scrollHeight  < nt[i].clientHeight) {
+                            console.log(nt[i].clientHeight);
+                            if (nt[i].clientHeight  > 38) {
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             }
                         }
