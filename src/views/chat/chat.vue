@@ -87,7 +87,7 @@
                             </transition>
                             <!-- 标题 -->
                             <h2 class="answer-title" :id=data1.uuid>
-                                <p class="question" ref="title" :style="monitorHeight">
+                                <p class="question" ref="title">
                                     <svg class="icon-qa" aria-hidden="true">
                                         <use xlink:href="#icon-changjianwenti"></use>
                                     </svg>
@@ -582,13 +582,13 @@ export default {
             'chatCache': state => state.chatCache.editableTabs,
             'chatRecycle': state => state.chatRecycle.editableTabsZ
         }),
-        monitorHeight() {
-            if (this.addTitleStyle()) {
-                return {whiteSpace: "break-spaces", textAlign: "justify"}
-            } else {
-                return {}
-            }
-        },
+        // monitorHeight() {
+        //     if (this.addTitleStyle()) {
+        //         return {whiteSpace: "break-spaces", textAlign: "justify"}
+        //     } else {
+        //         return {}
+        //     }
+        // },
     },
     components: {
         MarkdownCodeBlock,
@@ -704,7 +704,7 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            if (nt[i].scrollHeight  <= nt[i].clientHeight) {
+                            if (nt[i].scrollHeight  < nt[i].clientHeight) {
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             }
                         }
@@ -717,8 +717,10 @@ export default {
             this.$nextTick(function() {
                 const nt = this.$refs.title;
                 if (nt) {
+                    console.log(nt);
                     if (nt.length != 0) {
                         let lastTitle = nt.length - 1;
+                        console.log(nt.scrollHeight, nt.clientHeight);
                         return lastTitle.scrollHeight  <= lastTitle.clientHeight;
                     }
                 }
