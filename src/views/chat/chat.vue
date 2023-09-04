@@ -329,7 +329,8 @@
                         <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span class="z-notice-word">
-                            <el-link type="info" target="_blank" class="addr-size" :underline="false" href="https://xn--o0uq09burn.com/?tags=tool">提示词</el-link>
+                            <!-- <el-link type="info" target="_blank" class="addr-size" :underline="false" href="https://xn--o0uq09burn.com/?tags=tool" @click="isOpenNoticeWord()">提示词</el-link> -->
+                            <el-link type="info" target="_blank" class="addr-size" :underline="false" @click="isOpenNoticeWord()">提示词</el-link>
                         </span>
                     </div>
                     <div class="send-input">
@@ -383,6 +384,7 @@
                 width="600px"
                 v-loading="fileTextLoad"
                 :append-to-body="true"
+                :lock-scroll="false"
                 center
                 v-draggable
                 >
@@ -394,6 +396,14 @@
                 </span>
             </el-dialog>
         </div>
+        <transition name="el-zoom-in-center">
+            <div class="notice-word" v-if="noticeVisible" v-draggable>
+                <h2 class="notice-title">
+                    <el-button type="info" size="mini" @click="isOpenNoticeWord()">关闭</el-button>
+                </h2>
+                <iframe src="https://xn--o0uq09burn.com/?tags=tool" frameborder="0"></iframe>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -460,6 +470,7 @@ export default {
     data()  {
         return {
             fileText: '',
+            noticeVisible: false,
             fileTextVisible: false,
             fileTextLoad: true,
             currentUser: '',
@@ -585,6 +596,9 @@ export default {
     },
     
     methods: {
+        isOpenNoticeWord() {
+            this.noticeVisible = this.noticeVisible ? false : true;
+        },
         async chatDel(data) {
             const resp = await chatDel({uuid: JSON.stringify(data)}, this.callMethod);
             return resp
@@ -594,6 +608,7 @@ export default {
             if (this.isScrollLoadDataStatus) {
                 sessionStorage.setItem("sds", 1);
                 this.getChatList(100);
+                Message.success('滚动加载数据已开启');
             } else {
                 sessionStorage.setItem("sds", 2);
                 let loadCount = sessionStorage.getItem('loadCount');
@@ -601,6 +616,7 @@ export default {
                 if (loadCount != totals) {
                     sessionStorage.setItem('totals', loadCount);
                 }
+                Message.warning('滚动加载数据已关闭');
             }
         },
         // 滚动加载数据开关状态

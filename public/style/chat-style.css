@@ -847,3 +847,25 @@ ol > li {
 .z-notice-word .el-link--inner:hover {
     color: #01fa71;
 }
+
+.notice-word {
+    position: fixed;
+    width: 666px;
+    height: 522px;
+    top: 123px;
+    left: 137px;
+    background-color: #fff;
+}
+.notice-word iframe {
+    width: 100%;
+    height: 468px;
+}
+.notice-title {
+    width: 631px;
+    height: 44px;
+    line-height: 38px;
+    cursor: move;
+    text-align: left;
+    padding-left: 17px;
+    border-bottom: 1px solid #e9e9e9;
+}
