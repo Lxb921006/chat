@@ -93,7 +93,6 @@
                                     </svg>
                                     {{ data1.title }}  <el-link :underline="false" v-if="data1.file" @click="getFileText(data1.file)">{{ data1.file }}</el-link>
                                     <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
-                                    <!-- <markdown-title :code="data1.title" :cursor="data1.cursor"></markdown-title> -->
                                 </p>
                             </h2>
                             <!-- 回复内容 -->
@@ -414,7 +413,6 @@ import store from '../../store/index'
 import { wssSinUrl, wssUsUrl, wssSinApiUrl } from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
-import MarkdownTitle from './markdownCode';
 import baseUrl from "../../utils/baseUrl";
 import { chatList, chatSave, getFileText, chatDel } from '../../api'
 
@@ -539,7 +537,7 @@ export default {
                 },
                 {
                     value: 'ai-assistant',
-                    label: 'ai-assistant',
+                    label: 'chatLLAM',
                     disabled: false,
                 },
                 {
@@ -582,13 +580,6 @@ export default {
             'chatCache': state => state.chatCache.editableTabs,
             'chatRecycle': state => state.chatRecycle.editableTabsZ
         }),
-        // monitorHeight() {
-        //     if (this.addTitleStyle()) {
-        //         return {whiteSpace: "break-spaces", textAlign: "justify"}
-        //     } else {
-        //         return {}
-        //     }
-        // },
     },
     components: {
         MarkdownCodeBlock,
@@ -704,7 +695,6 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            console.log(nt[i].clientHeight);
                             if (nt[i].clientHeight  > 38) {
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             }
@@ -1295,9 +1285,7 @@ export default {
             let data = {data: JSON.stringify(lastData)};
             const resp = await chatSave(data, this.callMethod);
             if (resp.data.status != 666) {
-                console.log('保存数据失败>>>', resp.data.msg);
-            } else {
-                console.log(resp.data.msg);
+                Message.error('保存数据失败>>>', resp.data.msg);
             }
         },
         // claude
@@ -1330,7 +1318,6 @@ export default {
             } else {
                 sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: ''};
             }
-            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },

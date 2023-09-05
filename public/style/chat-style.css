@@ -677,6 +677,14 @@ ol > li {
     margin: 0 22px;
     min-height: 30px;
 }
+.code ul li > p:first-child {
+    position: relative;
+    bottom: 20px;
+}
+.code ul > li {
+    margin: 0 22px;
+    min-height: 30px;
+}
 .col-font {
     font-size: 12px;
 }

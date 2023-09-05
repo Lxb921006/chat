@@ -11,7 +11,8 @@ import MarkdownIt from 'markdown-it';
 import { Message } from 'element-ui'
 import hljs from 'highlight.js';
 import 'highlight.js/styles/stackoverflow-dark.css';
-// import 'highlight.js/styles/monokai.css'; // 高亮样式
+// 高亮样式
+// import 'highlight.js/styles/monokai.css'; 
 // import 'highlight.js/styles/tomorrow-night-blue.css';
 // import 'highlight.js/styles/tomorrow-night-bright.css';
 
@@ -29,6 +30,7 @@ export default {
     data() {
         return {
             renderedCode: '',
+            codeWithCursor: '',
         };
     },
     computed: {
@@ -48,7 +50,7 @@ export default {
             this.$copyText(newText).then(() => {
                 Message.info('已复制到剪贴板');
             }).catch((err) => {
-              Message.error('复制失败');;
+                Message.error('复制失败');;
             });
         },
         renderCode() {
@@ -60,7 +62,7 @@ export default {
                 highlight: function (code, lang) {
                     if (lang && hljs.getLanguage(lang)) {
                         try {
-                          return hljs.highlight(lang, code).value;
+                            return hljs.highlight(lang, code).value;
                         } catch (__) {}
                     }
                     return ''; // 使用外部默认转义
@@ -72,9 +74,9 @@ export default {
                 let langOld = lang;
                 const code = token.content.trim();
                 if (lang) {
-                    if (lang == "vue") { // 没有找到对vue.js的代码高亮支持，只能匹配到vue就让它显示js的高亮
+                    if (lang == "vue") { // 没有找到对vue.js的代码高亮支持，只能匹配到vue就让它显示js语法的高亮
                         lang = "javascript";
-                    } else if (lang == "" || lang == null) {
+                    } else if (lang == "" || lang == null) { // 没有匹配到lang就直接用bash的语法
                         lang = "bash"
                     }
 
@@ -84,10 +86,12 @@ export default {
                         return `<div class="custom-code-block-dev"><p class="lang-s">${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)} </code></pre>`;
                     }
                   } else {
-                      return `<div class="custom-code-block-dev"><p class="lang-s">text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(code)} </code></pre>`;
+                        return `<div class="custom-code-block-dev"><p class="lang-s">text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(code)} </code></pre>`;
                   }
             };
-              return md.render(this.code);
+            // console('code >>> ', this.code);
+            // this.codeWithCursor = this.code + '<span class="cursor-2" v-show="cursor">|</span>';
+            return md.render(this.code);
         },
     },
 };
