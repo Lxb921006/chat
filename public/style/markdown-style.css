@@ -72,3 +72,6 @@
     margin-left: 1px;
     animation: blink 1s infinite;
 }
+pre code {
+  white-space: break-spaces;
+}

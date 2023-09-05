@@ -104,7 +104,7 @@
                                 </div>
                                 <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
                                 <markdown-code-block :code="data1.answer" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
-                                <!-- 光标 -->
+                                <!-- 等待ai回复时的提示 -->
                                 <span class="cursor" id="loading" v-else>waiting{{ dots }}</span>
                                 <!-- 对话完成时间 -->
                                 <transition name="el-zoom-in-center">
@@ -512,7 +512,7 @@ export default {
             but1Icon: "el-icon-arrow-right",
             code:"",
             value: "text-davinci-003",
-            cc: "<span class='.cursor-2' v-show='this.cursor'>|</span>",
+            cc: "<span class='cursor-2' v-show='cursor'>|</span>",
             selectedModel: "",
             claudeIcon: "#icon-Claude2",
             defaultIcon: "#icon-a-5_moxingtongbu",
@@ -1209,7 +1209,7 @@ export default {
                     this.sendChatGpt();
                     break
                 case 'ai-assistant':
-                    this.Assistant();
+                    this.chatLLAM();
                     break
                 case 'bd':
                     console.log(1111);
@@ -1341,7 +1341,7 @@ export default {
             this.jumpFooter();
         },
         // assistant(第三方提供的api)
-        Assistant() {
+        chatLLAM() {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == 'ai-assistant');

@@ -1,7 +1,8 @@
 <template>
     <div ref="html" class="box">
         <pre>
-          <code v-html="formattedCode" class="code"></code><span class='cursor-2' v-show='cursor'>|</span>
+          <code v-html="formattedCode" class="code"></code>
+          <!-- <span class='cursor-2' v-show='cursor'>|</span> -->
         </pre>
     </div>
 </template>
@@ -31,6 +32,7 @@ export default {
         return {
             renderedCode: '',
             codeWithCursor: '',
+            cc: "<span class='cursor-2' v-show='cursor'>|</span>",
         };
     },
     computed: {
@@ -46,7 +48,7 @@ export default {
     },
     methods: {
         copy (text) {
-            let newText = text.replace(/kbkbkb/g, '`').replace(/jjjj/g, '$');
+            let newText = text.replace(/kbkbkb/g, '`').replace(/jjjj/g, '$').replace(/fffrrr/g, "\\");
             this.$copyText(newText).then(() => {
                 Message.info('已复制到剪贴板');
             }).catch((err) => {
@@ -81,16 +83,14 @@ export default {
                     }
 
                     try {
-                        return `<div class="custom-code-block-dev"><p class="lang-s">${langOld}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${hljs.highlight(lang, code).value} </code></pre>`;
+                        return `<div class="custom-code-block-dev"><p class="lang-s">${langOld}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj').replace(/\\/g, "fffrrr"))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${hljs.highlight(lang, code).value} </code></pre>`;
                     } catch (err) {
-                        return `<div class="custom-code-block-dev"><p class="lang-s">${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${md.utils.escapeHtml(code)} </code></pre>`;
+                        return `<div class="custom-code-block-dev"><p class="lang-s">${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj').replace(/\\/g, "fffrrr"))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${code} </code></pre>`;
                     }
                   } else {
-                        return `<div class="custom-code-block-dev"><p class="lang-s">text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj'))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${md.utils.escapeHtml(code)} </code></pre>`;
+                        return `<div class="custom-code-block-dev"><p class="lang-s">text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj').replace(/\\/g, "fffrrr"))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${code} </code></pre>`;
                   }
             };
-            // console('code >>> ', this.code);
-            // this.codeWithCursor = this.code + '<span class="cursor-2" v-show="cursor">|</span>';
             return md.render(this.code);
         },
     },
