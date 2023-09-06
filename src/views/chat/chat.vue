@@ -335,6 +335,7 @@
                     <div class="send-input">
                          <el-input
                             type="textarea"
+                            autocomplete="on"
                             show-word-limit
                             :autosize="{ minRows: 2, maxRows: 4 }"
                             placeholder="请输入对话内容, 先按住ctrl再按enter键提交"
@@ -511,8 +512,8 @@ export default {
             icon: "#icon-fuzhi2",
             but1Icon: "el-icon-arrow-right",
             code:"",
+            cc: "<span class='cursor-2'>|</span>",
             value: "text-davinci-003",
-            cc: "<span class='cursor-2' v-show='cursor'>|</span>",
             selectedModel: "",
             claudeIcon: "#icon-Claude2",
             defaultIcon: "#icon-a-5_moxingtongbu",
@@ -551,7 +552,7 @@ export default {
                     disabled: false,
                 },
             ],
-            allowFile: ['.txt'],
+            allowFile: ['.txt', '.pdf'],
             loadCount: 0,
             historyDataLoading: false,
             pages: {
@@ -702,21 +703,6 @@ export default {
                     }
                 }
             }); 
-        },
-        // 格式化标题
-        addTitleStyle () {
-            this.$nextTick(function() {
-                const nt = this.$refs.title;
-                if (nt) {
-                    console.log(nt);
-                    if (nt.length != 0) {
-                        let lastTitle = nt.length - 1;
-                        console.log(nt.scrollHeight, nt.clientHeight);
-                        return lastTitle.scrollHeight  <= lastTitle.clientHeight;
-                    }
-                }
-                return false;
-            });
         },
         // 加载数据的时候过滤掉重复的
         mergeUniqueByUUid(arr1, arr2) {
@@ -869,7 +855,6 @@ export default {
             Message.error('每次只能上传一个文件');
         },
         handlePreview(file) {
-            console.log(file);
             this.getFileText(file.name);
         },
         // 清空回收站
@@ -1212,7 +1197,6 @@ export default {
                     this.chatLLAM();
                     break
                 case 'bd':
-                    console.log(1111);
                     this.sendBd();
                     break
                 case 'xf':
@@ -1220,14 +1204,14 @@ export default {
                     break
             }
         },
-        // 后端发来的数据
+        // 接收数据
         getMessage (msg) {
             let jd = JSON.parse(msg.data);
             let div = document.querySelector(".content")
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].uuid == this.editableTabsValue) {
                     // this.chatCache[i].answer.push(jd.data);
-                    this.chatCache[i].answer += jd.data
+                    this.chatCache[i].answer += jd.data;
                     this.chatCache[i].cid = jd.cid;
                     this.chatCache[i].pid = jd.pid;
                     this.chatCache[i].content = jd.content;
@@ -1266,7 +1250,7 @@ export default {
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
             this.claudeFile = "";
-            this.fileList = [];
+            // this.fileList = [];
             this.chatContent = "";
             this.stopResp = false;
             this.socket = null;

@@ -148,6 +148,7 @@
   border-radius: 11px 11px 0 0;
   display: flex;
   justify-content: space-between;
+  margin-top: 8px;
 }
  .custom-code-block-dev p {
   padding-left: 10px;
@@ -671,7 +672,7 @@ pre code {
 }
 ol li > p:first-child {
     position: relative;
-    bottom: 20px;
+    bottom: 25px;
 }
 ol > li {
     margin: 0 22px;
@@ -820,6 +821,7 @@ ol > li {
     white-space: break-spaces;
     height: 460px;
     overflow-y: auto;
+    padding: 0 6px;
 }
 .el-dialog__header {
     background-color: #204f7f;
@@ -877,7 +879,7 @@ ol > li {
     padding-left: 17px;
     border-bottom: 1px solid #e9e9e9;
 }
-.cursor-2 {
+/* .cursor-2 {
     position: relative;
     left: 81px;
     bottom: 12px;
@@ -888,4 +890,4 @@ ol > li {
     display: inline-block;
     margin-left: 1px;
     animation: blink 1s infinite;
-}
+} */
