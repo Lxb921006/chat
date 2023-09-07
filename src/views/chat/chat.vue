@@ -528,7 +528,7 @@ export default {
             modelAll: [
                 {
                     value: 'claude-2',
-                    label: 'claude-2',
+                    label: 'claude',
                     disabled: false,
                 },
                 {
@@ -1207,7 +1207,7 @@ export default {
         // 接收数据
         getMessage (msg) {
             let jd = JSON.parse(msg.data);
-            let div = document.querySelector(".content")
+            let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].uuid == this.editableTabsValue) {
                     // this.chatCache[i].answer.push(jd.data);
@@ -1233,6 +1233,7 @@ export default {
                     } else {
                         answer = this.chatCache[i].answer;
                     }
+
                     let data = {
                         uuid: this.chatCache[i].uuid, 
                         answer: answer, 
@@ -1302,6 +1303,7 @@ export default {
             } else {
                 sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: ''};
             }
+
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
