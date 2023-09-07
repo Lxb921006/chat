@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "10911611",
+      "name": "内容-插件离线",
+      "font_class": "neirong-chajianlixian",
+      "unicode": "e635",
+      "unicode_decimal": 58933
+    },
+    {
+      "icon_id": "20841901",
+      "name": "插件",
+      "font_class": "chajian",
+      "unicode": "e69b",
+      "unicode_decimal": 59035
+    },
+    {
+      "icon_id": "29415629",
+      "name": "插件库",
+      "font_class": "chajianku",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
+    },
+    {
       "icon_id": "4398156",
       "name": "用户管理",
       "font_class": "yonghuguanli1",

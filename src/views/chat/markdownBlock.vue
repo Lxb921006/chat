@@ -62,10 +62,8 @@ export default {
         renderMarkdown() {
             const md = new MarkdownIt({
                 highlight: function (code, lang) {
-                    // 代码部分就去掉光标效果, 不然<span class="cursor-2">|</span>会原样输出, 不会被渲染成html标签, 还会有一堆报错
-                    code = code.replace(/<span class="language-html cursor-2">\|<\/span>/g, '');
+                    // 代码部分就去掉光标效果, 但是总是会提示缺少language, 改成<pre><code><span class="language-html cursor-2">|</span></code></pre>就可以，但是又达不到光标效果
                     if (lang && hljs.getLanguage(lang)) {
-                        console.log("code 2222>>> ", code);
                         try {
                             return hljs.highlight(lang, code).value;
                         } catch (__) {}
@@ -79,9 +77,9 @@ export default {
                 let lang = token.info.trim();
                 let langOld = lang;
                 let code = token.content.trim();
-                // 代码部分就去掉光标效果, 不然<span class="cursor-2">|</span>会原样输出, 不会被渲染成html标签, 还会有一堆报错
+                // 代码部分就去掉光标效果, 但是总是会提示缺少language, 改成<pre class="cursor-2"><code class="language-html cursor-2"<span class="language-html cursor-2">|</span></code></pre>就可以，但是又达不到光标效果
                 code = code.replace(/<span class="language-html cursor-2">\|<\/span>/g, '');
-                // lang = extractLangFromCode(code);
+                
                 if (lang) {
                     if (lang == "vue") { // 没有找到对vue.js的代码高亮支持，只能匹配到vue就让它显示js语法的高亮
                         lang = "javascript";
@@ -101,7 +99,7 @@ export default {
 
             // 返回被markdown，highlight组件渲染后的code
             const html = md.render(this.code + (this.cursor ? '<span class="language-html cursor-2">|</span>' : ""));
-            // const html = md.render(this.code);
+            // const html = md.render(this.code + '<pre class="cursor-3"><code class="language-html"><span class="cursor-2">|</span></code></pre>');
             return html
         },
     },
