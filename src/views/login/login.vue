@@ -83,7 +83,7 @@ export default {
             }
 
             sessionStorage.setItem("user", resp.data.user);
-            this.$router.replace('/index').catch((err) => err);
+            this.$router.replace('/chat').catch((err) => err);
             this.submitLoad = false;
             this.finished = false;
             this.logintext = "确定";
