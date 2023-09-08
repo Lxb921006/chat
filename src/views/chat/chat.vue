@@ -1036,10 +1036,10 @@ export default {
             const asideSt = getComputedStyle(asideEl);
             if (asideSt.display == 'none') {
                 document.querySelector(".aside").setAttribute("style", "display:block");
-                document.querySelector(".main").setAttribute("style", "width:calc(100% - 200px)");
+                document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px)");
             } else {
                 document.querySelector(".aside").setAttribute("style", "display:none");
-                document.querySelector(".main").setAttribute("style", "width:100%");
+                document.querySelector(".main").setAttribute("style", "width:100%;");
             }
         },
         // 是否隐藏左侧的菜单栏，默认不隐藏
