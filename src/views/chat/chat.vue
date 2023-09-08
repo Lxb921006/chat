@@ -1030,6 +1030,16 @@ export default {
             }
             this.getContentLen();
         },
+        // 隐藏显示侧边栏
+        showAside() {
+            const asideEl = document.querySelector('.aside');
+            const asideSt = getComputedStyle(asideEl);
+            if (asideSt.display == 'none') {
+                document.querySelector(".aside").setAttribute("style", "display:block");
+            } else {
+                document.querySelector(".aside").setAttribute("style", "display:none");
+            }
+        },
         // 是否隐藏左侧的菜单栏，默认不隐藏
         defaultHideAside() {
             if (!this.showAsideView) {
