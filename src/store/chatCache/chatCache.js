@@ -46,6 +46,7 @@ const chatCache = {
                 lfcd['pid'] = data['pid'];
                 lfcd['cid'] = data['cid'];
                 lfcd['content'] = data['content'];
+                lfcd['date'] = data['date'];
                 lfcd['file'] = data['file'];
                 break
             }

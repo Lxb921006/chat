@@ -363,7 +363,7 @@
                             :data="fileData"
                             :on-exceed="handleExceed"
                             :file-list="fileList">
-                            <el-tooltip class="item" effect="dark" content="只能上传.txt文件; 目前只支持claude上传附件" placement="top-start">
+                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .pdf文件; 目前只支持claude上传附件" placement="top-start">
                                 <el-button size="small" type="primary">
                                     <svg class="icon z-send-button" aria-hidden="true">
                                         <use xlink:href="#icon-fujian"></use>
@@ -543,7 +543,7 @@ export default {
                 },
                 {
                     value: 'xf',
-                    label: '讯飞星火2.0',
+                    label: '讯飞星火',
                     disabled: false,
                 },
                 {
@@ -1029,6 +1029,18 @@ export default {
                 console.log("还没有聊天数据哟");
             }
             this.getContentLen();
+        },
+        // 隐藏显示侧边栏
+        showAside() {
+            const asideEl = document.querySelector('.aside');
+            const asideSt = getComputedStyle(asideEl);
+            if (asideSt.display == 'none') {
+                document.querySelector(".aside").setAttribute("style", "display:block");
+                document.querySelector(".main").setAttribute("style", "width:calc(100% - 200px)");
+            } else {
+                document.querySelector(".aside").setAttribute("style", "display:none");
+                document.querySelector(".main").setAttribute("style", "width:100%");
+            }
         },
         // 是否隐藏左侧的菜单栏，默认不隐藏
         defaultHideAside() {
