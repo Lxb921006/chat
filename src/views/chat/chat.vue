@@ -363,7 +363,7 @@
                             :data="fileData"
                             :on-exceed="handleExceed"
                             :file-list="fileList">
-                            <el-tooltip class="item" effect="dark" content="只能上传.txt文件; 目前只支持claude上传附件" placement="top-start">
+                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .pdf文件; 目前只支持claude上传附件" placement="top-start">
                                 <el-button size="small" type="primary">
                                     <svg class="icon z-send-button" aria-hidden="true">
                                         <use xlink:href="#icon-fujian"></use>
@@ -543,7 +543,7 @@ export default {
                 },
                 {
                     value: 'xf',
-                    label: '讯飞星火2.0',
+                    label: '讯飞星火',
                     disabled: false,
                 },
                 {
