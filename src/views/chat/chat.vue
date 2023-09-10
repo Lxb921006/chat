@@ -566,14 +566,18 @@ export default {
         input: function(newVal, oldVal) {
             if (newVal === "") {
                 this.getAllChatData();
+            } else {
+                this.getSearchData();
             }
-            this.getSearchData();
+            this.getContentLen();
         },
         rbData: function(newVal, oldVal) {
             if (newVal === "") {
                 this.getAllRbData();
+            } else {
+                this.getSearchRbData();
             }
-            this.getSearchRbData();
+            this.getContentLen();
         },
     },
     computed: {
@@ -599,7 +603,18 @@ export default {
         saveScrollLoadDataStatus() {
             if (this.isScrollLoadDataStatus) {
                 sessionStorage.setItem("sds", 1);
-                this.getChatList(100);
+                this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
+                this.pages.page = parseInt(sessionStorage.getItem('page'));
+                let totals = parseInt(sessionStorage.getItem('totals'));
+                if (this.pages.page && this.pages.page > 1) {
+                    if (this.loadCount == totals) {
+                        sessionStorage.setItem('totals', totals-=1);
+                    }
+                    this.scrollLoadChatData();
+                } else {
+                    this.getChatList(100);
+                }
+                
                 Message.success('滚动加载数据已开启');
             } else {
                 sessionStorage.setItem("sds", 2);
@@ -810,7 +825,7 @@ export default {
         },
         // 滚动到底部就加载数据
         async scrollLoadChatData() {
-            let totals = sessionStorage.getItem('totals');
+            let totals = parseInt(sessionStorage.getItem('totals'));
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
             this.pages.page = parseInt(sessionStorage.getItem('page'));
             if (this.loadCount != totals) {
@@ -829,7 +844,9 @@ export default {
                 sessionStorage.setItem('loadCount', this.loadCount);
                 sessionStorage.setItem('page', this.pages.page);
                 
+                sessionStorage.setItem('totals', resp.data.totals);
             }
+            this.chatTitleFormat();
             this.setTimer = true; // 必须等数据加载完才能让handleScroll继续监听滚动条
             this.scrollLoading = false;
         },
@@ -1012,6 +1029,7 @@ export default {
         },
         // 所有聊天记录
         getAllChatData () {
+            this.setTimer = true;
             if (sessionStorage.getItem("chatCache")) {
                 store.commit("CLEAR_CHAT_CACHE");
                 this.show = true;
@@ -1023,6 +1041,7 @@ export default {
         },
         // 搜索聊天记录
         getSearchData() {
+            this.setTimer = false;
             if (this.chatCache.length != 0) {
                 store.commit("GET_CHAT_CACHE", this.input);
             } else {
@@ -1153,6 +1172,7 @@ export default {
 
             store.commit("ADD_CHAT_CACHE", data);
             this.jumpFooter();
+            this.chatTitleFormat();
             if (typeof(WebSocket) === "undefined") {
                 Message.error("您的浏览器不支持socket")
             } else {
