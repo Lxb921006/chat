@@ -11,7 +11,9 @@
 import MarkdownIt from 'markdown-it';
 import { Message } from 'element-ui'
 import hljs from 'highlight.js';
-import 'highlight.js/styles/stackoverflow-dark.css';
+import 'highlight.js/styles/hybrid.css';
+// import 'highlight.js/styles/color-brewer.css';
+// import 'highlight.js/styles/stackoverflow-dark.css';
 // 高亮样式
 // import 'highlight.js/styles/monokai.css'; 
 // import 'highlight.js/styles/tomorrow-night-blue.css';
@@ -79,21 +81,21 @@ export default {
                 let code = token.content.trim();
                 // 代码部分就去掉光标效果, 但是总是会提示缺少language, 改成<pre class="cursor-2"><code class="language-html cursor-2"<span class="language-html cursor-2">|</span></code></pre>就可以，但是又达不到光标效果
                 code = code.replace(/<span class="language-html cursor-2">\|<\/span>/g, '');
-                
                 if (lang) {
                     if (lang == "vue") { // 没有找到对vue.js的代码高亮支持，只能匹配到vue就让它显示js语法的高亮
                         lang = "javascript";
-                    } else if (lang == "" || lang == null) { // 没有匹配到lang就直接用bash的语法
+                    } else if (lang == "" || lang == null || !lang || lang == undefined) { // 没有匹配到lang就直接用bash的语法
                         lang = "bash"
                     }
 
                     try {
-                        return `<div class="custom-code-block-dev"><p class="lang-s">${langOld}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj').replace(/\\/g, "fffrrr"))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${hljs.highlight(lang, code).value}</code></pre>`;
+                        return `<div class="custom-code-block-dev"><p class="lang-s">${langOld}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj').replace(/\\/g, "fffrrr"))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${hljs.highlight(lang, code.replace(/<span class="language-html cursor-2">\|<\/span>/g, '')).value}</code></pre>`;
                     } catch (err) {
-                        return `<div class="custom-code-block-dev"><p class="lang-s">${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj').replace(/\\/g, "fffrrr"))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${code}</code></pre>`;
+                        return `<div class="custom-code-block-dev"><p class="lang-s">${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj').replace(/\\/g, "fffrrr"))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${code.replace(/<span class="language-html cursor-2">\|<\/span>/g, '')}</code></pre>`;
                     }
                 } else {
-                    return `<div class="custom-code-block-dev"><p class="lang-s">text</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj').replace(/\\/g, "fffrrr"))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-text code-3">${code}</code></pre>`;
+                    lang = "bash"
+                    return `<div class="custom-code-block-dev"><p class="lang-s">${lang}</p><button class="copy-1" onclick="copy(\`${md.utils.escapeHtml(code.replace(/\`/g, 'kbkbkb').replace(/\$/g, 'jjjj').replace(/\\/g, "fffrrr"))}\`)"><span class="iconfont icon-fuzhi"></span></button></div><pre class="custom-code-block"><code class="language-${lang} code-3">${code.replace(/<span class="language-html cursor-2">\|<\/span>/g, '')}</code></pre>`;
                 }
             };
 
