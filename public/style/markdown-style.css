@@ -8,6 +8,7 @@
 .custom-code-block-dev p {
     padding-left: 10px;
     padding-top: 10px;
+    font-weight: 600;
 }
 .code-3 {
     white-space: pre-wrap;
