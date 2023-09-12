@@ -534,11 +534,6 @@ export default {
                 {
                     value: 'chatGPT',
                     label: 'chatGPT',
-                    disabled: true,
-                },
-                {
-                    value: 'ai-assistant',
-                    label: 'chatGPT',
                     disabled: false,
                 },
                 {
@@ -1182,7 +1177,7 @@ export default {
                         this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'chatGPT':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'ai-assistant':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
@@ -1223,7 +1218,7 @@ export default {
                     this.sendClaude();
                     break
                 case 'chatGPT':
-                    this.sendChatGpt();
+                    this.chatLLAM();
                     break
                 case 'ai-assistant':
                     this.chatLLAM();
