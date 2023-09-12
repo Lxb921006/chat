@@ -534,7 +534,7 @@ export default {
                 {
                     value: 'chatGPT',
                     label: 'chatGPT',
-                    disabled: false,
+                    disabled: true,
                 },
                 {
                     value: 'ai-assistant',
