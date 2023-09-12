@@ -518,7 +518,7 @@ export default {
             claudeIcon: "#icon-Claude2",
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
-            assistantIcon: "#icon-moxingtongbu",
+            assistantIcon: "#icon-a-Chatgpt35",
             xfIcon: "#icon-xunfeilogo",
             wxIcon: "#icon-baidu",
             scrollLoading: false,
@@ -538,7 +538,7 @@ export default {
                 },
                 {
                     value: 'ai-assistant',
-                    label: 'chatLLAM',
+                    label: 'chatGPT',
                     disabled: false,
                 },
                 {
@@ -711,7 +711,7 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            if (nt[i].clientHeight  > 38) {
+                            if (nt[i].clientHeight  > 39) {
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             }
                         }
