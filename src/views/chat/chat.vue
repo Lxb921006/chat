@@ -323,6 +323,27 @@
                         </el-button>
                     </el-popconfirm>
                 </div>
+                <!-- 插件 -->
+                <div class="user rb">
+                    <el-popover
+                        placement="right"
+                        width="400"
+                        trigger="click">
+                        <div class="z-rb-title">
+                            <h2>插件</h2>
+                        </div>
+                        <el-row :gutter="20">
+                            <el-col :span=10>
+                                <el-checkbox v-model="pptCreate">ppt生成</el-checkbox>
+                            </el-col>
+                        </el-row>
+                        <el-button slot="reference">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-chajian"></use>
+                            </svg>
+                        </el-button>
+                    </el-popover>
+                </div>
                 <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
@@ -474,6 +495,7 @@ export default {
     },
     data()  {
         return {
+            pptCreate: '',
             fileText: '',
             noticeVisible: false,
             fileTextVisible: false,
@@ -693,7 +715,6 @@ export default {
             const dialogRect = this.$refs.dialog.getBoundingClientRect();  
             const mouseX = event.clientX;  
             const mouseY = event.clientY;  
-            console.log(dialogRect);
                 
             // 计算对话框应该移动到的位置  
             const newLeft = mouseX - (dialogRect.width - this.$refs.dialog.offsetWidth) / 2;  
@@ -1410,7 +1431,7 @@ export default {
         chatLLAM() {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == 'ai-assistant');
+            let gptData =  cacheData.filter(cd => cd.model == 'chatGPT');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
@@ -1421,7 +1442,6 @@ export default {
             } else {
                 sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
             }
-
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
