@@ -29,6 +29,12 @@
                             <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
+                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'GPT-4'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
+                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT3.5'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'claude-2'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
@@ -518,6 +524,7 @@ export default {
             claudeIcon: "#icon-Claude2",
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
+            gpt4: "#icon-a-Chatgpt4",
             assistantIcon: "#icon-a-Chatgpt35",
             xfIcon: "#icon-xunfeilogo",
             wxIcon: "#icon-baidu",
@@ -532,8 +539,18 @@ export default {
                     disabled: false,
                 },
                 {
+                    value: 'chatGPT3.5',
+                    label: 'GPT-3.5-turbo',
+                    disabled: false,
+                },
+                {
+                    value: 'GPT-4',
+                    label: 'GPT-4',
+                    disabled: false,
+                },
+                {
                     value: 'chatGPT',
-                    label: 'chatGPT',
+                    label: 'GPT-3',
                     disabled: false,
                 },
                 {
@@ -943,6 +960,12 @@ export default {
                 case '5':
                     this.selectedModel = 'bd';
                     break;
+                case '6':
+                    this.selectedModel = 'chatGPT3.5';
+                    break;
+                case '7':
+                    this.selectedModel = 'GPT-4';
+                    break;
                 default:
                     this.selectedModel = 'chatGPT';
                     break;
@@ -965,7 +988,13 @@ export default {
                     break
                 case 'bd':
                     window.sessionStorage.setItem('modelSelect', 5);
-                    break    
+                    break
+                case 'chatGPT3.5':
+                    window.sessionStorage.setItem('modelSelect', 6);
+                    break  
+                case 'GPT-4':
+                    window.sessionStorage.setItem('modelSelect', 7);
+                    break
             }
         },
         // 检查chatCache的长度
@@ -989,6 +1018,12 @@ export default {
                     window.open('https://yiyan.baidu.com/');
                     break;    
                 case 'ai-assistant':
+                    window.open('https://openai.com/');
+                    break;
+                case 'chatGPT3.5':
+                    window.open('https://openai.com/');
+                    break;
+                case 'GPT-4':
                     window.open('https://openai.com/');
                     break;
                 case 'xf':
@@ -1130,6 +1165,12 @@ export default {
             case 'chatGPT':
                 modelIcon = this.chatGptIcon;
                 break;
+            case 'GPT-4':
+                modelIcon = this.gpt4;
+                break;
+            case 'chatGPT3.5':
+                modelIcon = this.chatGptIcon;
+                break;    
             case 'ai-assistant':
                 modelIcon = this.assistantIcon;
                 break;
@@ -1174,6 +1215,12 @@ export default {
                 // 实例化socket
                 switch (this.selectedModel) {
                     case 'claude-2':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'chatGPT3.5':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'GPT-4':
                         this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'chatGPT':
@@ -1225,6 +1272,12 @@ export default {
                     break
                 case 'bd':
                     this.sendBd();
+                    break
+                case 'chatGPT3.5':
+                    this.chatGPT35();
+                    break
+                case 'GPT-4':
+                    this.chatGPT35();
                     break
                 case 'xf':
                     this.sendXF();
@@ -1358,6 +1411,25 @@ export default {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == 'ai-assistant');
+            if (this.contextSwitch) {
+                if (gptData.length > 1) {
+                    //发送的信息关联上下文
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-3), model: this.selectedModel};
+                } else {
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+                }
+            } else {
+                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+            }
+
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        // chatGPT3.5
+        chatGPT35() {
+            let sendData = {};
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.filter(cd => cd.model == 'chatGPT3.5');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文

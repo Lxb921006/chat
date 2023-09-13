@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "36677847",
+      "name": "Chatgpt 4",
+      "font_class": "a-Chatgpt4",
+      "unicode": "e61d",
+      "unicode_decimal": 58909
+    },
+    {
       "icon_id": "10911611",
       "name": "内容-插件离线",
       "font_class": "neirong-chajianlixian",
