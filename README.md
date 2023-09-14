@@ -29,7 +29,7 @@ v16.4.0
 4.图片生成, ppt生成，文件内容分析;  
 5.多平台ai切换:  
 &emsp;&emsp;claude(已完成);  
-&emsp;&emsp;chatgpt(已完成);  
+&emsp;&emsp;gpt3.5-turbo, gpt-4(已完成);  
 &emsp;&emsp;讯飞星火(已完成);  
 &emsp;&emsp;文心一言(已完成);  
 
