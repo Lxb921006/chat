@@ -279,12 +279,13 @@
     /* overflow-y: auto; */
     /* overflow: hidden; */
     width: 819px;
-    padding-bottom: 12px;
+    /* padding-bottom: 12px; */
     background-color: #373737;
     border-top: 1px solid #424242;
     border-left: 1px solid #424242;
     border-right: 1px solid #424242;
     overflow-wrap: break-word;
+    /* background-color: #4c4c4d; */
 }
 .answer-title::-webkit-scrollbar {
     display: none;
@@ -296,7 +297,7 @@
     text-align: left;
 }
 .question {
-    padding: 0 20px;
+    padding: 11px 20px 21px 20px;
 }
 .answer-loop {
     text-align: justify;

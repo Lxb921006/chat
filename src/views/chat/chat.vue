@@ -74,7 +74,7 @@
                 </div>
             </transition>
             <!-- Ai回复内容 -->
-            <div class="content" ref="wrapper" @scroll="handleScroll">
+            <div class="content" ref="wrapper" @scroll="handleScroll" :loading="true">
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
@@ -570,11 +570,11 @@ export default {
                     label: 'GPT-4',
                     disabled: false,
                 },
-                {
-                    value: 'chatGPT',
-                    label: 'GPT-3',
-                    disabled: false,
-                },
+                // {
+                //     value: 'chatGPT',
+                //     label: 'GPT-3',
+                //     disabled: false,
+                // },
                 {
                     value: 'xf',
                     label: '讯飞星火',
@@ -744,7 +744,8 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            if (nt[i].clientHeight  > 39) {
+                            // console.log(nt[i].clientHeight, nt);
+                            if (nt[i].clientHeight  > 68) {
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             }
                         }
@@ -988,7 +989,7 @@ export default {
                     this.selectedModel = 'GPT-4';
                     break;
                 default:
-                    this.selectedModel = 'chatGPT';
+                    this.selectedModel = 'GPT-4';
                     break;
             }
         },
@@ -1242,12 +1243,10 @@ export default {
                         this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'GPT-4':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        break
-                    case 'chatGPT':
+                        // this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
-                    case 'ai-assistant':
+                    case 'chatGPT':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'bd':
@@ -1288,9 +1287,6 @@ export default {
                 case 'chatGPT':
                     this.chatLLAM();
                     break
-                case 'ai-assistant':
-                    this.chatLLAM();
-                    break
                 case 'bd':
                     this.sendBd();
                     break
@@ -1298,7 +1294,8 @@ export default {
                     this.chatGPT35();
                     break
                 case 'GPT-4':
-                    this.chatGPT35();
+                    // this.chatGPT35();
+                    this.chatLLAM();
                     break
                 case 'xf':
                     this.sendXF();
@@ -1392,7 +1389,7 @@ export default {
             let sendData = {};
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == 'bd');
+            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
@@ -1412,7 +1409,7 @@ export default {
         sendXF() {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let xfData =  cacheData.filter(cd => cd.model == 'xf');
+            let xfData =  cacheData.filter(cd => cd.model == this.selectedModel);
             if (this.contextSwitch) {
                 if (xfData.length > 1) {
                     //发送的信息关联上下文
@@ -1431,7 +1428,7 @@ export default {
         chatLLAM() {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == 'chatGPT');
+            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
@@ -1442,6 +1439,7 @@ export default {
             } else {
                 sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
             }
+
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1449,7 +1447,7 @@ export default {
         chatGPT35() {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == 'chatGPT3.5');
+            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
@@ -1566,17 +1564,6 @@ export default {
                 // 滚动指定距离
                 tab.scrollTop = tabScroll;
             }, 8)
-
-            // if(content.scrollHeight > content.clientHeight) {
-            //     setTimeout(function(){
-            //         //设置滚动条到最底部
-            //         content.scrollTop = content.scrollHeight;
-            //     },0);
-            //     setTimeout(function(){
-            //         //设置滚动条到最底部
-            //         tab.scrollTop = tab.scrollHeight;
-            //     },0);
-            // }
         },
         // 滚动到最顶部
         juamTop() {
