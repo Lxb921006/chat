@@ -34,7 +34,7 @@ v16.4.0
 &emsp;&emsp;文心一言(已完成);  
 
 ### web部分ui展示
-[chat-ui-1](main-1.png)  
-[chat-ui-2](main-2.png)  
-[chat-ui-3](main-3.png)  
+![chat-ui-1](main-1.png)  
+![chat-ui-2](main-2.png)  
+![chat-ui-3](main-3.png)  
 
