@@ -14,14 +14,15 @@ const chatCache = {
     ADD_CHAT_CACHE(state, data){
       // 原始
       state.editableTabs.push(data);
-      localStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
+      sessionStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
     },
     REMOVE_CHAT_CACHE(state, data) {
       state.editableTabs = data;
-      localStorage.setItem("chatCache", JSON.stringify(data));
+      sessionStorage.setItem("chatCache", JSON.stringify(data));
     },
     CLEAR_CHAT_CACHE(state, data) {
       state.editableTabs = [];
+      // sessionStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
     },
     GET_CHAT_CACHE(state, data) {
       let reg = new RegExp(data);
@@ -34,10 +35,10 @@ const chatCache = {
       state.editableTabs = newChat;
     },
     SAVE_CHAT_CACHE_ANSWER(state, data) {
-        let chatData = localStorage.getItem("chatCache");
+        let chatData = sessionStorage.getItem("chatCache");
         let fcd = JSON.parse(chatData);
         for (let i = 0;i < fcd.length; i++) {
-            if (fcd[i].id == data.id) {
+            if (fcd[i].uuid == data.uuid) {
                 let lfcd = fcd[i];
                 lfcd['answer'] = data['answer'];
                 lfcd['cursor'] = false;
@@ -45,21 +46,17 @@ const chatCache = {
                 lfcd['pid'] = data['pid'];
                 lfcd['cid'] = data['cid'];
                 lfcd['content'] = data['content'];
+                lfcd['date'] = data['date'];
                 lfcd['file'] = data['file'];
                 break
             }
         }
         state.editableTabs = fcd;
         let jd = JSON.stringify(fcd);
-        localStorage.setItem("chatCache", jd);
+        sessionStorage.setItem("chatCache", jd);
     }
   },
   actions: {},
-  plugins: [createPersistedState({
-    key: 'chatLocalStorage',
-    storage: window.localStorage,
-    paths: ['editableTabs']
-  })],
 };
 
 export default chatCache

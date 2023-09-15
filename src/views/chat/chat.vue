@@ -23,16 +23,28 @@
                     active-text-color="#ffd04b"
                 >
                 <transition-group name="zoom" tag="ul">
-                    <el-menu-item :index=data.index v-for="data in chatCache" :key="data.index" @click="jump(data.id)" v-show="true">
-                        <i class="el-icon-delete delete" @click="removeChat(data.id)"></i>
+                    <el-menu-item :index=data.index v-for="data in chatCache" :key="data.index" @click="jump(data.uuid)" v-show="true">
+                        <i class="el-icon-delete delete" @click="removeChat(data.uuid)"></i>
                         <span slot="title" class="cache-title">
-                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT' || data.model == 'chatGPT-api-3.5'">
+                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
+                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'GPT-4'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
+                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT3.5'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'claude-2'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'xf'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
+                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'ai-assistant'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
+                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'bd'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
                             {{ data.title }}
@@ -42,7 +54,11 @@
                 </el-menu>
             </div>
             <div class="logout">
-                <el-button class="btu0" type="primary" round  @click="loginout()"><span class="iconfont icon-tuichu3 icon-size"></span></el-button>
+                <el-button class="btu0" type="primary" round  @click="logout()"><span class="iconfont icon-tuichu3 icon-size"></span></el-button>
+            </div>
+            <div class="z-user">
+                <span class="iconfont icon-yonghuguanli1 icon-git"></span>
+                <span class="z-user-style">{{ currentUser }}</span>
             </div>
             <div class="item-url">
                 <span class="iconfont icon-githubb icon-git"></span>
@@ -58,69 +74,71 @@
                 </div>
             </transition>
             <!-- Ai回复内容 -->
-            <div class="content" ref="wrapper">
+            <div class="content" ref="wrapper" @scroll="handleScroll" :loading="true">
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
                     </div>
                 </transition>
                 <transition-group name="el-zoom-in-center">
-                <template v-if="show">
-                    <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
-                        <!-- Ai模型 -->
-                        <transition name="el-zoom-in-top">
-                            <div class="platform">
-                                <p>
-                                    <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
-                                </p>
-                            </div>
-                        </transition>
-                        <h2 class="answer-title" :id=data1.id>
-                            <p class="question" ref="title">
-                                <svg class="icon-qa" aria-hidden="true">
-                                    <use xlink:href="#icon-changjianwenti"></use>
-                                </svg>
-                                {{ data1.title }}  <el-link :underline="false" v-if="data1.file">{{ data1.file }}</el-link>
-                                <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
-                                <!-- <markdown-title :code="data1.title" :cursor="data1.cursor"></markdown-title> -->
-                            </p>
-                        </h2>
-                        <div class="answer-loop">
-                            <div class="answer-icon" :style="{ visibility: data1.answer.length > 0 ? 'visible' : 'hidden' }">
-                                <svg class="icon-qa-2" aria-hidden="true">
-                                    <use xlink:href="#icon-cankaodaan"></use>
-                                </svg>
-                            </div>
-                            <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
-                            <markdown-code-block :code="data1.answer.join('')" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
-                            <!-- 光标 -->
-                            <span class="cursor" id="loading" v-else>waiting{{ dots }}</span>
-                            <!-- 对话完成时间 -->
-                            <transition name="el-zoom-in-center">
-                                <div class="finished-time" v-show="data1.timeShow">
-                                    <i class="el-icon-time time-2">{{ data1.time }}</i>
-                                    <div class="whole-answer">
-                                        <el-dropdown>
-                                            <span class="el-dropdown-link">
-                                                <svg class="icon" aria-hidden="true">
-                                                    <use xlink:href="#icon-shenglvehao"></use>
-                                                </svg>
-                                            </span>
-                                            <el-dropdown-menu slot="dropdown">
-                                                <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer.join(''))">复制整个对话</el-dropdown-item>
-                                                <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.id)">删改该对话</el-dropdown-item>
-                                            </el-dropdown-menu>
-                                        </el-dropdown>
-                                    </div>
+                    <template v-if="show">
+                        <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
+                            <!-- Ai模型 -->
+                            <transition name="el-zoom-in-top">
+                                <div class="platform">
+                                    <p>
+                                        <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
+                                    </p>
                                 </div>
                             </transition>
+                            <!-- 标题 -->
+                            <h2 class="answer-title" :id=data1.uuid>
+                                <p class="question" ref="title">
+                                    <svg class="icon-qa" aria-hidden="true">
+                                        <use xlink:href="#icon-changjianwenti"></use>
+                                    </svg>
+                                    {{ data1.title }}  <el-link :underline="false" v-if="data1.file" @click="getFileText(data1.file)">{{ data1.file }}</el-link>
+                                    <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
+                                </p>
+                            </h2>
+                            <!-- 回复内容 -->
+                            <div class="answer-loop">
+                                <div class="answer-icon" :style="{ visibility: data1.answer.length > 0 ? 'visible' : 'hidden' }">
+                                    <svg class="icon-qa-2" aria-hidden="true">
+                                        <use xlink:href="#icon-cankaodaan"></use>
+                                    </svg>
+                                </div>
+                                <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
+                                <markdown-code-block :code="data1.answer" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
+                                <!-- 等待ai回复时的提示 -->
+                                <span class="cursor" id="loading" v-else>waiting{{ dots }}</span>
+                                <!-- 对话完成时间 -->
+                                <transition name="el-zoom-in-center">
+                                    <div class="finished-time" v-show="data1.timeShow">
+                                        <i class="el-icon-time time-2">{{ data1.date }}</i>
+                                        <div class="whole-answer">
+                                            <el-dropdown>
+                                                <span class="el-dropdown-link">
+                                                    <svg class="icon" aria-hidden="true">
+                                                        <use xlink:href="#icon-shenglvehao"></use>
+                                                    </svg>
+                                                </span>
+                                                <el-dropdown-menu slot="dropdown">
+                                                    <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer)">复制整个对话</el-dropdown-item>
+                                                    <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.uuid)">删改该对话</el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </el-dropdown>
+                                        </div>
+                                    </div>
+                                </transition>
+                            </div>
                         </div>
-                    </div>
-                </template>
-            </transition-group>
+                    </template>
+                </transition-group>
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
-                        <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>底部</span>
+                        <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span v-loading="scrollLoading" v-if="scrollLoading"></span>
+                        <span v-else>底部</span>
                     </div>
                 </transition>
             </div>
@@ -142,6 +160,7 @@
                 </transition>
             </div>
             <el-divider></el-divider>
+            <!-- 所有设置 -->
             <div class="footer list-group"  id="sortable">
                 <!-- 设置 -->
                 <div class="setting">
@@ -161,15 +180,34 @@
                                     inactive-color="#ff4949">
                                 </el-switch>
                             </el-col>
-                            <el-col :span="1" class="z-col-3 col-font">是否开启白天模式: </el-col>
+                        </el-row>
+                        <el-row :gutter="10" class="set-item set-item-1">
+                            <el-col :span="1" class="z-col-3 col-font">是否开启预设模式: </el-col>
                             <el-col :span="1" class="z-col-4">
-                                <el-switch
-                                    @change="isOpenDay()"
-                                    v-model="dnSwitch"
-                                    active-color="#13ce66"
-                                    inactive-color="#ff4949">
-                                </el-switch>
+                                <el-tooltip content="只对chatGPT有效" placement="top">
+                                    <el-switch
+                                        @change="isOpenDay()"
+                                        v-model="dnSwitch"
+                                        active-color="#13ce66"
+                                        inactive-color="#ff4949">
+                                    </el-switch>
+                                </el-tooltip>
                             </el-col>
+                        </el-row>
+                        <el-row :gutter="10" class="set-item set-item-1">
+                            <el-col :span="1" class="z-col-3 col-font">是否开启滚动加载: </el-col>
+                            <el-col :span="1" class="z-col-4">
+                                <el-tooltip content="建议关闭" placement="top">
+                                    <el-switch
+                                        @change="saveScrollLoadDataStatus()"
+                                        v-model="isScrollLoadDataStatus"
+                                        active-color="#13ce66"
+                                        inactive-color="#ff4949">
+                                    </el-switch>
+                                </el-tooltip>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="z-col-5 col-font">模型选择: </el-col>
                             <el-col :span="1" class="z-col-6">
                                 <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
@@ -215,7 +253,7 @@
                             <el-table-column width="150" property="title" show-overflow-tooltip label="title"></el-table-column>
                             <el-table-column width="150" property="answer" show-overflow-tooltip label="答案">
                                 <template slot-scope="scope">
-                                    <el-link :underline="false">{{ scope.row.answer.join('') }}</el-link>
+                                    <el-link :underline="false">{{ scope.row.answer }}</el-link>
                                 </template>
                             </el-table-column>
                             <el-table-column property="model" label="模型"></el-table-column>
@@ -261,13 +299,47 @@
                             <el-table-column width="150" property="answer" show-overflow-tooltip label="密码"></el-table-column>
                             <el-table-column prop="operate" label="操作">
                                 <template slot-scope="scope">
-                                    <el-button size="mini" @click="restoreChat(scope.row.id)" type="primary">更新</el-button>
+                                    <el-button size="mini" @click="restoreChat(scope.row.uuid)" type="primary">更新</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
                         <el-button slot="reference">
                             <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-yonghubangzhu"></use>
+                                <use xlink:href="#icon-yonghuguanli"></use>
+                            </svg>
+                        </el-button>
+                    </el-popover>
+                </div>
+                <!-- 历史记录 -->
+                <div class="user rb">
+                    <el-popconfirm
+                        title="是否加载历史记录?(只加载最新的10条, 如需加载更多请把滚动加载打开)"
+                        @confirm="getChatList(100)"
+                        >
+                        <el-button slot="reference">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-xiaoxilishi"></use>
+                            </svg>
+                        </el-button>
+                    </el-popconfirm>
+                </div>
+                <!-- 插件 -->
+                <div class="user rb">
+                    <el-popover
+                        placement="right"
+                        width="400"
+                        trigger="click">
+                        <div class="z-rb-title">
+                            <h2>插件</h2>
+                        </div>
+                        <el-row :gutter="20">
+                            <el-col :span=10>
+                                <el-checkbox v-model="pptCreate">ppt生成</el-checkbox>
+                            </el-col>
+                        </el-row>
+                        <el-button slot="reference">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-chajian"></use>
                             </svg>
                         </el-button>
                     </el-popover>
@@ -275,18 +347,27 @@
                 <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
-                        <span>模型: 【{{ selectedModel }}】; </span>
-                        <span v-if="contextSwitch">上下文: 【开启】</span>
-                        <span v-else>上下文: 【关闭】</span>
+                        <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
+                        <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <span v-if="dnSwitch">预设: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>预设: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <span class="z-notice-word">
+                            <!-- <el-link type="info" target="_blank" class="addr-size" :underline="false" href="https://xn--o0uq09burn.com/?tags=tool" @click="isOpenNoticeWord()">提示词</el-link> -->
+                            <el-link type="info" target="_blank" class="addr-size" :underline="false" @click="isOpenNoticeWord()">提示词</el-link>
+                        </span>
                     </div>
                     <div class="send-input">
                          <el-input
                             type="textarea"
-                            :rows="6"
-                            :autosize="{ minRows: 2, maxRows: 6 }"
-                            placeholder="请输入对话内容"
+                            autocomplete="on"
+                            show-word-limit
+                            :autosize="{ minRows: 2, maxRows: 3 }"
+                            placeholder="请输入对话内容, 先按住ctrl再按enter键提交"
                             v-model="chatContent"
-                            @keyup.enter.native="wsInit()"
+                            @keyup.native="handleKeyUp"
                             :disabled="finished"
                             resize="none"
                             >
@@ -298,7 +379,7 @@
                         </el-button>
                         <!-- 目前只支持claude上传附件 -->
                         <el-upload
-                            :style="{ visibility: selectedModel=='1111' ? 'visible' : 'hidden' }"
+                            :style="{ visibility: selectedModel=='claude-2' ? 'visible' : 'hidden' }"
                             class="upload-demo"
                             :action=uploadUrl()
                             :on-preview="handlePreview"
@@ -309,7 +390,7 @@
                             :data="fileData"
                             :on-exceed="handleExceed"
                             :file-list="fileList">
-                            <el-tooltip class="item" effect="dark" content="只能上传.pdf .doc  .docs  .txt  .py文件" placement="top-start">
+                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .pdf文件; 目前只支持claude上传附件" placement="top-start">
                                 <el-button size="small" type="primary">
                                     <svg class="icon z-send-button" aria-hidden="true">
                                         <use xlink:href="#icon-fujian"></use>
@@ -317,11 +398,39 @@
                                 </el-button>
                             </el-tooltip>
                         </el-upload>
+                    
                     </div>
                 </div>
             </div>
         </div>
-        
+        <div class="file-text">
+            <el-dialog
+                title="文本内容"
+                :visible.sync="fileTextVisible"
+                :close-on-click-modal="false"
+                width="600px"
+                v-loading="fileTextLoad"
+                :append-to-body="true"
+                :lock-scroll="false"
+                center
+                v-draggable
+                >
+                <p class="ft">{{ fileText }}</p>
+                <!-- <Markdown-title :code="fileText" :cursor="true"></Markdown-title> -->
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="fileTextVisible = false">取 消</el-button>
+                    <el-button type="primary"  @click="copyAll(fileText)">复制文本</el-button>
+                </span>
+            </el-dialog>
+        </div>
+        <transition name="el-zoom-in-center">
+            <div class="notice-word" v-if="noticeVisible" v-draggable>
+                <h2 class="notice-title">
+                    <el-button type="info" size="mini" @click="isOpenNoticeWord()">关闭</el-button>
+                </h2>
+                <iframe src="https://xn--o0uq09burn.com/?tags=tool" frameborder="0"></iframe>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -332,14 +441,66 @@ import store from '../../store/index'
 import { wssSinUrl, wssUsUrl, wssSinApiUrl } from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
-import MarkdownTitle from './markdownCode';
 import baseUrl from "../../utils/baseUrl";
+import { chatList, chatSave, getFileText, chatDel } from '../../api'
+
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
 export default {
     name: "chat",
+    // 弹窗可拖拽
+    directives: {
+        draggable: {
+            bind(el, binding, vnode) {
+                el.style.position = 'fixed';
+                el.style.zIndex = 1000;
+
+                el.dragging = false;
+                el.startX = 0;
+                el.startY = 0;
+                el.left = 0;
+                el.top = 0;
+
+                el.addEventListener('mousedown', function (event) {
+                    el.dragging = true;
+                    el.startX = event.clientX;
+                    el.startY = event.clientY;
+
+                    const rect = el.getBoundingClientRect();
+                    el.left = rect.left;
+                    el.top = rect.top;
+
+                    document.addEventListener('mousemove', mouseMove);
+                    document.addEventListener('mouseup', mouseUp);
+                });
+
+                function mouseMove(event) {
+                    if (el.dragging) {
+                        const left = event.clientX - el.startX + el.left;
+                        const top = event.clientY - el.startY + el.top;
+                        el.style.left = `${left}px`;
+                        el.style.top = `${top}px`;
+                    }
+                }
+
+                function mouseUp() {
+                    if (el.dragging) {
+                        el.dragging = false;
+                        document.removeEventListener('mousemove', mouseMove);
+                        document.removeEventListener('mouseup', mouseUp);
+                    }
+                }
+            },
+        },
+    },
     data()  {
         return {
+            pptCreate: '',
+            fileText: '',
+            noticeVisible: false,
+            fileTextVisible: false,
+            fileTextLoad: true,
+            currentUser: '',
             loadTimer: null,
             dots: '',
             text:"copy me",
@@ -379,61 +540,78 @@ export default {
             icon: "#icon-fuzhi2",
             but1Icon: "el-icon-arrow-right",
             code:"",
+            cc: "<span class='cursor-2'>|</span>",
             value: "text-davinci-003",
-            cc: "<span class='cursor' v-show='this.cursor'>|</span>",
             selectedModel: "",
             claudeIcon: "#icon-Claude2",
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
-            xfIcon : "#icon-xunfeilogo",
+            gpt4: "#icon-a-Chatgpt4",
+            assistantIcon: "#icon-a-Chatgpt35",
+            xfIcon: "#icon-xunfeilogo",
+            wxIcon: "#icon-baidu",
+            scrollLoading: false,
+            setTimer: true,
+            isScrollLoadDataStatus: true,
             fileData: {},
             modelAll: [
                 {
                     value: 'claude-2',
-                    label: 'claude-2',
+                    label: 'claude',
                     disabled: false,
                 },
                 {
-                    value: 'chatGPT',
-                    label: 'chatGPT',
+                    value: 'chatGPT3.5',
+                    label: 'GPT-3.5-turbo',
                     disabled: false,
-                },
-                {
-                    value: 'chatGPT-api-3.5',
-                    label: 'chatGPT-api-3.5',
-                    disabled: true,
-                },
-                {
-                    value: 'xf',
-                    label: '讯飞星火2.0',
-                    disabled: false,
-                },
-                {
-                    value: 'claude-instant-100k',
-                    label: 'claude-instant-100k',
-                    disabled: true,
                 },
                 {
                     value: 'GPT-4',
                     label: 'GPT-4',
-                    disabled: true,
+                    disabled: false,
+                },
+                // {
+                //     value: 'chatGPT',
+                //     label: 'GPT-3',
+                //     disabled: false,
+                // },
+                {
+                    value: 'xf',
+                    label: '讯飞星火',
+                    disabled: false,
+                },
+                {
+                    value: 'bd',
+                    label: '文心一言',
+                    disabled: false,
                 },
             ],
-            allowFile: ['.doc', '.docs', '.txt', '.pdf', '.py'],
+            allowFile: ['.txt', '.pdf'],
+            loadCount: 0,
+            historyDataLoading: false,
+            pages: {
+                page: 1,
+                size: 10,
+                totals: 0,
+            },
         }
     },
     watch: {
         input: function(newVal, oldVal) {
             if (newVal === "") {
                 this.getAllChatData();
+            } else {
+                this.getSearchData();
             }
-            this.getSearchData();
+            this.getContentLen();
         },
         rbData: function(newVal, oldVal) {
             if (newVal === "") {
                 this.getAllRbData();
+            } else {
+                this.getSearchRbData();
             }
-            this.getSearchRbData();
+            this.getContentLen();
         },
     },
     computed: {
@@ -446,9 +624,268 @@ export default {
         MarkdownCodeBlock,
         // MarkdownTitle,
     },
+    
     methods: {
+        isOpenNoticeWord() {
+            this.noticeVisible = this.noticeVisible ? false : true;
+        },
+        async chatDel(data) {
+            const resp = await chatDel({uuid: JSON.stringify(data)}, this.callMethod);
+            return resp
+        },
+        // 滚动加载数据开关
+        saveScrollLoadDataStatus() {
+            if (this.isScrollLoadDataStatus) {
+                sessionStorage.setItem("sds", 1);
+                this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
+                this.pages.page = parseInt(sessionStorage.getItem('page'));
+                let totals = parseInt(sessionStorage.getItem('totals'));
+                if (this.pages.page && this.pages.page > 1) {
+                    if (this.loadCount == totals) {
+                        sessionStorage.setItem('totals', totals-=1);
+                    }
+                    this.scrollLoadChatData();
+                } else {
+                    this.getChatList(100);
+                }
+                
+                Message.success('滚动加载数据已开启');
+            } else {
+                sessionStorage.setItem("sds", 2);
+                let loadCount = sessionStorage.getItem('loadCount');
+                let totals = sessionStorage.getItem('totals');
+                if (loadCount != totals) {
+                    sessionStorage.setItem('totals', loadCount);
+                }
+                Message.warning('滚动加载数据已关闭');
+            }
+        },
+        // 滚动加载数据开关状态
+        checkisOpenScrollLoadData() {
+            let sds = window.sessionStorage.getItem('sds');
+            switch (sds) {
+                case '1':
+                    this.isScrollLoadDataStatus = true;
+                    break
+                case '2':
+                    this.isScrollLoadDataStatus = false;
+                    break
+                default:
+                    this.isScrollLoadDataStatus = false;
+                    break;
+            }
+            // this.saveScrollLoadDataStatus();
+        },
+        // 拖动
+        dialogDrag(event) {
+            if (!this.dragDialog.dragging) {
+                return;
+            }
+            // 计算拖拽距离
+            const left = event.clientX - this.dragDialog.startX + this.dragDialog.left;
+            const top = event.clientY - this.dragDialog.startY + this.dragDialog.top;
+            // 更新对话框位置
+            this.$refs.dialog.$el.style.left = `${left}px`;
+            this.$refs.dialog.$el.style.top = `${top}px`;
+        },
+        dialogMouseDown(event) {
+            // 开始拖拽
+            this.dragDialog.dragging = true;
+            // 记录起始位置
+            this.dragDialog.startX = event.clientX;
+            this.dragDialog.startY = event.clientY;
+            // 记录当前位置
+            const { left, top } = this.$refs.dialog.$el.getBoundingClientRect();
+            this.dragDialog.left = left;
+            this.dragDialog.top = top;
+            // 添加事件监听器
+            document.addEventListener('mousemove', this.dialogDrag);
+            document.addEventListener('mouseup', this.dialogMouseUp);
+        },
+        dialogMouseUp() {
+            // 结束拖拽
+            this.dragDialog.dragging = false;
+            // 移除事件监听器
+            document.removeEventListener('mousemove', this.dialogDrag);
+            document.removeEventListener('mouseup', this.dialogMouseUp);
+        },
+        onDragEnd(event) {  
+            // 获取对话框的当前位置和鼠标位置  
+            
+            const dialogRect = this.$refs.dialog.getBoundingClientRect();  
+            const mouseX = event.clientX;  
+            const mouseY = event.clientY;  
+                
+            // 计算对话框应该移动到的位置  
+            const newLeft = mouseX - (dialogRect.width - this.$refs.dialog.offsetWidth) / 2;  
+            const newTop = mouseY - (dialogRect.height - this.$refs.dialog.offsetHeight) / 2;  
+                
+            // 移动对话框到计算得到的位置  
+            this.$refs.dialog.style.left = `${newLeft}px`;  
+            this.$refs.dialog.style.top = `${newTop}px`;  
+        },
+        // 查看附件内容
+        async getFileText(file) {
+            this.fileTextVisible = true;
+            const resp = await getFileText({file: file, user: this.currentUser})
+            if (resp.data.status == 666) {
+                this.fileText = resp.data.data;
+                this.fileTextLoad = false;
+            } else {
+                Message.error(resp.data.msg);
+            }
+        },
+        getCurrentUser() {
+            this.currentUser = sessionStorage.getItem('user');
+        },
+        chatTitleFormat() {
+            this.$nextTick(function() {
+                const nt = this.$refs.title;
+                if (nt) {
+                    if (nt.length != 0) {
+                        for (let i = 0; i < nt.length; i++) {
+                            // console.log(nt[i].clientHeight, nt);
+                            if (nt[i].clientHeight  > 68) {
+                                nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
+                            }
+                        }
+                    }
+                }
+            }); 
+        },
+        // 加载数据的时候过滤掉重复的
+        mergeUniqueByUUid(arr1, arr2) {
+            const idMap = new Map();
+            const mergedArray = [];
+            for (const item of arr1) {
+                if (!idMap.has(item.uuid)) {
+                idMap.set(item.uuid, true);
+                mergedArray.push(item);
+                }
+            }
+            for (const item of arr2) {
+                if (!idMap.has(item.uuid)) {
+                idMap.set(item.uuid, true);
+                mergedArray.push(item);
+                }
+            }
+
+            return mergedArray;
+        },
+        // 监听滚动条是否已经滚动到底部
+        handleScroll() {
+            let content = document.getElementsByClassName('content')[0];
+            if (content.scrollTop + content.clientHeight + 0.5 >= content.scrollHeight && this.setTimer) {
+                this.scrollLoadChatData();
+            }
+        },
+        // 拉取保存在服务端的历史对话-建议关闭，如果数据过多，滚动加载会比较慢
+        async getChatList(ac) {
+            if (ac==100) {
+                this.pages.page = 1;
+            }
+
+            const resp = await chatList({page: this.pages.page, size: this.pages.size})
+            if (resp.data.status != 666) {
+                Message.error('加载历史对话失败')
+                return
+            }
+
+            if (ac == 100) {
+                let respData = resp.data.data;
+                if (resp.data.totals == 0) {
+                    Message.warning('没有历史数据可加载')
+                    return
+                }
+                this.pages.totals = resp.data.totals;
+                this.loadCount = respData.length;
+                this.saveChatListTotal(this.loadCount);
+                this.saveLoadingOffset();
+                store.commit("CLEAR_CHAT_CACHE");
+                let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
+                this.show = true;
+                this.showhi = true;
+                for (let i = 0; i < historyData.length; i++) {
+                    store.commit("ADD_CHAT_CACHE", historyData[i]);
+                }
+
+                // Message.success('历史对话加载完成');
+            }
+            this.chatTitleFormat();
+
+            return resp
+        },
+        saveChatListTotal(loadCount) {
+            if (this.isScrollLoadDataStatus) {
+                sessionStorage.setItem('totals', this.pages.totals);
+            } else {
+                sessionStorage.setItem('totals', loadCount);
+            }
+        },
+        saveLoadingOffset() {
+            sessionStorage.setItem('page', this.pages.page);
+            sessionStorage.setItem('loadCount', this.loadCount);
+        },
+        checkLoadingOffset() {
+            let td = sessionStorage.getItem('loadCount');
+            let page = sessionStorage.getItem('page');
+            let totals = sessionStorage.getItem('totals');
+            if (!td) {
+                sessionStorage.setItem('loadCount', 0);
+            } else {
+                this.loadCount = td;
+            }
+
+            if (!page) {
+                sessionStorage.setItem('page', 0);
+            } else {
+                this.pages.page = page;
+            }
+
+            if (!totals) {
+                sessionStorage.setItem('totals', 0);
+            } else {
+                this.pages.totals = totals;
+            }
+        },
+        scrollLoadChatDataStatus() {
+            let td = sessionStorage.getItem('loadCount');
+            let totals = sessionStorage.getItem('totals');
+            if (td == totals) {
+                this.scrollLoading = false;
+            } else {
+                this.scrollLoading = true;
+            }
+        },
+        // 滚动到底部就加载数据
+        async scrollLoadChatData() {
+            let totals = parseInt(sessionStorage.getItem('totals'));
+            this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
+            this.pages.page = parseInt(sessionStorage.getItem('page'));
+            if (this.loadCount != totals) {
+                console.log('--------------正在加载数据----------------');
+                this.setTimer = false;
+                this.scrollLoading = true;
+                this.pages.page += 1;
+                const resp = await this.getChatList(200);
+                let respData = resp.data.data;
+                let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
+                store.commit("CLEAR_CHAT_CACHE");
+                for (let i = 0; i < historyData.length; i++) {
+                    store.commit("ADD_CHAT_CACHE", historyData[i]);
+                }
+                this.loadCount += respData.length;
+                sessionStorage.setItem('loadCount', this.loadCount);
+                sessionStorage.setItem('page', this.pages.page);
+                
+                sessionStorage.setItem('totals', resp.data.totals);
+            }
+            this.chatTitleFormat();
+            this.setTimer = true; // 必须等数据加载完才能让handleScroll继续监听滚动条
+            this.scrollLoading = false;
+        },
         uploadUrl () {
-            return `${baseUrl}/claude/`
+            return `${baseUrl}/claude/upload/`
         },
         successUpload(response, file, fileList) {
             this.claudeFile = file.name;
@@ -469,17 +906,22 @@ export default {
             Message.error('每次只能上传一个文件');
         },
         handlePreview(file) {
-            console.log(file);
+            this.getFileText(file.name);
         },
         // 清空回收站
-        clearRbData() {
-            store.commit("Z_CLEAR_CHAT_CACHE", 'clear');
+        async clearRbData() {
+            let uuids = this.chatRecycle.map(uuid => uuid.uuid);
+            const resp = await this.chatDel(uuids);
+            if (resp.data.status == 666) {
+                store.commit("Z_CLEAR_CHAT_CACHE", 'clear');
+            }
+            
         },
         // 回收站恢复数据
         restoreChat(data) {
-            let chatRecycleData = JSON.parse(localStorage.getItem("chatRecycle"));
+            let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
             for (let i = 0; i < chatRecycleData.length; i++) {
-                if (chatRecycleData[i].id == data.id) {
+                if (chatRecycleData[i].uuid == data.uuid) {
                     store.commit("ADD_CHAT_CACHE", chatRecycleData[i]);
                     this.removeRbData(data);
                     break;
@@ -489,18 +931,24 @@ export default {
             Message.success(`【${data.title}】已从回收站恢复`);
         },
         // 删除回收站的数据
-        removeRbData(data) {
+        async removeRbData(data) {
             this.getAllRbData();
             let tabs = this.chatRecycle;
-            let rbChat = tabs.filter(tab => tab.id != data.id);
-            store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
-            this.getContentLen();
+            let rbChat = tabs.filter(tab => tab.uuid != data.uuid);
+            let fd = [data.uuid]
+            const resp = await this.chatDel(fd);
+            if (resp.data.status == 666) {
+                store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
+                this.getContentLen();
+            }
+            // store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
+            // this.getContentLen();
         },
         // 回收站的所有数据
         getAllRbData() {
-            if (localStorage.getItem("chatRecycle")) {
+            if (sessionStorage.getItem("chatRecycle")) {
                 store.commit("Z_CLEAR_CHAT_CACHE");
-                let chatRecycleData = JSON.parse(localStorage.getItem("chatRecycle"));
+                let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
                 for (let i = 0; i < chatRecycleData.length; i++) {
                     store.commit("Z_ADD_CHAT_CACHE", chatRecycleData[i]);
                 }
@@ -516,7 +964,8 @@ export default {
         },
         // 重新加载页面时显示已经切换的ai平台
         checkModel() {
-            let model = window.localStorage.getItem('modelSelect');
+            let model = window.sessionStorage.getItem('modelSelect');
+            
             switch (model) {
                 case '1':
                     this.selectedModel = 'claude-2';
@@ -525,13 +974,22 @@ export default {
                     this.selectedModel = 'chatGPT';
                     break;
                 case '3':
-                    this.selectedModel = 'chatGPT-api-3.5';
+                    this.selectedModel = 'ai-assistant';
                     break;
                 case '4':
                     this.selectedModel = 'xf';
                     break;
+                case '5':
+                    this.selectedModel = 'bd';
+                    break;
+                case '6':
+                    this.selectedModel = 'chatGPT3.5';
+                    break;
+                case '7':
+                    this.selectedModel = 'GPT-4';
+                    break;
                 default:
-                    this.selectedModel = 'chatGPT';
+                    this.selectedModel = 'GPT-4';
                     break;
             }
         },
@@ -539,16 +997,25 @@ export default {
         modelSwitch() {
             switch (this.selectedModel) {
                 case 'claude-2':
-                    window.localStorage.setItem('modelSelect', 1);
+                    window.sessionStorage.setItem('modelSelect', 1);
                     break
                 case 'chatGPT':
-                    window.localStorage.setItem('modelSelect', 2);
+                    window.sessionStorage.setItem('modelSelect', 2);
                     break
-                case 'chatGPT-api-3.5':
-                    window.localStorage.setItem('modelSelect', 3);
+                case 'ai-assistant':
+                    window.sessionStorage.setItem('modelSelect', 3);
                     break
                 case 'xf':
-                    window.localStorage.setItem('modelSelect', 4);
+                    window.sessionStorage.setItem('modelSelect', 4);
+                    break
+                case 'bd':
+                    window.sessionStorage.setItem('modelSelect', 5);
+                    break
+                case 'chatGPT3.5':
+                    window.sessionStorage.setItem('modelSelect', 6);
+                    break  
+                case 'GPT-4':
+                    window.sessionStorage.setItem('modelSelect', 7);
                     break
             }
         },
@@ -569,21 +1036,22 @@ export default {
                 case 'chatGPT':
                     window.open('https://openai.com/');
                     break;
-                case 'chatGPT-api-3.5':
+                case 'bd':
+                    window.open('https://yiyan.baidu.com/');
+                    break;    
+                case 'ai-assistant':
+                    window.open('https://openai.com/');
+                    break;
+                case 'chatGPT3.5':
+                    window.open('https://openai.com/');
+                    break;
+                case 'GPT-4':
                     window.open('https://openai.com/');
                     break;
                 case 'xf':
                     window.open('https://xinghuo.xfyun.cn/');
                     break;    
             }   
-        },
-        stopChat(){
-            if (this.socket) {
-                this.close();
-                this.socket.close();
-                this.socket = null;
-                this.stopCursor = false;
-            }
         },
         // 时间格式化
         getDate() {
@@ -601,21 +1069,23 @@ export default {
             let formattedTime = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
             return formattedTime;
         },
-        loginout() {
-            localStorage.removeItem('user');
-            this.$router.replace('/login').catch((err) => err);
+        logout() {
+            // sessionStorage.removeItem('user');
+            sessionStorage.clear();
+            location.reload();
         },
         addB() {
             this.clearS = setInterval(() => {
                 this.showCursor = !this.showCursor;
             }, 500);
         },
-        // 查找聊天记录
+        // 所有聊天记录
         getAllChatData () {
-            if (localStorage.getItem("chatCache")) {
+            this.setTimer = true;
+            if (sessionStorage.getItem("chatCache")) {
                 store.commit("CLEAR_CHAT_CACHE");
                 this.show = true;
-                let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+                let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
                 for (let i = 0; i < cacheData.length; i++) {
                     store.commit("ADD_CHAT_CACHE", cacheData[i]);
                 }
@@ -623,6 +1093,7 @@ export default {
         },
         // 搜索聊天记录
         getSearchData() {
+            this.setTimer = false;
             if (this.chatCache.length != 0) {
                 store.commit("GET_CHAT_CACHE", this.input);
             } else {
@@ -630,26 +1101,16 @@ export default {
             }
             this.getContentLen();
         },
-        // 白天黑夜背景切换
+        // 隐藏显示侧边栏
         showAside() {
             const asideEl = document.querySelector('.aside');
             const asideSt = getComputedStyle(asideEl);
             if (asideSt.display == 'none') {
                 document.querySelector(".aside").setAttribute("style", "display:block");
-                if (this.dnSwitch) {
-                    document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px);background-color: #e5e5e5");
-                } else {
-                    document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px);background-color: #262626");
-                }
-                // this.but1Icon = "el-icon-arrow-right";
+                document.querySelector(".main").setAttribute("style", "width: calc(100% - 200px)");
             } else {
                 document.querySelector(".aside").setAttribute("style", "display:none");
-                if (this.dnSwitch) {
-                    document.querySelector(".main").setAttribute("style", "width:100%;;background-color: #e5e5e5");
-                } else {
-                    document.querySelector(".main").setAttribute("style", "width:100%;background-color: #262626");
-                }
-                
+                document.querySelector(".main").setAttribute("style", "width:100%;");
             }
         },
         // 是否隐藏左侧的菜单栏，默认不隐藏
@@ -672,7 +1133,7 @@ export default {
         },
         // 刷新页面时，保存最新一条数据
         loadLatestId() {
-            let oid = localStorage.getItem('data_id');
+            let oid = sessionStorage.getItem('data_id');
             if (oid) {
                 this.editableTabsValue = oid;
             }
@@ -684,12 +1145,23 @@ export default {
             if (this.dots.length > 3) {
                 this.dots = ''; 
             }
-            }, 300);
+            }, 500);
         },      
         saveLatestId(id) {
-            localStorage.setItem('data_id', id);
+            sessionStorage.setItem('data_id', id);
         },
-        // websocket前后端交互
+        // 手动停止ai响应
+        stopChat(){
+            this.socket.close();
+            this.socket = null;
+            this.stopCursor = false;
+        },
+        handleKeyUp(event) {
+            if (event.ctrlKey && event.keyCode === 13) {
+                this.wsInit();
+            }
+        },
+        // 建立websocket连接
         wsInit () {
             if (!this.chatContent.replace(/[\r\n\s]+/g, '')) {
                 this.chatContent = "";
@@ -707,6 +1179,7 @@ export default {
             let index = Math.random().toString(36).slice(-8);
             this.show = true;
             let modelIcon= "";
+
             switch (this.selectedModel) {
             case 'claude-2':
                 modelIcon = this.claudeIcon;
@@ -714,9 +1187,18 @@ export default {
             case 'chatGPT':
                 modelIcon = this.chatGptIcon;
                 break;
-            case 'chatGPT-api-3.5':
-                modelIcon = this.chatGptIcon;
+            case 'GPT-4':
+                modelIcon = this.gpt4;
                 break;
+            case 'chatGPT3.5':
+                modelIcon = this.chatGptIcon;
+                break;    
+            case 'ai-assistant':
+                modelIcon = this.assistantIcon;
+                break;
+            case 'bd':
+                modelIcon = this.wxIcon;
+                break;    
             case 'xf':
                 modelIcon = this.xfIcon;
                 break;    
@@ -726,13 +1208,13 @@ export default {
             }
 
             let data = {
-                title: this.chatContent.replace(/[\n]+/g, ''),
-                answer: new Array,
-                id: Math.floor(id),
+                title: this.chatContent,
+                answer: "",
+                uuid: Math.floor(id),
                 name: this.id++,
                 index: index,
                 cursor: true,
-                time: this.getDate(),
+                date: this.getDate(),
                 timeShow: false,
                 cid: "",
                 pid: "",
@@ -743,11 +1225,12 @@ export default {
             };
 
             this.waitingData();
-            this.saveLatestId(data.id);
-            this.editableTabsValue = data.id;
+            this.saveLatestId(data.uuid);
+            this.editableTabsValue = data.uuid;
 
             store.commit("ADD_CHAT_CACHE", data);
             this.jumpFooter();
+            this.chatTitleFormat();
             if (typeof(WebSocket) === "undefined") {
                 Message.error("您的浏览器不支持socket")
             } else {
@@ -756,12 +1239,19 @@ export default {
                     case 'claude-2':
                         this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
-                    case 'chatGPT':
-                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                    case 'chatGPT3.5':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
-                    case 'chatGPT-api-3.5':
+                    case 'GPT-4':
+                        // this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
+                    case 'chatGPT':
+                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'bd':
+                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break    
                     case 'xf':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
@@ -795,23 +1285,31 @@ export default {
                     this.sendClaude();
                     break
                 case 'chatGPT':
-                    this.sendChatGpt();
+                    this.chatLLAM();
                     break
-                case 'chatGPT-api-3.5':
-                    this.sendChatGpt();
+                case 'bd':
+                    this.sendBd();
+                    break
+                case 'chatGPT3.5':
+                    this.chatGPT35();
+                    break
+                case 'GPT-4':
+                    // this.chatGPT35();
+                    this.chatLLAM();
                     break
                 case 'xf':
                     this.sendXF();
                     break
             }
         },
-        // 后端发来的数据
+        // 接收数据
         getMessage (msg) {
             let jd = JSON.parse(msg.data);
-            let div = document.querySelector(".content")
+            let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
-                if (this.chatCache[i].id == this.editableTabsValue) {
-                    this.chatCache[i].answer.push(jd.data);
+                if (this.chatCache[i].uuid == this.editableTabsValue) {
+                    // this.chatCache[i].answer.push(jd.data);
+                    this.chatCache[i].answer += jd.data;
                     this.chatCache[i].cid = jd.cid;
                     this.chatCache[i].pid = jd.pid;
                     this.chatCache[i].content = jd.content;
@@ -825,19 +1323,19 @@ export default {
             console.log('-----------websocket已关闭------------')
             this.finished = false;
             let answer = "";
-            // this.mh = false;
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
-                if (this.chatCache[i].id == this.editableTabsValue) {
+                if (this.chatCache[i].uuid == this.editableTabsValue) {
                     if (this.chatCache[i].answer.length == 0) {
-                        answer = ['websocket连接已关闭'];
+                        answer = '抱歉, 网络不佳, ai回复失败, 请重新提问';
                     } else {
                         answer = this.chatCache[i].answer;
                     }
+
                     let data = {
-                        id: this.chatCache[i].id, 
+                        uuid: this.chatCache[i].uuid, 
                         answer: answer, 
-                        time: this.getDate(), 
+                        date: this.getDate(), 
                         timeShow: true,
                         content: this.chatCache[i].content,
                         cid: this.chatCache[i].cid,
@@ -851,20 +1349,57 @@ export default {
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
             this.claudeFile = "";
-            this.fileList = [];
+            // this.fileList = [];
             this.chatContent = "";
-            clearInterval(this.loadTimer);
             this.stopResp = false;
+            this.socket = null;
+            this.jumpFooter();
+            this.saveChatData();
+            this.getChatList();
+            this.chatTitleFormat();
+            clearInterval(this.loadTimer);
+        },
+        // 保存对话记录
+        async saveChatData() {
+            let lastData = [];
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            lastData = cacheData[cacheData.length - 1];
+            // lastData['answer'] = JSON.stringify(lastData['answer']);
+            let data = {data: JSON.stringify(lastData)};
+            const resp = await chatSave(data, this.callMethod);
+            if (resp.data.status != 666) {
+                Message.error('保存数据失败>>>', resp.data.msg);
+            }
         },
         // claude
         sendClaude() {
             let sendData = {};
-            // let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+            // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             if (this.contextSwitch) {
                 //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: 'open'};
             } else {
-                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: ''};
+            }
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        // 文心一言
+        sendBd() {
+            let sendData = {};
+            let lastData = [];
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
+            if (this.contextSwitch) {
+                if (gptData.length > 1) {
+                    //发送的信息关联上下文
+                    lastData = gptData[gptData.length - 2];
+                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: lastData.title};
+                } else {
+                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: ''};
+                }
+            } else {
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: ''};
             }
 
             this.socket.send(JSON.stringify(sendData));
@@ -873,24 +1408,57 @@ export default {
         // 讯飞星火
         sendXF() {
             let sendData = {};
-            let lastData = [];
-            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == 'xf');
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let xfData =  cacheData.filter(cd => cd.model == this.selectedModel);
+            if (this.contextSwitch) {
+                if (xfData.length > 1) {
+                    //发送的信息关联上下文
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: xfData.slice(-4), model: this.selectedModel};
+                } else {
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                }
+            } else {
+                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+            }
+            
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        // assistant(第三方提供的api)
+        chatLLAM() {
+            let sendData = {};
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    lastData = gptData[gptData.length - 2];
-                    if (lastData.model == 'xf') {
-                        sendData = {cid: 'xf', pid: 'xf', data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: lastData.answer.join(''), model: this.selectedModel};
-                    } else {
-                        sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
-                    }
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-3), model: this.selectedModel};
                 } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
                 }
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
             }
+
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        // chatGPT3.5
+        chatGPT35() {
+            let sendData = {};
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
+            if (this.contextSwitch) {
+                if (gptData.length > 1) {
+                    //发送的信息关联上下文
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-3), model: this.selectedModel};
+                } else {
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+                }
+            } else {
+                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+            }
+
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -898,30 +1466,25 @@ export default {
         sendChatGpt() {
             let sendData = {};
             let lastData = [];
-            let cacheData = JSON.parse(localStorage.getItem("chatCache"));
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == 'chatGPT');
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
-                    if (lastData.model == 'chatGPT') {
-                        sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
-                    } else {
-                        sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
-                    }
+                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, systemSet: this.dnSwitch ? 'open' : ''};
                 } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, systemSet: this.dnSwitch ? 'open' : ''};
                 }
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel};
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, systemSet: this.dnSwitch ? 'open' : ''};
             }
-            
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
         // 保存上下文开关状态
         checkContextStatus() {
-            let contextSwitch = localStorage.getItem('oc');
+            let contextSwitch = sessionStorage.getItem('oc');
             if (contextSwitch == 1) {
                 this.contextSwitch = true;
             } else if (contextSwitch == 2) {
@@ -934,88 +1497,142 @@ export default {
         isOpenContext() {
             if (this.contextSwitch) {
                 Message.success('对话已启用上下文关联');
-                localStorage.setItem("oc", 1);
+                sessionStorage.setItem("oc", 1);
             } else {
                 Message.warning('对话已禁用上下文关联');
-                localStorage.setItem("oc", 2);
+                sessionStorage.setItem("oc", 2);
             }
         },
-        // 检查白天黑夜背景状态
-        checkDn() {
-            const main = document.querySelector(".main");
-            let dn = JSON.parse(localStorage.getItem('day'));
-            if (dn) {
-                if (dn.status == 1) {
-                    this.dnSwitch = true;
-                    main.style.backgroundColor = dn.color;
-                } else if (dn.status == 2) {
-                    this.dnSwitch = false;
-                    main.style.backgroundColor = dn.color;
-                } else {
-                    this.dnSwitch = false;
-                }
-            }
-        },
-        isOpenDay() {
-            const main = document.querySelector(".main");
-            if (this.dnSwitch) {
-                main.style.backgroundColor = "#e5e5e5";
-                let data = {status: 1, color: "#e5e5e5"}
-                localStorage.setItem("day", JSON.stringify(data));
+        // 检查预设状态
+        checkSystemSet() {
+            let dnSwitch = sessionStorage.getItem('ss');
+            if (dnSwitch == 1) {
+                this.dnSwitch = true;
+            } else if (dnSwitch == 2) {
+                this.dnSwitch = false;
             } else {
-                main.style.backgroundColor = "#262626";
-                let data = {status: 2, color: "#262626"}
-                localStorage.setItem("day", JSON.stringify(data));
+                this.dnSwitch = false; //预设默认关闭
             }
         },
+        // 预设开关-仅对chatGPT有效
+        isOpenDay() {
+            if (this.dnSwitch) {
+                Message.success('已启用预设角色回复');
+                sessionStorage.setItem("ss", 1);
+            } else {
+                Message.warning('已关闭预设角色回复');
+                sessionStorage.setItem("ss", 2);
+            }
+        },
+        // 滚动到最底部
         jumpFooter () {
+            // if (!this.setTimer) {
+            //     Message.error('不要着急, 先等数据加载完再点击滚动到最底部按钮');
+            //     return;
+            // }
+
             let tab = document.getElementsByClassName('tab')[0];
             let content = document.getElementsByClassName('content')[0];
-            if(content.scrollHeight > content.clientHeight) {
-                setTimeout(function(){
-                    //设置滚动条到最底部
-                    content.scrollTop = content.scrollHeight;
-                },0);
-                setTimeout(function(){
-                    //设置滚动条到最底部
-                    tab.scrollTop = tab.scrollHeight;
-                },0);
-            }
+            let scroll = content.scrollTop;
+            let tabScroll = tab.scrollTop;
+
+            const distance = 1500;
+
+            // 使用setInterval平滑滚动content
+            const timer2 = setInterval(() => {
+                scroll += distance
+
+                // 滚动到底部时停止
+                if(scroll >= content.scrollHeight){
+                    clearInterval(timer2);
+                }
+
+                // 滚动指定距离
+                content.scrollTop = scroll;
+            }, 8)
+
+
+            // 使用setInterval平滑滚动tab
+            const timer3 = setInterval(() => {
+                tabScroll += distance
+
+                // 滚动到底部时停止
+                if(tabScroll >= tab.scrollHeight){
+                    clearInterval(timer3);
+                }
+
+                // 滚动指定距离
+                tab.scrollTop = tabScroll;
+            }, 8)
         },
+        // 滚动到最顶部
         juamTop() {
             let content = document.getElementsByClassName('content')[0]
             let tab = document.getElementsByClassName('tab')[0];
-            if(content.scrollHeight > content.clientHeight) {
+            
+            let scroll = content.scrollTop;
+            let tabScroll = tab.scrollTop;
+
+            const distance = 1500;
+
+            // 使用setInterval平滑滚动content
+            const timer2 = setInterval(() => {
+                scroll -= distance
+
+                // 滚动到顶部时停止
+                if(scroll <= 0){
+                    clearInterval(timer2);
+                }
+
+                // 滚动指定距离
+                content.scrollTop = scroll;
+            }, 8)
+
+            // 使用setInterval平滑滚动tab
+            const timer3 = setInterval(() => {
+                tabScroll -= distance
+
+                // 滚动到顶部时停止
+                if(tabScroll <= 0){
+                    clearInterval(timer3);
+                }
+
+                // 滚动指定距离
+                tab.scrollTop = tabScroll;
+            }, 8)
+
+
+            // if(content.scrollHeight > content.clientHeight) {
                 
-                setTimeout(function(){
-                    //设置滚动条到最顶部
-                    content.scrollTop = 0;
-                },0);
-                setTimeout(function(){
-                    //设置滚动条到最顶部
-                    tab.scrollTop = 0;
-                },0);
-            }
+            //     setTimeout(function(){
+            //         //设置滚动条到最顶部
+            //         content.scrollTop = 0;
+            //     },0);
+            //     setTimeout(function(){
+            //         //设置滚动条到最顶部
+            //         tab.scrollTop = 0;
+            //     },0);
+            // }
         },
         // 删除对话记录, 会现在回收站保存, 最多保留200条数据
         removeChat(targetName) {
             this.getAllChatData();
             let tabs = this.chatCache;
-            let rbChat = tabs.filter(tab => tab.id == targetName);
+            let rbChat = tabs.filter(tab => tab.uuid == targetName);
             let activeName = this.editableTabsValue;
             if (activeName == targetName) {
                 tabs.forEach((tab, index) => {
-                    if (tab.id == targetName) {
+                    if (tab.uuid == targetName) {
                         let nextTab = tabs[index + 1] || tabs[index - 1];
                         if (nextTab) {
-                            activeName = nextTab.id;
+                            activeName = nextTab.uuid;
                         }
                     }
                 });
             }
             
             this.editableTabsValue = activeName;
-            let newChat = tabs.filter(tab => tab.id != targetName);
+            let newChat = tabs.filter(tab => tab.uuid != targetName);
             store.commit("REMOVE_CHAT_CACHE", newChat);
             this.getContentLen();
 
@@ -1029,6 +1646,7 @@ export default {
 
             Message.success(`【${rbChat[0].title}】已删除, 可在回收站恢复`);
         },
+        // 锚点
         jump(id) {
             location.hash = "#" + id;
             document.getElementById(id).setAttribute("style", "color: #d9d04b;");
@@ -1037,24 +1655,19 @@ export default {
             this.close();
             clearInterval(this.loadTimer);
         },
+        callMethod() {},
     },
     filters: {
-        getCode(data) {
-            const regex = /```([\s\S]*?)```/g;
-            const content = data;
-            let newContent = content;
-            let match;
-            while ((match = regex.exec(content)) !== null) {
-                // 将代码块用 <pre> 和 <code> 标签包裹起来
-                const code = match[1].trim();
-                const formattedCode = `<pre><code class="code">${code}</code></pre>`;
-                newContent = newContent.replace(match[0], formattedCode);
-            }
-            return newContent;
-        },
         getModelLabel(data, allModel) {
             let label = allModel.find(item => item.value == data);
-            return label.label
+            return label.label;
+        },
+        getModelLabel2(data, allModel) {
+            if (allModel && Array.isArray(allModel)) {
+                let label = allModel.find(item => item.value == data);
+                return label ? label.label : "";
+            }
+            return data;
         },
     },
     mounted() {
@@ -1064,12 +1677,16 @@ export default {
         this.checkContextStatus();
         this.getAllChatData();
         // this.defaultHideAside();
-        this.checkDn();
+        this.checkSystemSet();
         this.getContentLen();
         this.getAllRbData();
         this.checkModel();
-        this.loadLatestId();
-        this.refresh();
+        this.checkLoadingOffset();
+        // this.getChatList(100);
+        this.chatTitleFormat();
+        this.scrollLoadChatDataStatus();
+        this.getCurrentUser();
+        this.checkisOpenScrollLoadData();
     },
 }
 </script>

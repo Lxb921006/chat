@@ -2,33 +2,20 @@
     color: #262626
 }
 .box {
-  position: relative;
-  margin-top: -44px;
+    position: relative;
+    margin-top: -44px;
 }
-/*
-.custom-code-block {
-  background-color: #2e2e2e;
-  padding: 10px;
-  line-height: 1.5;
-  width: 659px;
-  margin-bottom: 10px;
-}
-
-.custom-code-block-dev {
-  height: 39px;
-  line-height: 39px;
-  background-color: #262626;
-  border-radius: 2px;
-}
-*/
 .custom-code-block-dev p {
-  padding-left: 10px;
+    padding-left: 10px;
+    padding-top: 10px;
+    font-weight: 600;
 }
 .code-3 {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
+    font-family: fangsong;
 }
 .code {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
     display: block;
     margin: 0 auto;
     width: 659px;
@@ -44,7 +31,7 @@
     line-height: 1.5;
 }
 .title-block {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
     display: block;
     margin: 0 auto;
     width: 659px;
@@ -59,4 +46,28 @@
 }
 .code-day {
     color: #262626
+}
+.cursor-3 {
+    display: inline;
+}
+.cursor-2 {
+    position: relative;
+    bottom: 3px;
+    color: #fff;
+    background-color: #fff;
+    width: 9px;
+    height: 19px;
+    line-height: 1;
+    display: inline-block;
+    animation: blink 0.19s infinite;
+}
+pre code {
+    white-space: break-spaces;
+}
+pre code p {
+    display: inline;
+    line-height: 2;
+}
+.icon-fuzhi {
+  font-size: 13px;
 }

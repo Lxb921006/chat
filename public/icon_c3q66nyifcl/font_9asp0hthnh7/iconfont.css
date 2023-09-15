@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4197599 */
-  src: url('iconfont.woff2?t=1692845873055') format('woff2'),
-       url('iconfont.woff?t=1692845873055') format('woff'),
-       url('iconfont.ttf?t=1692845873055') format('truetype');
+  src: url('iconfont.woff2?t=1694585384286') format('woff2'),
+       url('iconfont.woff?t=1694585384286') format('woff'),
+       url('iconfont.ttf?t=1694585384286') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,50 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-a-Chatgpt4:before {
+  content: "\e61d";
+}
+
+.icon-neirong-chajianlixian:before {
+  content: "\e635";
+}
+
+.icon-chajian:before {
+  content: "\e69b";
+}
+
+.icon-chajianku:before {
+  content: "\e64d";
+}
+
+.icon-yonghuguanli1:before {
+  content: "\e63c";
+}
+
+.icon-yonghu1:before {
+  content: "\e873";
+}
+
+.icon-baidu:before {
+  content: "\e61c";
+}
+
+.icon-letter-chinese-a:before {
+  content: "\e6bd";
+}
+
+.icon-moxing:before {
+  content: "\e61b";
+}
+
+.icon-moxingtongbu:before {
+  content: "\e681";
+}
+
+.icon-AImoxing-01:before {
+  content: "\e61a";
 }
 
 .icon-fujian:before {

@@ -74,7 +74,6 @@ export default {
 
             this.submitLoad = true;
             const resp = await gaLogin({code: this.gacode, user: this.user}, this.user, this.callMethod).catch(err => {this.submitLoad = false;})
-            console.log(resp);
 
             if (resp.data.status !== 10000) {
                 this.submitLoad = false;
@@ -84,7 +83,7 @@ export default {
             }
 
             sessionStorage.setItem("user", resp.data.user);
-            this.$router.replace('/index').catch((err) => err);
+            this.$router.replace('/chat').catch((err) => err);
             this.submitLoad = false;
             this.finished = false;
             this.logintext = "确定";

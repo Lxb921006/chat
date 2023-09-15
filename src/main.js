@@ -33,9 +33,17 @@ import { Switch } from 'element-ui'
 import { Table } from 'element-ui'
 import { TableColumn } from 'element-ui'
 import { Popconfirm } from 'element-ui'
+import { Loading } from 'element-ui';
+import { Dialog } from 'element-ui';
+import { Checkbox } from 'element-ui';
+// import { Collapse } from 'element-ui';
+// import { CollapseItem } from 'element-ui';
 import VuePageTransition from 'vue-page-transition'
 
 
+// Vue.use(Collapse);
+// Vue.use(CollapseItem);
+Vue.use(Checkbox);
 Vue.use(Button);
 Vue.use(Input);
 Vue.use(Divider);
@@ -62,6 +70,9 @@ Vue.use(Table);
 Vue.use(TableColumn);
 Vue.use(Popconfirm);
 Vue.use(Upload);
+Vue.use(Dialog);
+Vue.use(Loading);
+
 Vue.use(VuePageTransition);
 
 //复制插件
