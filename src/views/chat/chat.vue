@@ -1432,7 +1432,7 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-3), model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-5), model: this.selectedModel};
                 } else {
                     sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
                 }
