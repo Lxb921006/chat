@@ -744,7 +744,6 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            console.log(nt[i].clientHeight, nt);
                             if (nt[i].clientHeight  > 69) {
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             }
