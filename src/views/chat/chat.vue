@@ -350,8 +350,8 @@
                         <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
                         <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <span v-if="dnSwitch">预设: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>预设: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <span v-if="dnSwitch">预设角色: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>预设角色: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span class="z-notice-word">
@@ -635,6 +635,7 @@ export default {
         },
         // 滚动加载数据开关
         saveScrollLoadDataStatus() {
+            this.lazyLoadData(); // 当打开开关，防止滚动条刚好在最底部无限刷新的bug
             if (this.isScrollLoadDataStatus) {
                 sessionStorage.setItem("sds", 1);
                 this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
@@ -1242,8 +1243,8 @@ export default {
                         this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'GPT-4':
-                        // this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        // this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'chatGPT':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
@@ -1293,8 +1294,8 @@ export default {
                     this.chatGPT35();
                     break
                 case 'GPT-4':
-                    // this.chatGPT35();
-                    this.chatLLAM();
+                    this.chatGPT35();
+                    // this.chatLLAM();
                     break
                 case 'xf':
                     this.sendXF();
@@ -1539,7 +1540,7 @@ export default {
 
             // 使用setInterval平滑滚动content
             const timer2 = setInterval(() => {
-                scroll += distance
+                scroll += distance;
 
                 // 滚动到底部时停止
                 if(scroll >= content.scrollHeight){
@@ -1553,7 +1554,7 @@ export default {
 
             // 使用setInterval平滑滚动tab
             const timer3 = setInterval(() => {
-                tabScroll += distance
+                tabScroll += distance;
 
                 // 滚动到底部时停止
                 if(tabScroll >= tab.scrollHeight){
@@ -1564,9 +1565,15 @@ export default {
                 tab.scrollTop = tabScroll;
             }, 8)
         },
+        lazyLoadData() {
+            let content = document.getElementsByClassName('content')[0];
+            let scroll = content.scrollTop;
+            scroll -= 3;
+            content.scrollTop = scroll;
+        },
         // 滚动到最顶部
         juamTop() {
-            let content = document.getElementsByClassName('content')[0]
+            let content = document.getElementsByClassName('content')[0];
             let tab = document.getElementsByClassName('tab')[0];
             
             let scroll = content.scrollTop;
@@ -1576,7 +1583,7 @@ export default {
 
             // 使用setInterval平滑滚动content
             const timer2 = setInterval(() => {
-                scroll -= distance
+                scroll -= distance;
 
                 // 滚动到顶部时停止
                 if(scroll <= 0){
@@ -1589,7 +1596,7 @@ export default {
 
             // 使用setInterval平滑滚动tab
             const timer3 = setInterval(() => {
-                tabScroll -= distance
+                tabScroll -= distance;
 
                 // 滚动到顶部时停止
                 if(tabScroll <= 0){
