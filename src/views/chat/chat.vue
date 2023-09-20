@@ -74,7 +74,7 @@
                 </div>
             </transition>
             <!-- Ai回复内容 -->
-            <div class="content" ref="wrapper" @scroll="handleScroll" :loading="true">
+            <div class="content" ref="wrapper" @scroll="handleScroll" v-loading="dataLoading">
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
@@ -442,7 +442,7 @@ import { wssSinUrl, wssUsUrl, wssSinApiUrl } from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
 import baseUrl from "../../utils/baseUrl";
-import { chatList, chatSave, getFileText, chatDel } from '../../api'
+import { chatList, chatSave, getFileText, chatDel } from '../../api';
 
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
@@ -495,6 +495,7 @@ export default {
     },
     data()  {
         return {
+            dataLoading: false,
             pptCreate: '',
             fileText: '',
             noticeVisible: false,
@@ -783,15 +784,16 @@ export default {
         async getChatList(ac) {
             if (ac==100) {
                 this.pages.page = 1;
-            }
+            };
 
             const resp = await chatList({page: this.pages.page, size: this.pages.size})
             if (resp.data.status != 666) {
                 Message.error('加载历史对话失败')
                 return
-            }
+            };
 
             if (ac == 100) {
+                this.dataLoading = true;
                 let respData = resp.data.data;
                 if (resp.data.totals == 0) {
                     Message.warning('没有历史数据可加载')
@@ -808,12 +810,15 @@ export default {
                 for (let i = 0; i < historyData.length; i++) {
                     store.commit("ADD_CHAT_CACHE", historyData[i]);
                 }
-
+                this.dataLoading = false;
                 // Message.success('历史对话加载完成');
-            }
-            this.chatTitleFormat();
+            };
 
-            return resp
+            setTimeout(() => {
+                this.chatTitleFormat();
+            }, 2000);
+
+            return resp;
         },
         saveChatListTotal(loadCount) {
             if (this.isScrollLoadDataStatus) {

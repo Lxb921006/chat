@@ -10,7 +10,7 @@
     padding-top: 14px;
 }
 .set-item {
-    margin-top: 15px;
+    margin-top: 6px;
 }
 .ss-aside:hover {
     color: #585858;
@@ -453,7 +453,7 @@
 }
 .collapse-aside {
     position: fixed;
-    z-index: 1000;
+    z-index: 10000;
 }
 .btu1 {
     cursor: pointer;
@@ -879,6 +879,9 @@ ol > li {
     text-align: left;
     padding-left: 17px;
     border-bottom: 1px solid #e9e9e9;
+}
+.el-loading-mask {
+    background-color: #262626;
 }
 /* .cursor-2 {
     position: relative;
