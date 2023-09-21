@@ -334,7 +334,11 @@
                         </div>
                         <el-row :gutter="20">
                             <el-col :span=10>
-                                <el-checkbox v-model="pptCreate">ppt生成</el-checkbox>
+                                <el-checkbox v-model="pptCreate" size="medium">
+                                    <svg class="icon z-rb-icon z-ppt-icon" aria-hidden="true">
+                                        <use xlink:href="#icon-ppt"></use>
+                                    </svg>ppt生成
+                                </el-checkbox>
                             </el-col>
                         </el-row>
                         <el-button slot="reference">
@@ -1471,7 +1475,7 @@ export default {
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
-        // chatGPT3.5
+        // chatGPT3.5,gpt-4
         chatGPT35() {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
@@ -1491,7 +1495,6 @@ export default {
                 sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
             }
             
-            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
