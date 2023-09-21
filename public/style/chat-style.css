@@ -155,6 +155,7 @@
 }
 .code-3 {
   white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 .copy-1 {
     background-color: #262626;
@@ -389,18 +390,18 @@
     overflow: hidden;
 }
 .icon-qa-2 {
-    /* display: block; */
-    /* margin: 0 auto; */
-    /* width: 580px; */
+    display: block; 
     position: relative;
-    /* right: 373px; */
-    right: 112px;
-    /* top: 5px; */
-    /* left: 105px; */
+    left: 6px;
     height: 2em;
     fill: currentColor;
     overflow: hidden;
-    
+    z-index: 1000;
+    width: 60px;
+}
+.icon-qa-2:hover {
+    transform: scale(2); /* 放大到原来的多少倍 */
+    transition: transform 0.3s ease; /* 过渡效果，0.3秒平滑过渡 */
 }
 .icon-qa-copy {
     width: 27px;

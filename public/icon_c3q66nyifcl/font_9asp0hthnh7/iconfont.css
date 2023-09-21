@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4197599 */
-  src: url('iconfont.woff2?t=1694585384286') format('woff2'),
-       url('iconfont.woff?t=1694585384286') format('woff'),
-       url('iconfont.ttf?t=1694585384286') format('truetype');
+  src: url('iconfont.woff2?t=1695281195262') format('woff2'),
+       url('iconfont.woff?t=1695281195262') format('woff'),
+       url('iconfont.ttf?t=1695281195262') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bangzhu:before {
+  content: "\e61e";
 }
 
 .icon-a-Chatgpt4:before {

@@ -344,6 +344,22 @@
                         </el-button>
                     </el-popover>
                 </div>
+                <!-- 提示词 -->
+                <div class="user rb">
+                    <!-- <el-popover
+                        placement="right"
+                        width="400"
+                        trigger="hover">
+                        <div class="z-rb-title">
+                            <h2>提示词</h2>
+                        </div> -->
+                        <el-button @click="isOpenNoticeWord()">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-bangzhu"></use>
+                            </svg>
+                        </el-button>
+                    <!-- </el-popover> -->
+                </div>
                 <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
@@ -354,10 +370,11 @@
                         <span v-else>预设角色: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <span class="z-notice-word">
-                            <!-- <el-link type="info" target="_blank" class="addr-size" :underline="false" href="https://xn--o0uq09burn.com/?tags=tool" @click="isOpenNoticeWord()">提示词</el-link> -->
+                        <span v-if="pptCreate">ppt生成: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>ppt生成: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <!-- <span class="z-notice-word">
                             <el-link type="info" target="_blank" class="addr-size" :underline="false" @click="isOpenNoticeWord()">提示词</el-link>
-                        </span>
+                        </span> -->
                     </div>
                     <div class="send-input">
                          <el-input
@@ -627,6 +644,11 @@ export default {
     },
     
     methods: {
+        isCreatePPT() {
+            if (this.pptCreate) {
+
+            }
+        },
         isOpenNoticeWord() {
             this.noticeVisible = this.noticeVisible ? false : true;
         },
@@ -1339,7 +1361,7 @@ export default {
 
                     let data = {
                         uuid: this.chatCache[i].uuid, 
-                        answer: answer, 
+                        answer: answer.replace(/ppt正在制作中.../g, 'ppt制作完成'), 
                         date: this.getDate(), 
                         timeShow: true,
                         content: this.chatCache[i].content,
@@ -1358,6 +1380,7 @@ export default {
             this.chatContent = "";
             this.stopResp = false;
             this.socket = null;
+            this.pptCreate = false;
             this.jumpFooter();
             this.saveChatData();
             this.getChatList();
@@ -1453,17 +1476,22 @@ export default {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
+            let id = (100000000 - 1) * Math.random() + 1;
+            let uuid = Math.floor(id);
+            let file = this.pptCreate ? uuid+'.pptx': '';
+            let ppt = this.pptCreate ? 'ppt': '';
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-5), model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-5), model: this.selectedModel, file: file, ppt: ppt};
                 } else {
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
                 }
             } else {
-                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
             }
-
+            
+            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
