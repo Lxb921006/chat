@@ -5,3 +5,4 @@ export const chatList = (params, query, method) => get(`/chat/list/?user=${sessi
 export const chatSave = (params, query, method) => post(`/chat/save/?user=${sessionStorage.getItem('user')}`, params, query, method);
 export const chatDel = (params, query, method) => post(`/chat/del/?user=${sessionStorage.getItem('user')}`, params, query, method);
 export const getFileText = (params, query, method) => get(`/claude/text/?user=${sessionStorage.getItem('user')}`, params, query, method);
+export const downloadFile = (params, query, method) => get('/claude/download/', params, query, method);

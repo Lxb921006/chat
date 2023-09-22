@@ -354,6 +354,13 @@
 .code img {
     width: 680px;
 }
+.code p a {
+    text-decoration: none;
+    color: rgb(199, 199, 100);
+}
+.code p a:hover {
+    color: rgb(236, 236, 16);
+}
 .time-2 {
     display: inline-block;
     position: relative;
@@ -806,6 +813,10 @@ ol > li {
     background-color: #262626;
     border: none;
 }
+.upload-demo-1 ul {
+    position: relative;
+    bottom: 9px;
+}
 .upload-demo ul {
     position: relative;
     bottom: 44px;
@@ -899,15 +910,9 @@ ol > li {
     left: 7px;
     top: 4px;
 }
-/* .cursor-2 {
-    position: relative;
-    left: 81px;
-    bottom: 12px;
-    color: #fff;
-    background-color: #fff;
-    width: 9px;
-    height: 19px;
-    display: inline-block;
-    margin-left: 1px;
-    animation: blink 1s infinite;
-} */
+.z-pdf-word-row {
+    margin-top: 12px;
+}
+.el-upload__tip {
+    margin-top: 14px;
+}

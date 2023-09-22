@@ -350,19 +350,52 @@
                 </div>
                 <!-- 提示词 -->
                 <div class="user rb">
-                    <!-- <el-popover
+                    <el-button @click="isOpenNoticeWord()">
+                        <svg class="icon z-rb-icon" aria-hidden="true">
+                            <use xlink:href="#icon-bangzhu"></use>
+                        </svg>
+                    </el-button>
+                </div>
+                <!-- 工具-pdf-word文档互转 -->
+                <div class="user rb">
+                    <el-popover
                         placement="right"
                         width="400"
-                        trigger="hover">
+                        trigger="click">
                         <div class="z-rb-title">
-                            <h2>提示词</h2>
-                        </div> -->
-                        <el-button @click="isOpenNoticeWord()">
+                            <h2>pdf-word文档互转</h2>
+                        </div>
+                        <el-upload
+                            class="upload-demo-1"
+                            drag
+                            :action=uploadUrl()
+                            :on-preview="handlePreview"
+                            :before-upload="checkUploadFileType"
+                            :on-success="successUpload"
+                            :limit="1"
+                            :on-remove="handleRemove"
+                            :on-exceed="handleExceed"
+                            multiple
+                            :data="fileData"
+                            :file-list="fileList"
+                            >
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">将pdf或者word文档拖到此处, 或<em>点击上传</em></div>
+                        </el-upload>
+                        <el-row :gutter="10" class="z-pdf-word-row">
+                            <el-col :span="8">
+                                <el-button type="success " size="mini" :disabled="isOpenSwitch" @click="downloadFile()">下载</el-button>
+                            </el-col>
+                            <!-- <el-col :span="1">
+                                <el-button type="primary" size="mini" :disabled="isOpenSwitch" @click="downloadFile()">word文档转pdf</el-button>
+                            </el-col> -->
+                        </el-row>
+                        <el-button slot="reference">
                             <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-bangzhu"></use>
+                                <use xlink:href="#icon-gongju"></use>
                             </svg>
                         </el-button>
-                    <!-- </el-popover> -->
+                    </el-popover> 
                 </div>
                 <!-- 对话输入 -->
                 <div class="send-question">
@@ -376,9 +409,6 @@
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="pptCreate">ppt生成: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>ppt生成: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <!-- <span class="z-notice-word">
-                            <el-link type="info" target="_blank" class="addr-size" :underline="false" @click="isOpenNoticeWord()">提示词</el-link>
-                        </span> -->
                     </div>
                     <div class="send-input">
                          <el-input
@@ -409,9 +439,10 @@
                             multiple
                             :limit="1"
                             :data="fileData"
+                            :file-list="fileList"
                             :on-exceed="handleExceed"
-                            :file-list="fileList">
-                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .pdf文件; 目前只支持claude上传附件" placement="top-start">
+                            >
+                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .pdf, .docx文件; 目前只支持claude上传附件" placement="top-start">
                                 <el-button size="small" type="primary">
                                     <svg class="icon z-send-button" aria-hidden="true">
                                         <use xlink:href="#icon-fujian"></use>
@@ -463,7 +494,7 @@ import { wssSinUrl, wssUsUrl, wssSinApiUrl } from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
 import baseUrl from "../../utils/baseUrl";
-import { chatList, chatSave, getFileText, chatDel } from '../../api';
+import { chatList, chatSave, getFileText, chatDel, downloadFile } from '../../api';
 
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
@@ -516,6 +547,7 @@ export default {
     },
     data()  {
         return {
+            isOpenSwitch: true,
             dataLoading: false,
             pptCreate: '',
             fileText: '',
@@ -608,7 +640,7 @@ export default {
                     disabled: false,
                 },
             ],
-            allowFile: ['.txt', '.pdf'],
+            allowFile: ['.txt', '.pdf', '.docx'],
             loadCount: 0,
             historyDataLoading: false,
             pages: {
@@ -648,10 +680,21 @@ export default {
     },
     
     methods: {
-        isCreatePPT() {
-            if (this.pptCreate) {
-
-            }
+        handleRemove(file, fileList) {
+            this.isOpenSwitch = true;
+        },
+        async downloadFile() {
+            let name = this.fileData.file;
+            let pre = name.split(".")[0];
+            let suf = name.split(".")[1];
+            let file = suf == "docx" ? pre + ".pdf" : pre + ".docx";
+            // const resp = await downloadFile({file: file, user: this.currentUser})
+            // if (resp.data.status == 444) {
+            //     Message.error(resp.data.msg);
+            // }
+            let url = `http://43.153.55.148:8091/chat/download/?user=${sessionStorage.getItem('user')}&file=${file}`;
+            window.open(url, "_self")
+            this.fileList = [];
         },
         isOpenNoticeWord() {
             this.noticeVisible = this.noticeVisible ? false : true;
@@ -920,9 +963,12 @@ export default {
         },
         successUpload(response, file, fileList) {
             this.claudeFile = file.name;
+            this.isOpenSwitch = false;
+            this.fileData.file = file.name;
         },
         checkUploadFileType(file) {
             this.fileData.user = sessionStorage.getItem('user');
+
             var filePath = file.name;
             //获取最后一个.的位置
             var index= filePath.lastIndexOf(".");
@@ -938,13 +984,14 @@ export default {
         },
         handlePreview(file) {
             this.getFileText(file.name);
+            // this.downloadFile(file.name);
         },
         // 清空回收站
         async clearRbData() {
             let uuids = this.chatRecycle.map(uuid => uuid.uuid);
             const resp = await this.chatDel(uuids);
             if (resp.data.status == 666) {
-                store.commit("Z_CLEAR_CHAT_CACHE", 'clear');
+                store.commit("Z_REMOVE_ALL_CHAT_CACHE", "clear");
             }
             
         },
@@ -953,6 +1000,7 @@ export default {
             let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
             for (let i = 0; i < chatRecycleData.length; i++) {
                 if (chatRecycleData[i].uuid == data.uuid) {
+                    console.log(chatRecycleData[i]);
                     store.commit("ADD_CHAT_CACHE", chatRecycleData[i]);
                     this.removeRbData(data);
                     break;
@@ -970,6 +1018,7 @@ export default {
             const resp = await this.chatDel(fd);
             if (resp.data.status == 666) {
                 store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
+
                 this.getContentLen();
             }
             // store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
@@ -1119,6 +1168,16 @@ export default {
                 let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
                 for (let i = 0; i < cacheData.length; i++) {
                     store.commit("ADD_CHAT_CACHE", cacheData[i]);
+                }
+            }
+        },
+        getAllChatRecycleData () {
+            if (sessionStorage.getItem("chatRecycle")) {
+                store.commit("Z_CLEAR_CHAT_CACHE");
+                this.show = true;
+                let cacheData = JSON.parse(sessionStorage.getItem("chatRecycle"));
+                for (let i = 0; i < cacheData.length; i++) {
+                    store.commit("Z_ADD_CHAT_CACHE", cacheData[i]);
                 }
             }
         },
@@ -1718,6 +1777,7 @@ export default {
         }
         this.checkContextStatus();
         this.getAllChatData();
+        this.getAllChatRecycleData();
         // this.defaultHideAside();
         this.checkSystemSet();
         this.getContentLen();

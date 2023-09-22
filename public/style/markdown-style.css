@@ -59,7 +59,7 @@
     height: 19px;
     line-height: 1;
     display: inline-block;
-    animation: blink 0.19s infinite;
+    animation: blink 1s infinite;
 }
 pre code {
     white-space: break-spaces;
