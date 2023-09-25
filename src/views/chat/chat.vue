@@ -47,6 +47,9 @@
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'bd'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
+                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'qw'">
+                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
+                            </span>
                             {{ data.title }}
                         </span>
                     </el-menu-item>
@@ -604,6 +607,7 @@ export default {
             assistantIcon: "#icon-a-Chatgpt35",
             xfIcon: "#icon-xunfeilogo",
             wxIcon: "#icon-baidu",
+            qwIcon: "#icon-a-result4",
             scrollLoading: false,
             setTimer: true,
             isScrollLoadDataStatus: true,
@@ -637,6 +641,11 @@ export default {
                 {
                     value: 'bd',
                     label: '文心一言',
+                    disabled: false,
+                },
+                {
+                    value: 'qw',
+                    label: '通义千问',
                     disabled: false,
                 },
             ],
@@ -962,7 +971,9 @@ export default {
             return `${baseUrl}/claude/upload/`
         },
         successUpload(response, file, fileList) {
-            this.claudeFile = file.name;
+            if (this.pptCreate) {
+                this.claudeFile = file.name;
+            }
             this.isOpenSwitch = false;
             this.fileData.file = file.name;
         },
@@ -1068,6 +1079,9 @@ export default {
                 case '7':
                     this.selectedModel = 'GPT-4';
                     break;
+                case '8':
+                    this.selectedModel = 'qw';
+                    break;
                 default:
                     this.selectedModel = 'GPT-4';
                     break;
@@ -1096,6 +1110,9 @@ export default {
                     break  
                 case 'GPT-4':
                     window.sessionStorage.setItem('modelSelect', 7);
+                    break
+                case 'qw':
+                    window.sessionStorage.setItem('modelSelect', 8);
                     break
             }
         },
@@ -1131,6 +1148,9 @@ export default {
                 case 'xf':
                     window.open('https://xinghuo.xfyun.cn/');
                     break;    
+                case 'qw':
+                    window.open('https://qianwen.aliyun.com/');
+                    break;  
             }   
         },
         // 时间格式化
@@ -1292,6 +1312,9 @@ export default {
             case 'xf':
                 modelIcon = this.xfIcon;
                 break;    
+            case 'qw':
+                modelIcon = this.qwIcon;
+                break;   
             default:
                 modelIcon = this.defaultIcon;
                 break;
@@ -1342,6 +1365,9 @@ export default {
                     case 'bd':
                         this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
+                    case 'qw':
+                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
                     case 'xf':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
@@ -1379,6 +1405,9 @@ export default {
                     break
                 case 'bd':
                     this.sendBd();
+                    break
+                case 'qw':
+                    this.sendQw();
                     break
                 case 'chatGPT3.5':
                     this.chatGPT35();
@@ -1461,6 +1490,18 @@ export default {
             if (resp.data.status != 666) {
                 Message.error('保存数据失败>>>', resp.data.msg);
             }
+        },
+        // 通义千问
+        sendQw() {
+            let sendData = {};
+            if (this.contextSwitch) {
+                //发送的信息关联上下文
+                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: 'open'};
+            } else {
+                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: ''};
+            }
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
         },
         // claude
         sendClaude() {
@@ -1553,7 +1594,7 @@ export default {
             } else {
                 sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
             }
-            
+            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },

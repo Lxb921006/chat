@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "36600757",
+      "name": "通义千问",
+      "font_class": "a-result4",
+      "unicode": "e621",
+      "unicode_decimal": 58913
+    },
+    {
       "icon_id": "2208525",
       "name": "工具",
       "font_class": "gongju",
