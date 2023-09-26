@@ -552,7 +552,7 @@ export default {
         return {
             isOpenSwitch: true,
             dataLoading: false,
-            pptCreate: '',
+            pptCreate: false,
             fileText: '',
             noticeVisible: false,
             fileTextVisible: false,
@@ -824,7 +824,7 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            if (nt[i].clientHeight  > 69) {
+                            if (nt[i].clientHeight  > 72) {
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             }
                         }
@@ -971,9 +971,7 @@ export default {
             return `${baseUrl}/claude/upload/`
         },
         successUpload(response, file, fileList) {
-            if (this.pptCreate) {
-                this.claudeFile = file.name;
-            }
+            this.claudeFile = file.name;
             this.isOpenSwitch = false;
             this.fileData.file = file.name;
         },
@@ -1493,13 +1491,23 @@ export default {
         },
         // 通义千问
         sendQw() {
+            this.claudeFile = "";
             let sendData = {};
+            let lastData = [];
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
             if (this.contextSwitch) {
-                //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: 'open'};
+                if (gptData.length > 1) {
+                    //发送的信息关联上下文
+                    lastData = gptData[gptData.length - 2];
+                    sendData = {cid: "", pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: lastData.title};
+                } else {
+                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: ''};
+                }
             } else {
-                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: ''};
+                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: ''};
             }
+
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1518,6 +1526,7 @@ export default {
         },
         // 文心一言
         sendBd() {
+            this.claudeFile = "";
             let sendData = {};
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
@@ -1539,6 +1548,7 @@ export default {
         },
         // 讯飞星火
         sendXF() {
+            this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let xfData =  cacheData.filter(cd => cd.model == this.selectedModel);
@@ -1558,6 +1568,7 @@ export default {
         },
         // assistant(第三方提供的api)
         chatLLAM() {
+            this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
@@ -1577,6 +1588,7 @@ export default {
         },
         // chatGPT3.5,gpt-4
         chatGPT35() {
+            this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
@@ -1600,6 +1612,7 @@ export default {
         },
         // chatgpt
         sendChatGpt() {
+            this.claudeFile = "";
             let sendData = {};
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
