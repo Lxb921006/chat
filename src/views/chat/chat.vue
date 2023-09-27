@@ -1260,9 +1260,10 @@ export default {
         },
         // 手动停止ai响应
         stopChat(){
+            this.stopCursor = false;
             this.socket.close();
             this.socket = null;
-            this.stopCursor = false;
+            
         },
         handleKeyUp(event) {
             if (event.ctrlKey && event.keyCode === 13) {
@@ -1287,6 +1288,7 @@ export default {
             let index = Math.random().toString(36).slice(-8);
             this.show = true;
             let modelIcon= "";
+            let newfile = "";
 
             switch (this.selectedModel) {
             case 'claude-2':
@@ -1318,6 +1320,12 @@ export default {
                 break;
             }
 
+            if (this.selectedModel == 'claude-2') {
+                newfile = this.claudeFile;
+            } else {
+                newfile = "";
+            }
+
             let data = {
                 title: this.chatContent,
                 answer: "",
@@ -1332,8 +1340,10 @@ export default {
                 icon: modelIcon,
                 content: "",
                 model: this.selectedModel,
-                file: this.claudeFile,
+                file: newfile,
             };
+
+            console.log(data);
 
             this.waitingData();
             this.saveLatestId(data.uuid);
