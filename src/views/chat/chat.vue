@@ -185,7 +185,7 @@
                             </el-col>
                         </el-row>
                         <el-row :gutter="10" class="set-item set-item-1">
-                            <el-col :span="1" class="z-col-3 col-font">是否开启预设模式: </el-col>
+                            <el-col :span="1" class="z-col-3 col-font">是否开启角色回复: </el-col>
                             <el-col :span="1" class="z-col-4">
                                 <el-tooltip content="只对chatGPT有效" placement="top">
                                     <el-switch
@@ -340,7 +340,7 @@
                                 <el-checkbox v-model="pptCreate" size="medium">
                                     <svg class="icon z-rb-icon z-ppt-icon" aria-hidden="true">
                                         <use xlink:href="#icon-ppt"></use>
-                                    </svg>ppt生成
+                                    </svg>ppt生成(只能用GPT-3.5-turbo模型来生成)
                                 </el-checkbox>
                             </el-col>
                         </el-row>
