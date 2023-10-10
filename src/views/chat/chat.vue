@@ -1261,9 +1261,9 @@ export default {
         // 手动停止ai响应
         stopChat(){
             this.stopCursor = false;
-            this.socket.close();
+            this.socket.close(1000);
             this.socket = null;
-            
+            this.close();
         },
         handleKeyUp(event) {
             if (event.ctrlKey && event.keyCode === 13) {
@@ -1342,8 +1342,6 @@ export default {
                 model: this.selectedModel,
                 file: newfile,
             };
-
-            console.log(data);
 
             this.waitingData();
             this.saveLatestId(data.uuid);
