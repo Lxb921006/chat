@@ -916,3 +916,14 @@ ol > li {
 .el-upload__tip {
     margin-top: 14px;
 }
+.smbpages {
+    margin-top: 15px;
+}
+.add_new_sess {
+    margin: 24px auto;
+}
+.add_new_sess button {
+    height: 50px;
+    width: 156px;
+}
+

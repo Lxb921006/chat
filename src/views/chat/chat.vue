@@ -7,6 +7,9 @@
                 </svg>
                 <h2>DaVinci AI</h2>
             </div>
+            <div class="add_new_sess" v-show="false">
+                <el-button type="primary" size="medium" icon="el-icon-document-add" round>新建对话</el-button>
+            </div>
             <div class="search">
                 <el-input
                     placeholder="请输入搜索内容"
@@ -171,7 +174,7 @@
                         placement="right-start"
                         title="设置"
                         width="200"
-                        trigger="click"
+                        trigger="hover"
                         >
                         <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="context-switch col-font">是否开启上下文: </el-col>
@@ -315,16 +318,43 @@
                 </div>
                 <!-- 历史记录 -->
                 <div class="user rb">
-                    <el-popconfirm
-                        title="是否加载历史记录?(只加载最新的10条, 如需加载更多请把滚动加载打开)"
-                        @confirm="getChatList(100)"
+                    <!-- <el-popconfirm
+                        title="是否加载历史记录?(可选择加载指定页码)"
+                        @confirm="clickLoadChatData()"
                         >
+
                         <el-button slot="reference">
                             <svg class="icon z-rb-icon" aria-hidden="true">
                                 <use xlink:href="#icon-xiaoxilishi"></use>
                             </svg>
                         </el-button>
-                    </el-popconfirm>
+                    </el-popconfirm> -->
+                    <el-popover
+                        placement="right"
+                        width="400"
+                        trigger="click">
+                        <div class="z-rb-title">
+                            <h2>历史聊天加载</h2>
+                        </div>
+                        <div class="pages">
+                            <el-select v-model="selectPage" class="c-select" placeholder="请选择">
+                                <el-option
+                                v-for="item in totalPages"
+                                :key="item"
+                                :label="item"
+                                :value="item">
+                                </el-option>
+                            </el-select>
+                        </div>
+                        <div class="smbpages">
+                            <el-button size="mini" type="primary" @click="clickLoadChatData()">加载数据</el-button>
+                        </div>
+                        <el-button slot="reference">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-xiaoxilishi"></use>
+                            </svg>
+                        </el-button>
+                    </el-popover>
                 </div>
                 <!-- 插件 -->
                 <div class="user rb">
@@ -352,7 +382,7 @@
                     </el-popover>
                 </div>
                 <!-- 提示词 -->
-                <div class="user rb">
+                <div class="user rb" v-show="false">
                     <el-button @click="isOpenNoticeWord()">
                         <svg class="icon z-rb-icon" aria-hidden="true">
                             <use xlink:href="#icon-bangzhu"></use>
@@ -550,6 +580,8 @@ export default {
     },
     data()  {
         return {
+            selectPage: 1,
+            totalPages: 0,
             isOpenSwitch: true,
             dataLoading: false,
             pptCreate: false,
@@ -724,7 +756,7 @@ export default {
                     if (this.loadCount == totals) {
                         sessionStorage.setItem('totals', totals-=1);
                     }
-                    this.scrollLoadChatData();
+                    this.handleScroll();
                 } else {
                     this.getChatList(100);
                 }
@@ -756,54 +788,7 @@ export default {
             }
             // this.saveScrollLoadDataStatus();
         },
-        // 拖动
-        dialogDrag(event) {
-            if (!this.dragDialog.dragging) {
-                return;
-            }
-            // 计算拖拽距离
-            const left = event.clientX - this.dragDialog.startX + this.dragDialog.left;
-            const top = event.clientY - this.dragDialog.startY + this.dragDialog.top;
-            // 更新对话框位置
-            this.$refs.dialog.$el.style.left = `${left}px`;
-            this.$refs.dialog.$el.style.top = `${top}px`;
-        },
-        dialogMouseDown(event) {
-            // 开始拖拽
-            this.dragDialog.dragging = true;
-            // 记录起始位置
-            this.dragDialog.startX = event.clientX;
-            this.dragDialog.startY = event.clientY;
-            // 记录当前位置
-            const { left, top } = this.$refs.dialog.$el.getBoundingClientRect();
-            this.dragDialog.left = left;
-            this.dragDialog.top = top;
-            // 添加事件监听器
-            document.addEventListener('mousemove', this.dialogDrag);
-            document.addEventListener('mouseup', this.dialogMouseUp);
-        },
-        dialogMouseUp() {
-            // 结束拖拽
-            this.dragDialog.dragging = false;
-            // 移除事件监听器
-            document.removeEventListener('mousemove', this.dialogDrag);
-            document.removeEventListener('mouseup', this.dialogMouseUp);
-        },
-        onDragEnd(event) {  
-            // 获取对话框的当前位置和鼠标位置  
-            
-            const dialogRect = this.$refs.dialog.getBoundingClientRect();  
-            const mouseX = event.clientX;  
-            const mouseY = event.clientY;  
-                
-            // 计算对话框应该移动到的位置  
-            const newLeft = mouseX - (dialogRect.width - this.$refs.dialog.offsetWidth) / 2;  
-            const newTop = mouseY - (dialogRect.height - this.$refs.dialog.offsetHeight) / 2;  
-                
-            // 移动对话框到计算得到的位置  
-            this.$refs.dialog.style.left = `${newLeft}px`;  
-            this.$refs.dialog.style.top = `${newTop}px`;  
-        },
+        
         // 查看附件内容
         async getFileText(file) {
             this.fileTextVisible = true;
@@ -824,7 +809,7 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            if (nt[i].clientHeight  > 72) {
+                            if (nt[i].clientHeight  > 80) {
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             }
                         }
@@ -860,36 +845,17 @@ export default {
         },
         // 拉取保存在服务端的历史对话-建议关闭，如果数据过多，滚动加载会比较慢
         async getChatList(ac) {
+            let page = 1;
             if (ac==100) {
-                this.pages.page = 1;
-            };
+                page = this.selectPage;
+            } else {
+                page = this.pages.page;
+            }
 
-            const resp = await chatList({page: this.pages.page, size: this.pages.size})
+            const resp = await chatList({page: page , size: this.pages.size})
             if (resp.data.status != 666) {
                 Message.error('加载历史对话失败')
                 return
-            };
-
-            if (ac == 100) {
-                this.dataLoading = true;
-                let respData = resp.data.data;
-                if (resp.data.totals == 0) {
-                    Message.warning('没有历史数据可加载')
-                    return
-                }
-                this.pages.totals = resp.data.totals;
-                this.loadCount = respData.length;
-                this.saveChatListTotal(this.loadCount);
-                this.saveLoadingOffset();
-                store.commit("CLEAR_CHAT_CACHE");
-                let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
-                this.show = true;
-                this.showhi = true;
-                for (let i = 0; i < historyData.length; i++) {
-                    store.commit("ADD_CHAT_CACHE", historyData[i]);
-                }
-                this.dataLoading = false;
-                // Message.success('历史对话加载完成');
             };
 
             setTimeout(() => {
@@ -940,18 +906,60 @@ export default {
                 this.scrollLoading = true;
             }
         },
+        mountTotalPages () {
+            let tp = sessionStorage.getItem('totalPages');
+            if (tp) {
+                this.totalPages = JSON.parse(tp);
+            }
+        },
+        // 点击可选择页面加载数据
+        async clickLoadChatData() {
+            this.isScrollLoadDataStatus = true;
+            this.show = true;
+            this.showhi = true;
+            this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
+            let totals = parseInt(sessionStorage.getItem('totals'));
+            this.pages.page = parseInt(sessionStorage.getItem('page'));
+            // if (this.loadCount != totals) {
+            console.log('--------------点击加载数据----------------');
+            this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
+            this.setTimer = false;
+            this.scrollLoading = true;
+            this.pages.page += 1;
+            const resp = await this.getChatList(100);
+            let respData = resp.data.data;
+            this.totalPages = resp.data.total_pages;
+            sessionStorage.setItem('totalPages', JSON.stringify(this.totalPages));
+            let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
+            store.commit("CLEAR_CHAT_CACHE");
+            for (let i = 0; i < historyData.length; i++) {
+                store.commit("ADD_CHAT_CACHE", historyData[i]);
+            }
+            this.loadCount += respData.length;
+            sessionStorage.setItem('loadCount', this.loadCount);
+            sessionStorage.setItem('page', this.pages.page);
+            
+            sessionStorage.setItem('totals', resp.data.totals);
+            // }
+            this.chatTitleFormat();
+            this.setTimer = true; // 必须等数据加载完才能让handleScroll继续监听滚动条
+            this.scrollLoading = false;
+        },
         // 滚动到底部就加载数据
         async scrollLoadChatData() {
-            let totals = parseInt(sessionStorage.getItem('totals'));
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
+            let totals = parseInt(sessionStorage.getItem('totals'));
             this.pages.page = parseInt(sessionStorage.getItem('page'));
             if (this.loadCount != totals) {
-                console.log('--------------正在加载数据----------------');
+                console.log('--------------滚动加载数据----------------');
+                this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
                 this.setTimer = false;
                 this.scrollLoading = true;
                 this.pages.page += 1;
                 const resp = await this.getChatList(200);
                 let respData = resp.data.data;
+                this.totalPages = resp.data.total_pages;
+                sessionStorage.setItem('totalPages', JSON.stringify(this.totalPages));
                 let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
                 store.commit("CLEAR_CHAT_CACHE");
                 for (let i = 0; i < historyData.length; i++) {
@@ -1583,7 +1591,7 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-5), model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-10), model: this.selectedModel};
                 } else {
                     sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
                 }
@@ -1607,7 +1615,7 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-5), model: this.selectedModel, file: file, ppt: ppt};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-6), model: this.selectedModel, file: file, ppt: ppt};
                 } else {
                     sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
                 }
@@ -1818,6 +1826,54 @@ export default {
             this.close();
             clearInterval(this.loadTimer);
         },
+        // 拖动
+        dialogDrag(event) {
+            if (!this.dragDialog.dragging) {
+                return;
+            }
+            // 计算拖拽距离
+            const left = event.clientX - this.dragDialog.startX + this.dragDialog.left;
+            const top = event.clientY - this.dragDialog.startY + this.dragDialog.top;
+            // 更新对话框位置
+            this.$refs.dialog.$el.style.left = `${left}px`;
+            this.$refs.dialog.$el.style.top = `${top}px`;
+        },
+        dialogMouseDown(event) {
+            // 开始拖拽
+            this.dragDialog.dragging = true;
+            // 记录起始位置
+            this.dragDialog.startX = event.clientX;
+            this.dragDialog.startY = event.clientY;
+            // 记录当前位置
+            const { left, top } = this.$refs.dialog.$el.getBoundingClientRect();
+            this.dragDialog.left = left;
+            this.dragDialog.top = top;
+            // 添加事件监听器
+            document.addEventListener('mousemove', this.dialogDrag);
+            document.addEventListener('mouseup', this.dialogMouseUp);
+        },
+        dialogMouseUp() {
+            // 结束拖拽
+            this.dragDialog.dragging = false;
+            // 移除事件监听器
+            document.removeEventListener('mousemove', this.dialogDrag);
+            document.removeEventListener('mouseup', this.dialogMouseUp);
+        },
+        onDragEnd(event) {  
+            // 获取对话框的当前位置和鼠标位置  
+            
+            const dialogRect = this.$refs.dialog.getBoundingClientRect();  
+            const mouseX = event.clientX;  
+            const mouseY = event.clientY;  
+                
+            // 计算对话框应该移动到的位置  
+            const newLeft = mouseX - (dialogRect.width - this.$refs.dialog.offsetWidth) / 2;  
+            const newTop = mouseY - (dialogRect.height - this.$refs.dialog.offsetHeight) / 2;  
+                
+            // 移动对话框到计算得到的位置  
+            this.$refs.dialog.style.left = `${newLeft}px`;  
+            this.$refs.dialog.style.top = `${newTop}px`;  
+        },
         callMethod() {},
     },
     filters: {
@@ -1851,6 +1907,7 @@ export default {
         this.scrollLoadChatDataStatus();
         this.getCurrentUser();
         this.checkisOpenScrollLoadData();
+        this.mountTotalPages();
     },
 }
 </script>
