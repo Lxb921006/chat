@@ -8,7 +8,7 @@
                 <h2>DaVinci AI</h2>
             </div>
             <div class="add_new_sess">
-                <el-button type="primary" size="medium" icon="el-icon-document-add" round>新建对话</el-button>
+                <el-button type="primary" size="medium" icon="el-icon-document-add" round @click="createNewPage()">新建对话</el-button>
             </div>
             <div class="search">
                 <el-input
@@ -79,8 +79,23 @@
                     </svg>
                 </div>
             </transition>
+            <!-- 新建页面内容 -->
+            <div class="add-new-sess" v-show="showNewPage">
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <el-card>
+                            写个ppt
+                        </el-card>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-card>
+                            写个ppt
+                        </el-card>
+                    </el-col>
+                </el-row>
+            </div>
             <!-- Ai回复内容 -->
-            <div class="content" ref="wrapper" @scroll="handleScroll" v-loading="dataLoading">
+            <div class="content" ref="wrapper" @scroll="handleScroll" v-loading="dataLoading" v-if="show">
                 <transition name="el-zoom-in-top">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
@@ -572,6 +587,7 @@ export default {
     },
     data()  {
         return {
+            showNewPage: false,
             searchBk: "",
             selectPage: 1,
             totalPages: 0,
@@ -714,6 +730,11 @@ export default {
     },
     
     methods: {
+        createNewPage() {
+            this.showNewPage = true;
+            this.show = false;
+            this.showhi = false;
+        },
         handleRemove(file, fileList) {
             this.isOpenSwitch = true;
         },

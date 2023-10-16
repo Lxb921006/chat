@@ -176,7 +176,7 @@
     padding: 14px 0;
 }
 .tab {
-    height: 64%;
+    height: 54%;
     overflow-y: auto;
     border-top: 1px solid #242424;
 }
@@ -932,4 +932,10 @@ ol > li {
 .search-bk input {
     height: 30px;
     width: 126px;
+}
+.add-new-sess {
+    overflow: hidden;
+    height: 70%;
+    scrollbar-width: none;
+    position: relative;
 }
