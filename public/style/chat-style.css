@@ -926,4 +926,10 @@ ol > li {
     height: 50px;
     width: 156px;
 }
-
+.search-bk {
+    margin-top: 15px;
+}
+.search-bk input {
+    height: 30px;
+    width: 126px;
+}

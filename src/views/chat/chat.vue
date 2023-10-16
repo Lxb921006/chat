@@ -174,7 +174,7 @@
                         placement="right-start"
                         title="设置"
                         width="200"
-                        trigger="hover"
+                        trigger="click"
                         >
                         <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="context-switch col-font">是否开启上下文: </el-col>
@@ -318,17 +318,6 @@
                 </div>
                 <!-- 历史记录 -->
                 <div class="user rb">
-                    <!-- <el-popconfirm
-                        title="是否加载历史记录?(可选择加载指定页码)"
-                        @confirm="clickLoadChatData()"
-                        >
-
-                        <el-button slot="reference">
-                            <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-xiaoxilishi"></use>
-                            </svg>
-                        </el-button>
-                    </el-popconfirm> -->
                     <el-popover
                         placement="right"
                         width="400"
@@ -345,6 +334,9 @@
                                 :value="item">
                                 </el-option>
                             </el-select>
+                        </div>
+                        <div class="search-bk">
+                            <el-input v-model="searchBk"></el-input>
                         </div>
                         <div class="smbpages">
                             <el-button size="mini" type="primary" @click="clickLoadChatData()">加载数据</el-button>
@@ -580,6 +572,7 @@ export default {
     },
     data()  {
         return {
+            searchBk: "",
             selectPage: 1,
             totalPages: 0,
             isOpenSwitch: true,
@@ -852,7 +845,7 @@ export default {
                 page = this.pages.page;
             }
 
-            const resp = await chatList({page: page , size: this.pages.size})
+            const resp = await chatList({page: page , size: this.pages.size, search: this.searchBk})
             if (resp.data.status != 666) {
                 Message.error('加载历史对话失败')
                 return
@@ -928,6 +921,10 @@ export default {
             this.pages.page += 1;
             const resp = await this.getChatList(100);
             let respData = resp.data.data;
+            if (respData.length == 0) {
+                Message.error("没有数据可加载.");
+                return;
+            }
             this.totalPages = resp.data.total_pages;
             sessionStorage.setItem('totalPages', JSON.stringify(this.totalPages));
             let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
