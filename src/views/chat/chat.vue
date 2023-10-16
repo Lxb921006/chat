@@ -7,7 +7,7 @@
                 </svg>
                 <h2>DaVinci AI</h2>
             </div>
-            <div class="add_new_sess" v-show="false">
+            <div class="add_new_sess">
                 <el-button type="primary" size="medium" icon="el-icon-document-add" round>新建对话</el-button>
             </div>
             <div class="search">
