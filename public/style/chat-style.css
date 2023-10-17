@@ -525,12 +525,12 @@ pre code {
     color: #fff;
 }
 @media only screen and (min-width: 2000px) {
-    .content,.stop,.footer {
+    .content,.stop,.footer,.add-new-sess {
         padding-right: 568px;
     }
 }
 @media only screen and (max-height: 800px) {
-    .content {
+    .content,.add-new-sess {
         height: 63%;
     }
     .tab {
@@ -938,4 +938,40 @@ ol > li {
     height: 70%;
     scrollbar-width: none;
     position: relative;
+}
+.add-new-sess .el-row {
+    width: 800px;
+    margin: 330px auto!important;
+}
+.el-card {
+    border-radius: 4px;
+    border: 1px solid #494949;
+    background-color: #494949;
+    overflow: hidden;
+    color: #fff;
+    transition: .3s;
+    cursor: pointer;
+}
+.el-card:hover {
+    background-color: #333333;
+}
+.intru-content {
+    position: relative;
+    top: 310px;
+}
+.intru-tt {
+    color: #fff;
+}
+.intru-pp {
+    color: #fff;
+    font-size: 15px;
+    padding-top: 10px;
+}
+.intru-ic {
+    position: relative;
+    top: 8px;
+}
+.change-ques {
+    position: relative;
+    bottom: 290px;
 }

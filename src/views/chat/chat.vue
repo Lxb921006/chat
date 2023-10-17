@@ -80,19 +80,48 @@
                 </div>
             </transition>
             <!-- 新建页面内容 -->
-            <div class="add-new-sess" v-show="showNewPage">
+            <div class="add-new-sess" v-if="showNewPage">
+                <div class="intru-content">
+                    <h3 class="intru-tt">
+                        <svg class="icon intru-ic" aria-hidden="true">
+                            <use xlink:href="#icon-a-5_moxingtongbu"></use>
+                        </svg>
+                        你好, 这里是聚合了国内外主流ai的网站
+                    </h3>
+                    <p class="intru-pp">可以试试如下提问:</p>
+                </div>
                 <el-row :gutter="20">
-                    <el-col :span="6">
+                    <!-- <template> -->
+                    <el-col :span="6" v-for="item in questions" :key="item.id">
                         <el-card>
-                            写个ppt
+                            {{ item.que }}
+                        </el-card>
+                    </el-col>
+                    <!-- </template> -->
+                    <!-- <el-col :span="6">
+                        <el-card>
+                            我爱我的国家, 帮我翻译成英文
                         </el-card>
                     </el-col>
                     <el-col :span="6">
                         <el-card>
-                            写个ppt
+                            帮我规划下假期旅游攻略
                         </el-card>
                     </el-col>
+                    <el-col :span="6">
+                        <el-card>
+                            帮我写个小红书关于女生穿搭的文案
+                        </el-card>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-card>
+                            帮我画一个明星美女图片
+                        </el-card>
+                    </el-col> -->
                 </el-row>
+                <div class="change-ques">
+                    <el-button icon="el-icon-refresh" size="mini" round>换一批</el-button>
+                </div>
             </div>
             <!-- Ai回复内容 -->
             <div class="content" ref="wrapper" @scroll="handleScroll" v-loading="dataLoading" v-if="show">
@@ -653,6 +682,12 @@ export default {
             setTimer: true,
             isScrollLoadDataStatus: true,
             fileData: {},
+            questions: [
+                {id:1, que: "我爱我的国家, 帮我翻译成英文"},
+                {id:2, que: "帮我规划下假期旅游攻略"},
+                {id:3, que: "帮我写个小红书关于女生穿搭的文案"},
+                {id:4, que: "帮我画一个明星美女图片"},
+            ],
             modelAll: [
                 {
                     value: 'claude-2',
@@ -731,6 +766,10 @@ export default {
     
     methods: {
         createNewPage() {
+            if (this.showNewPage) {
+                Message.info("已是最新对话");
+                return;
+            }
             this.showNewPage = true;
             this.show = false;
             this.showhi = false;
@@ -1309,113 +1348,229 @@ export default {
                 this.getAllChatData();
             }
 
-            this.finished = true;
-            let id = (100000000 - 1) * Math.random() + 1;
-            let index = Math.random().toString(36).slice(-8);
-            this.show = true;
-            let modelIcon= "";
-            let newfile = "";
-
-            switch (this.selectedModel) {
-            case 'claude-2':
-                modelIcon = this.claudeIcon;
-                break;
-            case 'chatGPT':
-                modelIcon = this.chatGptIcon;
-                break;
-            case 'GPT-4':
-                modelIcon = this.gpt4;
-                break;
-            case 'chatGPT3.5':
-                modelIcon = this.chatGptIcon;
-                break;    
-            case 'ai-assistant':
-                modelIcon = this.assistantIcon;
-                break;
-            case 'bd':
-                modelIcon = this.wxIcon;
-                break;    
-            case 'xf':
-                modelIcon = this.xfIcon;
-                break;    
-            case 'qw':
-                modelIcon = this.qwIcon;
-                break;   
-            default:
-                modelIcon = this.defaultIcon;
-                break;
+            if (this.showNewPage) {
+                this.showNewPage = false;
+                this.show = true;
+                this.showhi = true;
             }
 
-            if (this.selectedModel == 'claude-2') {
-                newfile = this.claudeFile;
-            } else {
-                newfile = "";
-            }
+            setTimeout(() => {
+                this.finished = true;
+                let id = (100000000 - 1) * Math.random() + 1;
+                let index = Math.random().toString(36).slice(-8);
+                this.show = true;
+                let modelIcon= "";
+                let newfile = "";
 
-            let data = {
-                title: this.chatContent,
-                answer: "",
-                uuid: Math.floor(id),
-                name: this.id++,
-                index: index,
-                cursor: true,
-                date: this.getDate(),
-                timeShow: false,
-                cid: "",
-                pid: "",
-                icon: modelIcon,
-                content: "",
-                model: this.selectedModel,
-                file: newfile,
-            };
-
-            this.waitingData();
-            this.saveLatestId(data.uuid);
-            this.editableTabsValue = data.uuid;
-
-            store.commit("ADD_CHAT_CACHE", data);
-            this.jumpFooter();
-            this.chatTitleFormat();
-            if (typeof(WebSocket) === "undefined") {
-                Message.error("您的浏览器不支持socket")
-            } else {
-                // 实例化socket
                 switch (this.selectedModel) {
-                    case 'claude-2':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        break
-                    case 'chatGPT3.5':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        break
-                    case 'GPT-4':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        // this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        break
-                    case 'chatGPT':
-                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        break
-                    case 'bd':
-                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        break    
-                    case 'qw':
-                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        break
-                    case 'xf':
-                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        break    
+                case 'claude-2':
+                    modelIcon = this.claudeIcon;
+                    break;
+                case 'chatGPT':
+                    modelIcon = this.chatGptIcon;
+                    break;
+                case 'GPT-4':
+                    modelIcon = this.gpt4;
+                    break;
+                case 'chatGPT3.5':
+                    modelIcon = this.chatGptIcon;
+                    break;    
+                case 'ai-assistant':
+                    modelIcon = this.assistantIcon;
+                    break;
+                case 'bd':
+                    modelIcon = this.wxIcon;
+                    break;    
+                case 'xf':
+                    modelIcon = this.xfIcon;
+                    break;    
+                case 'qw':
+                    modelIcon = this.qwIcon;
+                    break;   
+                default:
+                    modelIcon = this.defaultIcon;
+                    break;
                 }
+
+                if (this.selectedModel == 'claude-2') {
+                    newfile = this.claudeFile;
+                } else {
+                    newfile = "";
+                }
+
+                let data = {
+                    title: this.chatContent,
+                    answer: "",
+                    uuid: Math.floor(id),
+                    name: this.id++,
+                    index: index,
+                    cursor: true,
+                    date: this.getDate(),
+                    timeShow: false,
+                    cid: "",
+                    pid: "",
+                    icon: modelIcon,
+                    content: "",
+                    model: this.selectedModel,
+                    file: newfile,
+                };
+
+                this.waitingData();
+                this.saveLatestId(data.uuid);
+                this.editableTabsValue = data.uuid;
+
+                store.commit("ADD_CHAT_CACHE", data);
+                this.jumpFooter();
+                this.chatTitleFormat();
+                if (typeof(WebSocket) === "undefined") {
+                    Message.error("您的浏览器不支持socket")
+                } else {
+                    // 实例化socket
+                    switch (this.selectedModel) {
+                        case 'claude-2':
+                            this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                            break
+                        case 'chatGPT3.5':
+                            this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                            break
+                        case 'GPT-4':
+                            this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                            // this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                            break
+                        case 'chatGPT':
+                            this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                            break
+                        case 'bd':
+                            this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                            break    
+                        case 'qw':
+                            this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                            break
+                        case 'xf':
+                            this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                            break    
+                    }
+                    
+                    this.socket = new WebSocket(this.wsUrl);
+                    // 监听socket连接
+                    this.socket.onopen = this.open;
+                    // 监听socket错误信息
+                    this.socket.onerror = this.error;
+                    // 监听socket消息
+                    this.socket.onmessage = this.getMessage;
+                    // 监听socket关闭消息
+                    this.socket.onclose = this.close;
+                    
+                }
+            }, 500)
+
+            // this.finished = true;
+            // let id = (100000000 - 1) * Math.random() + 1;
+            // let index = Math.random().toString(36).slice(-8);
+            // this.show = true;
+            // let modelIcon= "";
+            // let newfile = "";
+
+            // switch (this.selectedModel) {
+            // case 'claude-2':
+            //     modelIcon = this.claudeIcon;
+            //     break;
+            // case 'chatGPT':
+            //     modelIcon = this.chatGptIcon;
+            //     break;
+            // case 'GPT-4':
+            //     modelIcon = this.gpt4;
+            //     break;
+            // case 'chatGPT3.5':
+            //     modelIcon = this.chatGptIcon;
+            //     break;    
+            // case 'ai-assistant':
+            //     modelIcon = this.assistantIcon;
+            //     break;
+            // case 'bd':
+            //     modelIcon = this.wxIcon;
+            //     break;    
+            // case 'xf':
+            //     modelIcon = this.xfIcon;
+            //     break;    
+            // case 'qw':
+            //     modelIcon = this.qwIcon;
+            //     break;   
+            // default:
+            //     modelIcon = this.defaultIcon;
+            //     break;
+            // }
+
+            // if (this.selectedModel == 'claude-2') {
+            //     newfile = this.claudeFile;
+            // } else {
+            //     newfile = "";
+            // }
+
+            // let data = {
+            //     title: this.chatContent,
+            //     answer: "",
+            //     uuid: Math.floor(id),
+            //     name: this.id++,
+            //     index: index,
+            //     cursor: true,
+            //     date: this.getDate(),
+            //     timeShow: false,
+            //     cid: "",
+            //     pid: "",
+            //     icon: modelIcon,
+            //     content: "",
+            //     model: this.selectedModel,
+            //     file: newfile,
+            // };
+
+            // this.waitingData();
+            // this.saveLatestId(data.uuid);
+            // this.editableTabsValue = data.uuid;
+
+            // store.commit("ADD_CHAT_CACHE", data);
+            // this.jumpFooter();
+            // this.chatTitleFormat();
+            // if (typeof(WebSocket) === "undefined") {
+            //     Message.error("您的浏览器不支持socket")
+            // } else {
+            //     // 实例化socket
+            //     switch (this.selectedModel) {
+            //         case 'claude-2':
+            //             this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+            //             break
+            //         case 'chatGPT3.5':
+            //             this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+            //             break
+            //         case 'GPT-4':
+            //             this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+            //             // this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+            //             break
+            //         case 'chatGPT':
+            //             this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+            //             break
+            //         case 'bd':
+            //             this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+            //             break    
+            //         case 'qw':
+            //             this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+            //             break
+            //         case 'xf':
+            //             this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+            //             break    
+            //     }
                 
-                this.socket = new WebSocket(this.wsUrl);
-                // 监听socket连接
-                this.socket.onopen = this.open;
-                // 监听socket错误信息
-                this.socket.onerror = this.error;
-                // 监听socket消息
-                this.socket.onmessage = this.getMessage;
-                // 监听socket关闭消息
-                this.socket.onclose = this.close;
+            //     this.socket = new WebSocket(this.wsUrl);
+            //     // 监听socket连接
+            //     this.socket.onopen = this.open;
+            //     // 监听socket错误信息
+            //     this.socket.onerror = this.error;
+            //     // 监听socket消息
+            //     this.socket.onmessage = this.getMessage;
+            //     // 监听socket关闭消息
+            //     this.socket.onclose = this.close;
                 
-            }
+            // }
         },
         open () {
             console.log('-----------websocket连接成功------------')
@@ -1837,8 +1992,15 @@ export default {
         },
         // 锚点
         jump(id) {
-            location.hash = "#" + id;
-            document.getElementById(id).setAttribute("style", "color: #d9d04b;");
+            if (!this.show) {
+                this.showNewPage = false;
+                this.show = true;
+                this.showhi = true;
+            }
+            setTimeout(() => {
+                location.hash = "#" + id;
+                document.getElementById(id).setAttribute("style", "color: #d9d04b;"); 
+            }, 100)
         },
         refresh() {
             this.close();
