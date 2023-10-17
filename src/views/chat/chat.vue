@@ -968,6 +968,8 @@ export default {
         // 点击可选择页面加载数据
         async clickLoadChatData() {
             this.isScrollLoadDataStatus = true;
+            sessionStorage.setItem("ns", 1);
+            this.showNewPage = false;
             this.show = true;
             this.showhi = true;
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
@@ -1010,6 +1012,8 @@ export default {
             if (this.loadCount != totals) {
                 console.log('--------------滚动加载数据----------------');
                 this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
+                sessionStorage.setItem("ns", 1);
+                this.showNewPage = false;
                 this.setTimer = false;
                 this.scrollLoading = true;
                 this.pages.page += 1;
@@ -2054,6 +2058,14 @@ export default {
             this.$refs.dialog.style.left = `${newLeft}px`;  
             this.$refs.dialog.style.top = `${newTop}px`;  
         },
+        aiNewSesshow() {
+            let ns = sessionStorage.getItem("ns");
+            if (ns == 1) {
+                this.showNewPage = false;
+            } else {
+                this.showNewPage = true;
+            }
+        },
         callMethod() {},
     },
     filters: {
@@ -2088,6 +2100,7 @@ export default {
         this.getCurrentUser();
         this.checkisOpenScrollLoadData();
         this.mountTotalPages();
+        this.aiNewSesshow();
     },
 }
 </script>
