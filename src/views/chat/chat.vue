@@ -564,6 +564,7 @@ import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样�
 import MarkdownCodeBlock from './markdownBlock';
 import baseUrl from "../../utils/baseUrl";
 import { chatList, chatSave, getFileText, chatDel, downloadFile } from '../../api';
+import { v4 as uuidv4 } from 'uuid';
 
 
 // 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
@@ -683,8 +684,8 @@ export default {
             isScrollLoadDataStatus: true,
             fileData: {},
             questions: [
-                {id:1, que: "我爱我的国家, 帮我翻译成英文"},
-                {id:2, que: "帮我规划下假期旅游攻略"},
+                {id:1, que: "我爱我的国家, 帮我翻译成俄文"},
+                {id:2, que: "帮我规划下假期旅游攻略.........."},
                 {id:3, que: "帮我写个小红书关于女生穿搭的文案"},
                 {id:4, que: "帮我画一个明星美女图片"},
             ],
@@ -827,7 +828,7 @@ export default {
         },
         // 滚动加载数据开关状态
         checkisOpenScrollLoadData() {
-            let sds = window.sessionStorage.getItem('sds');
+            let sds = sessionStorage.getItem('sds');
             switch (sds) {
                 case '1':
                     this.isScrollLoadDataStatus = true;
@@ -969,13 +970,13 @@ export default {
         async clickLoadChatData() {
             this.isScrollLoadDataStatus = true;
             sessionStorage.setItem("ns", 1);
+            sessionStorage.setItem("sds", 1);
             this.showNewPage = false;
             this.show = true;
             this.showhi = true;
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
             let totals = parseInt(sessionStorage.getItem('totals'));
             this.pages.page = parseInt(sessionStorage.getItem('page'));
-            // if (this.loadCount != totals) {
             console.log('--------------点击加载数据----------------');
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
             this.setTimer = false;
@@ -997,9 +998,7 @@ export default {
             this.loadCount += respData.length;
             sessionStorage.setItem('loadCount', this.loadCount);
             sessionStorage.setItem('page', this.pages.page);
-            
             sessionStorage.setItem('totals', resp.data.totals);
-            // }
             this.chatTitleFormat();
             this.setTimer = true; // 必须等数据加载完才能让handleScroll继续监听滚动条
             this.scrollLoading = false;
@@ -1402,6 +1401,8 @@ export default {
                     newfile = "";
                 }
 
+                let child = [];
+
                 let data = {
                     title: this.chatContent,
                     answer: "",
@@ -1418,6 +1419,11 @@ export default {
                     model: this.selectedModel,
                     file: newfile,
                 };
+                
+                let sessData = {
+                    key: uuidv4(),
+                    child: child.push(data),
+                }
 
                 this.waitingData();
                 this.saveLatestId(data.uuid);
@@ -1427,7 +1433,7 @@ export default {
                 this.jumpFooter();
                 this.chatTitleFormat();
                 if (typeof(WebSocket) === "undefined") {
-                    Message.error("您的浏览器不支持socket")
+                    Message.error("您的浏览器不支持socket");
                 } else {
                     // 实例化socket
                     switch (this.selectedModel) {
