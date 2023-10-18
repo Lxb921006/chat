@@ -1357,6 +1357,12 @@ export default {
                 this.showhi = true;
             }
 
+            if (this.selectedModel == 'claude-2') {
+                newfile = this.claudeFile;
+            } else {
+                newfile = "";
+            }
+
             setTimeout(() => {
                 this.finished = true;
                 let id = (100000000 - 1) * Math.random() + 1;
@@ -1395,12 +1401,6 @@ export default {
                     break;
                 }
 
-                if (this.selectedModel == 'claude-2') {
-                    newfile = this.claudeFile;
-                } else {
-                    newfile = "";
-                }
-
                 let child = [];
                 let key = uuidv4();
                 let data = {
@@ -1418,14 +1418,13 @@ export default {
                     content: "",
                     model: this.selectedModel,
                     file: newfile,
-                    key: key
                 };
-                
-                let sessData = {
-                    key: key,
-                    child: child.push(data),
-                }
 
+                if (this.showNewPage) {
+                    data['child'] = [];
+                    data['key'] = key;
+                } 
+                
                 this.waitingData();
                 this.saveLatestId(data.uuid);
                 this.editableTabsValue = data.uuid;
@@ -1433,7 +1432,7 @@ export default {
                 store.commit("ADD_CHAT_CACHE", data);
                 this.jumpFooter();
                 this.chatTitleFormat();
-                
+
                 if (typeof(WebSocket) === "undefined") {
                     Message.error("您的浏览器不支持socket");
                 } else {
