@@ -1402,7 +1402,7 @@ export default {
                 }
 
                 let child = [];
-
+                let key = uuidv4();
                 let data = {
                     title: this.chatContent,
                     answer: "",
@@ -1418,10 +1418,11 @@ export default {
                     content: "",
                     model: this.selectedModel,
                     file: newfile,
+                    key: key
                 };
                 
                 let sessData = {
-                    key: uuidv4(),
+                    key: key,
                     child: child.push(data),
                 }
 
@@ -1432,6 +1433,7 @@ export default {
                 store.commit("ADD_CHAT_CACHE", data);
                 this.jumpFooter();
                 this.chatTitleFormat();
+                
                 if (typeof(WebSocket) === "undefined") {
                     Message.error("您的浏览器不支持socket");
                 } else {
@@ -1473,114 +1475,6 @@ export default {
                     
                 }
             }, 500)
-
-            // this.finished = true;
-            // let id = (100000000 - 1) * Math.random() + 1;
-            // let index = Math.random().toString(36).slice(-8);
-            // this.show = true;
-            // let modelIcon= "";
-            // let newfile = "";
-
-            // switch (this.selectedModel) {
-            // case 'claude-2':
-            //     modelIcon = this.claudeIcon;
-            //     break;
-            // case 'chatGPT':
-            //     modelIcon = this.chatGptIcon;
-            //     break;
-            // case 'GPT-4':
-            //     modelIcon = this.gpt4;
-            //     break;
-            // case 'chatGPT3.5':
-            //     modelIcon = this.chatGptIcon;
-            //     break;    
-            // case 'ai-assistant':
-            //     modelIcon = this.assistantIcon;
-            //     break;
-            // case 'bd':
-            //     modelIcon = this.wxIcon;
-            //     break;    
-            // case 'xf':
-            //     modelIcon = this.xfIcon;
-            //     break;    
-            // case 'qw':
-            //     modelIcon = this.qwIcon;
-            //     break;   
-            // default:
-            //     modelIcon = this.defaultIcon;
-            //     break;
-            // }
-
-            // if (this.selectedModel == 'claude-2') {
-            //     newfile = this.claudeFile;
-            // } else {
-            //     newfile = "";
-            // }
-
-            // let data = {
-            //     title: this.chatContent,
-            //     answer: "",
-            //     uuid: Math.floor(id),
-            //     name: this.id++,
-            //     index: index,
-            //     cursor: true,
-            //     date: this.getDate(),
-            //     timeShow: false,
-            //     cid: "",
-            //     pid: "",
-            //     icon: modelIcon,
-            //     content: "",
-            //     model: this.selectedModel,
-            //     file: newfile,
-            // };
-
-            // this.waitingData();
-            // this.saveLatestId(data.uuid);
-            // this.editableTabsValue = data.uuid;
-
-            // store.commit("ADD_CHAT_CACHE", data);
-            // this.jumpFooter();
-            // this.chatTitleFormat();
-            // if (typeof(WebSocket) === "undefined") {
-            //     Message.error("您的浏览器不支持socket")
-            // } else {
-            //     // 实例化socket
-            //     switch (this.selectedModel) {
-            //         case 'claude-2':
-            //             this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-            //             break
-            //         case 'chatGPT3.5':
-            //             this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-            //             break
-            //         case 'GPT-4':
-            //             this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-            //             // this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-            //             break
-            //         case 'chatGPT':
-            //             this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-            //             break
-            //         case 'bd':
-            //             this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-            //             break    
-            //         case 'qw':
-            //             this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-            //             break
-            //         case 'xf':
-            //             this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-            //             break    
-            //     }
-                
-            //     this.socket = new WebSocket(this.wsUrl);
-            //     // 监听socket连接
-            //     this.socket.onopen = this.open;
-            //     // 监听socket错误信息
-            //     this.socket.onerror = this.error;
-            //     // 监听socket消息
-            //     this.socket.onmessage = this.getMessage;
-            //     // 监听socket关闭消息
-            //     this.socket.onclose = this.close;
-                
-            // }
         },
         open () {
             console.log('-----------websocket连接成功------------')
