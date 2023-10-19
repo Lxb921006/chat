@@ -617,7 +617,8 @@ export default {
     },
     data()  {
         return {
-            selectKey: "",
+            isOpenNewSess: false,
+            selectedSess: "",
             showNewPage: false,
             searchBk: "",
             selectPage: 1,
@@ -775,6 +776,7 @@ export default {
             this.showNewPage = true;
             this.show = false;
             this.showhi = false;
+            this.isOpenNewSess = true;
         },
         handleRemove(file, fileList) {
             this.isOpenSwitch = true;
@@ -1420,11 +1422,6 @@ export default {
                     file: newfile,
                 };
 
-                if (this.showNewPage) {
-                    data['child'] = [];
-                    data['parent'] = uuidv4();
-                } 
-                
                 this.waitingData();
                 this.saveLatestId(data.uuid);
                 this.editableTabsValue = data.uuid;
