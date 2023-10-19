@@ -617,6 +617,7 @@ export default {
     },
     data()  {
         return {
+            selectKey: "",
             showNewPage: false,
             searchBk: "",
             selectPage: 1,
@@ -1357,12 +1358,6 @@ export default {
                 this.showhi = true;
             }
 
-            if (this.selectedModel == 'claude-2') {
-                newfile = this.claudeFile;
-            } else {
-                newfile = "";
-            }
-
             setTimeout(() => {
                 this.finished = true;
                 let id = (100000000 - 1) * Math.random() + 1;
@@ -1370,6 +1365,13 @@ export default {
                 this.show = true;
                 let modelIcon= "";
                 let newfile = "";
+
+                if (this.selectedModel == 'claude-2') {
+                    newfile = this.claudeFile;
+                } else {
+                    newfile = "";
+                }
+
 
                 switch (this.selectedModel) {
                 case 'claude-2':
@@ -1401,8 +1403,6 @@ export default {
                     break;
                 }
 
-                let child = [];
-                let key = uuidv4();
                 let data = {
                     title: this.chatContent,
                     answer: "",
@@ -1422,7 +1422,7 @@ export default {
 
                 if (this.showNewPage) {
                     data['child'] = [];
-                    data['key'] = key;
+                    data['parent'] = uuidv4();
                 } 
                 
                 this.waitingData();
@@ -1517,12 +1517,11 @@ export default {
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].uuid == this.editableTabsValue) {
-                    // this.chatCache[i].answer.push(jd.data);
                     this.chatCache[i].answer += jd.data;
                     this.chatCache[i].cid = jd.cid;
                     this.chatCache[i].pid = jd.pid;
                     this.chatCache[i].content = jd.content;
-                } 
+                }
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
             this.getContentLen();
