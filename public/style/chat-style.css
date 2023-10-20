@@ -941,7 +941,7 @@ ol > li {
 }
 .add-new-sess .el-row {
     width: 800px;
-    margin: 330px auto!important;
+    margin: 133px auto!important;
 }
 .el-card {
     border-radius: 4px;
@@ -957,7 +957,7 @@ ol > li {
 }
 .intru-content {
     position: relative;
-    top: 310px;
+    top: 110px;
 }
 .intru-tt {
     color: #fff;
@@ -973,5 +973,5 @@ ol > li {
 }
 .change-ques {
     position: relative;
-    bottom: 290px;
+    bottom: 108px;
 }

@@ -91,33 +91,11 @@
                     <p class="intru-pp">可以试试如下提问:</p>
                 </div>
                 <el-row :gutter="20">
-                    <!-- <template> -->
                     <el-col :span="6" v-for="item in questions" :key="item.id">
                         <el-card>
                             {{ item.que }}
                         </el-card>
                     </el-col>
-                    <!-- </template> -->
-                    <!-- <el-col :span="6">
-                        <el-card>
-                            我爱我的国家, 帮我翻译成英文
-                        </el-card>
-                    </el-col>
-                    <el-col :span="6">
-                        <el-card>
-                            帮我规划下假期旅游攻略
-                        </el-card>
-                    </el-col>
-                    <el-col :span="6">
-                        <el-card>
-                            帮我写个小红书关于女生穿搭的文案
-                        </el-card>
-                    </el-col>
-                    <el-col :span="6">
-                        <el-card>
-                            帮我画一个明星美女图片
-                        </el-card>
-                    </el-col> -->
                 </el-row>
                 <div class="change-ques">
                     <el-button icon="el-icon-refresh" size="mini" round>换一批</el-button>
@@ -764,10 +742,32 @@ export default {
     },
     components: {
         MarkdownCodeBlock,
-        // MarkdownTitle,
     },
-    
     methods: {
+        getSelectSessKey() {
+            let key = sessionStorage.getItem('recordSelectSessKey');
+            if (key) {
+                this.selectedSess = key;
+            }
+        },
+        recordSelectSessKey(key) {
+            sessionStorage.setItem('recordSelectSessKey', key);
+        },
+        dafaultIsOpenNewSess() {
+            let d = sessionStorage.getItem("isOpenNewSess");
+            switch (d) {
+                case '1':
+                    this.isOpenNewSess = true;
+                    break;
+                case '2':
+                    this.isOpenNewSess = false;
+                    break;
+                default:
+                    this.isOpenNewSess = true;
+                    sessionStorage.setItem("isOpenNewSess", 1);
+                    break;
+            }       
+        },
         createNewPage() {
             if (this.showNewPage) {
                 Message.info("已是最新对话");
@@ -777,6 +777,8 @@ export default {
             this.show = false;
             this.showhi = false;
             this.isOpenNewSess = true;
+            sessionStorage.setItem("isOpenNewSess", 1);
+            sessionStorage.setItem("ns", 2);
         },
         handleRemove(file, fileList) {
             this.isOpenSwitch = true;
@@ -1358,6 +1360,7 @@ export default {
                 this.showNewPage = false;
                 this.show = true;
                 this.showhi = true;
+                sessionStorage.setItem("ns", 1);
             }
 
             setTimeout(() => {
@@ -1373,7 +1376,6 @@ export default {
                 } else {
                     newfile = "";
                 }
-
 
                 switch (this.selectedModel) {
                 case 'claude-2':
@@ -1404,7 +1406,8 @@ export default {
                     modelIcon = this.defaultIcon;
                     break;
                 }
-
+                
+                let key = uuidv4();
                 let data = {
                     title: this.chatContent,
                     answer: "",
@@ -1420,11 +1423,28 @@ export default {
                     content: "",
                     model: this.selectedModel,
                     file: newfile,
+                    key: key,
+                    isParent: "",
                 };
+                
+                let new_data = {}
 
+                if (this.isOpenNewSess) {
+                    new_data['child'] = [];
+                    new_data['child'].push(data);
+                    new_data['key'] = key;
+                    data['isParent'] = 1;
+                    this.selectedSess = key;
+                    this.recordSelectSessKey(this.selectedSess);
+                } else {
+                    this.addConPdSess(data)
+                }
+                
                 this.waitingData();
                 this.saveLatestId(data.uuid);
                 this.editableTabsValue = data.uuid;
+                this.isOpenNewSess = false;
+                sessionStorage.setItem("isOpenNewSess", 2);
 
                 store.commit("ADD_CHAT_CACHE", data);
                 this.jumpFooter();
@@ -1471,6 +1491,13 @@ export default {
                     
                 }
             }, 500)
+        },
+        addConPdSess(data) {
+            for (let i = 0; i < this.chatCache.length; i++) {
+                if (this.chatCache[i].key == this.selectedSess) {
+                    this.chatCache[i].child.push(data);
+                }
+            }
         },
         open () {
             console.log('-----------websocket连接成功------------')
@@ -1895,7 +1922,9 @@ export default {
                 this.showNewPage = false;
                 this.show = true;
                 this.showhi = true;
+                sessionStorage.setItem("ns", 1);
             }
+            this.selectedSess = id;
             setTimeout(() => {
                 location.hash = "#" + id;
                 document.getElementById(id).setAttribute("style", "color: #d9d04b;"); 
@@ -1959,6 +1988,8 @@ export default {
                 this.showNewPage = false;
             } else {
                 this.showNewPage = true;
+                this.show = false;
+                this.shiwhi = false;
             }
         },
         callMethod() {},
@@ -1996,6 +2027,7 @@ export default {
         this.checkisOpenScrollLoadData();
         this.mountTotalPages();
         this.aiNewSesshow();
+        this.dafaultIsOpenNewSess();
     },
 }
 </script>
