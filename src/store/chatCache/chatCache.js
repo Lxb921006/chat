@@ -38,8 +38,11 @@ const chatCache = {
         let chatData = sessionStorage.getItem("chatCache");
         let fcd = JSON.parse(chatData);
         for (let i = 0;i < fcd.length; i++) {
-            if (fcd[i].uuid == data.uuid) {
-                let lfcd = fcd[i];
+          if (data['key'] == fcd[i].key) {
+            let child = fcd[i].child;
+            for (let k = 0; k < child.length; k++) {
+              if (child[i].uuid == child.uuid) {
+                let lfcd = child[i];
                 lfcd['answer'] = data['answer'];
                 lfcd['cursor'] = false;
                 lfcd['timeShow'] = true;
@@ -49,8 +52,25 @@ const chatCache = {
                 lfcd['date'] = data['date'];
                 lfcd['file'] = data['file'];
                 break
+              }
             }
-        }
+          }
+          
+      }
+        // for (let i = 0;i < fcd.length; i++) {
+        //     if (fcd[i].uuid == data.uuid) {
+        //         let lfcd = fcd[i];
+        //         lfcd['answer'] = data['answer'];
+        //         lfcd['cursor'] = false;
+        //         lfcd['timeShow'] = true;
+        //         lfcd['pid'] = data['pid'];
+        //         lfcd['cid'] = data['cid'];
+        //         lfcd['content'] = data['content'];
+        //         lfcd['date'] = data['date'];
+        //         lfcd['file'] = data['file'];
+        //         break
+        //     }
+        // }
         state.editableTabs = fcd;
         let jd = JSON.stringify(fcd);
         sessionStorage.setItem("chatCache", jd);

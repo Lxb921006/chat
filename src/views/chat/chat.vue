@@ -1446,7 +1446,7 @@ export default {
                 this.isOpenNewSess = false;
                 sessionStorage.setItem("isOpenNewSess", 2);
 
-                store.commit("ADD_CHAT_CACHE", data);
+                store.commit("ADD_CHAT_CACHE", new_data);
                 this.jumpFooter();
                 this.chatTitleFormat();
 
@@ -1540,12 +1540,24 @@ export default {
             let jd = JSON.parse(msg.data);
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
-                if (this.chatCache[i].uuid == this.editableTabsValue) {
-                    this.chatCache[i].answer += jd.data;
-                    this.chatCache[i].cid = jd.cid;
-                    this.chatCache[i].pid = jd.pid;
-                    this.chatCache[i].content = jd.content;
+                if (this.chatCache[i].key == this.selectedSess) {
+                    let child = this.chatCache[i].child;
+                    for (let k = 0; k < child.length; k++) {
+                        if (child[i].uuid == this.editableTabsValue) {
+                            child[i].answer += jd.data;
+                            child[i].cid = jd.cid;
+                            child[i].pid = jd.pid;
+                            child[i].content = jd.content;
+                        }
+                    }
                 }
+                
+                // if (this.chatCache[i].uuid == this.editableTabsValue) {
+                //     this.chatCache[i].answer += jd.data;
+                //     this.chatCache[i].cid = jd.cid;
+                //     this.chatCache[i].pid = jd.pid;
+                //     this.chatCache[i].content = jd.content;
+                // }
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
             this.getContentLen();
@@ -1557,27 +1569,54 @@ export default {
             let answer = "";
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
-                if (this.chatCache[i].uuid == this.editableTabsValue) {
-                    if (this.chatCache[i].answer.length == 0) {
-                        answer = '抱歉, 网络不佳, ai回复失败, 请重新提问';
-                    } else {
-                        answer = this.chatCache[i].answer;
+                if (this.chatCache[i].key == this.selectedSess) {
+                    let child = this.chatCache[i].child;
+                    for (let k = 0; k < child.length; k++) {
+                        if (child[i].uuid == this.editableTabsValue) {
+                            if (child[i].answer.length == 0) {
+                                answer = '抱歉, 网络不佳, ai回复失败, 请重新提问';
+                            } else {
+                                answer = child[i].answer;
+                            }
+                            let data = {
+                                key: this.selectedSess,
+                                uuid: child[i].uuid, 
+                                answer: answer.replace(/ppt正在制作中.../g, 'ppt制作完成'), 
+                                date: this.getDate(), 
+                                timeShow: true,
+                                content: child[i].content,
+                                cid: child[i].cid,
+                                pid: child[i].pid,
+                                cursor: false,
+                                file: this.claudeFile,
+                            }
+                            
+                            store.commit("SAVE_CHAT_CACHE_ANSWER", data);
+                            break
+                        }
                     }
+                }
+                // if (this.chatCache[i].uuid == this.editableTabsValue) {
+                //     if (this.chatCache[i].answer.length == 0) {
+                //         answer = '抱歉, 网络不佳, ai回复失败, 请重新提问';
+                //     } else {
+                //         answer = this.chatCache[i].answer;
+                //     }
 
-                    let data = {
-                        uuid: this.chatCache[i].uuid, 
-                        answer: answer.replace(/ppt正在制作中.../g, 'ppt制作完成'), 
-                        date: this.getDate(), 
-                        timeShow: true,
-                        content: this.chatCache[i].content,
-                        cid: this.chatCache[i].cid,
-                        pid: this.chatCache[i].pid,
-                        cursor: false,
-                        file: this.claudeFile,
-                    }
-                    store.commit("SAVE_CHAT_CACHE_ANSWER", data);
-                    break
-                } 
+                //     let data = {
+                //         uuid: this.chatCache[i].uuid, 
+                //         answer: answer.replace(/ppt正在制作中.../g, 'ppt制作完成'), 
+                //         date: this.getDate(), 
+                //         timeShow: true,
+                //         content: this.chatCache[i].content,
+                //         cid: this.chatCache[i].cid,
+                //         pid: this.chatCache[i].pid,
+                //         cursor: false,
+                //         file: this.claudeFile,
+                //     }
+                //     store.commit("SAVE_CHAT_CACHE_ANSWER", data);
+                //     break
+                // } 
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
             this.claudeFile = "";
