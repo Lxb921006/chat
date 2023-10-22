@@ -41,14 +41,14 @@ const chatCache = {
           if (data['key'] == fcd[i].key) {
             let child = fcd[i].child;
             for (let k = 0; k < child.length; k++) {
-              if (child[i].uuid == child.uuid) {
-                let lfcd = child[i];
+              if (child[k].uuid == data['uuid']) {
+                let lfcd = child[k];
                 lfcd['answer'] = data['answer'];
                 lfcd['cursor'] = false;
                 lfcd['timeShow'] = true;
                 lfcd['pid'] = data['pid'];
                 lfcd['cid'] = data['cid'];
-                lfcd['content'] = data['content'];
+                lfcd['content'] = data['content']; 
                 lfcd['date'] = data['date'];
                 lfcd['file'] = data['file'];
                 break

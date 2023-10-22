@@ -26,7 +26,7 @@
                     active-text-color="#ffd04b"
                 >
                 <transition-group name="zoom" tag="ul">
-                    <el-menu-item :index=data.index v-for="data in chatCache" :key="data.index" @click="jump(data.uuid)" v-show="true">
+                    <el-menu-item :index=data.index v-for="data in chatCache" :key="data.key" @click="jump(data)" v-show="true">
                         <i class="el-icon-delete delete" @click="removeChat(data.uuid)"></i>
                         <span slot="title" class="cache-title">
                             <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT'">
@@ -53,7 +53,7 @@
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'qw'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
-                            {{ data.title }}
+                            {{ data.key }}
                         </span>
                     </el-menu-item>
                 </transition-group>
@@ -110,55 +110,59 @@
                 </transition>
                 <transition-group name="el-zoom-in-center">
                     <template v-if="show">
-                        <div v-for="(data1, index1) in chatCache" :key="index1+1" class="z-content">
-                            <!-- Ai模型 -->
-                            <transition name="el-zoom-in-top">
-                                <div class="platform">
-                                    <p>
-                                        <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
-                                    </p>
-                                </div>
-                            </transition>
-                            <!-- 标题 -->
-                            <h2 class="answer-title" :id=data1.uuid>
-                                <p class="question" ref="title">
-                                    <svg class="icon-qa" aria-hidden="true">
-                                        <use xlink:href="#icon-changjianwenti"></use>
-                                    </svg>
-                                    {{ data1.title }}  <el-link :underline="false" v-if="data1.file" @click="getFileText(data1.file)">{{ data1.file }}</el-link>
-                                    <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
-                                </p>
-                            </h2>
-                            <!-- 回复内容 -->
-                            <div class="answer-loop">
-                                <div class="answer-icon" :style="{ visibility: data1.answer.length > 0 ? 'visible' : 'hidden' }">
-                                    <svg class="icon-qa-2" aria-hidden="true">
-                                        <use xlink:href="#icon-cankaodaan"></use>
-                                    </svg>
-                                </div>
-                                <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
-                                <markdown-code-block :code="data1.answer" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
-                                <!-- 等待ai回复时的提示 -->
-                                <span class="cursor" id="loading" v-else>waiting{{ dots }}</span>
-                                <!-- 对话完成时间 -->
-                                <transition name="el-zoom-in-center">
-                                    <div class="finished-time" v-show="data1.timeShow">
-                                        <i class="el-icon-time time-2">{{ data1.date }}</i>
-                                        <div class="whole-answer">
-                                            <el-dropdown>
-                                                <span class="el-dropdown-link">
-                                                    <svg class="icon" aria-hidden="true">
-                                                        <use xlink:href="#icon-shenglvehao"></use>
-                                                    </svg>
-                                                </span>
-                                                <el-dropdown-menu slot="dropdown">
-                                                    <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer)">复制整个对话</el-dropdown-item>
-                                                    <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.uuid)">删改该对话</el-dropdown-item>
-                                                </el-dropdown-menu>
-                                            </el-dropdown>
+                        <div v-for="(data, index) in chatCache" :key="index+1" class="z-content">
+                            <div v-if="data.key == selectedSess">
+                                <div v-for="(data1, index1) in data.child" :key=index1+1>
+                                    <!-- Ai模型 -->
+                                    <transition name="el-zoom-in-top">
+                                        <div class="platform">
+                                            <p>
+                                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
+                                            </p>
                                         </div>
+                                    </transition>
+                                    <!-- 标题 -->
+                                    <h2 class="answer-title" :id=data1.uuid>
+                                        <p class="question" ref="title">
+                                            <svg class="icon-qa" aria-hidden="true">
+                                                <use xlink:href="#icon-changjianwenti"></use>
+                                            </svg>
+                                            {{ data1.title }}  <el-link :underline="false" v-if="data1.file" @click="getFileText(data1.file)">{{ data1.file }}</el-link>
+                                            <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
+                                        </p>
+                                    </h2>
+                                    <!-- 回复内容 -->
+                                    <div class="answer-loop">
+                                        <div class="answer-icon" :style="{ visibility: data1.answer.length > 0 ? 'visible' : 'hidden' }">
+                                            <svg class="icon-qa-2" aria-hidden="true">
+                                                <use xlink:href="#icon-cankaodaan"></use>
+                                            </svg>
+                                        </div>
+                                        <!-- 自定义的代码语言自动识别以及高亮显示组件 -->
+                                        <markdown-code-block :code="data1.answer" :cursor="data1.cursor" v-if="data1.answer.length > 0"></markdown-code-block>
+                                        <!-- 等待ai回复时的提示 -->
+                                        <span class="cursor" id="loading" v-else>waiting{{ dots }}</span>
+                                        <!-- 对话完成时间 -->
+                                        <transition name="el-zoom-in-center">
+                                            <div class="finished-time" v-show="data1.timeShow">
+                                                <i class="el-icon-time time-2">{{ data1.date }}</i>
+                                                <div class="whole-answer">
+                                                    <el-dropdown>
+                                                        <span class="el-dropdown-link">
+                                                            <svg class="icon" aria-hidden="true">
+                                                                <use xlink:href="#icon-shenglvehao"></use>
+                                                            </svg>
+                                                        </span>
+                                                        <el-dropdown-menu slot="dropdown">
+                                                            <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer)">复制整个对话</el-dropdown-item>
+                                                            <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.uuid)">删改该对话</el-dropdown-item>
+                                                        </el-dropdown-menu>
+                                                    </el-dropdown>
+                                                </div>
+                                            </div>
+                                        </transition>
                                     </div>
-                                </transition>
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -750,8 +754,8 @@ export default {
                 this.selectedSess = key;
             }
         },
-        recordSelectSessKey(key) {
-            sessionStorage.setItem('recordSelectSessKey', key);
+        recordSelectSessKey() {
+            sessionStorage.setItem('recordSelectSessKey', this.selectedSess);
         },
         dafaultIsOpenNewSess() {
             let d = sessionStorage.getItem("isOpenNewSess");
@@ -779,6 +783,7 @@ export default {
             this.isOpenNewSess = true;
             sessionStorage.setItem("isOpenNewSess", 1);
             sessionStorage.setItem("ns", 2);
+            console.log(this.isOpenNewSess);
         },
         handleRemove(file, fileList) {
             this.isOpenSwitch = true;
@@ -1435,7 +1440,7 @@ export default {
                     new_data['key'] = key;
                     data['isParent'] = 1;
                     this.selectedSess = key;
-                    this.recordSelectSessKey(this.selectedSess);
+                    this.recordSelectSessKey();
                 } else {
                     this.addConPdSess(data)
                 }
@@ -1495,7 +1500,8 @@ export default {
         addConPdSess(data) {
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].key == this.selectedSess) {
-                    this.chatCache[i].child.push(data);
+                    let child = this.chatCache[i].child;
+                    child.push(data);
                 }
             }
         },
@@ -1543,11 +1549,11 @@ export default {
                 if (this.chatCache[i].key == this.selectedSess) {
                     let child = this.chatCache[i].child;
                     for (let k = 0; k < child.length; k++) {
-                        if (child[i].uuid == this.editableTabsValue) {
-                            child[i].answer += jd.data;
-                            child[i].cid = jd.cid;
-                            child[i].pid = jd.pid;
-                            child[i].content = jd.content;
+                        if (child[k].uuid == this.editableTabsValue) {
+                            child[k].answer += jd.data;
+                            child[k].cid = jd.cid;
+                            child[k].pid = jd.pid;
+                            child[k].content = jd.content;
                         }
                     }
                 }
@@ -1572,21 +1578,21 @@ export default {
                 if (this.chatCache[i].key == this.selectedSess) {
                     let child = this.chatCache[i].child;
                     for (let k = 0; k < child.length; k++) {
-                        if (child[i].uuid == this.editableTabsValue) {
-                            if (child[i].answer.length == 0) {
+                        if (child[k].uuid == this.editableTabsValue) {
+                            if (child[k].answer.length == 0) {
                                 answer = '抱歉, 网络不佳, ai回复失败, 请重新提问';
                             } else {
-                                answer = child[i].answer;
+                                answer = child[k].answer;
                             }
                             let data = {
                                 key: this.selectedSess,
-                                uuid: child[i].uuid, 
+                                uuid: child[k].uuid, 
                                 answer: answer.replace(/ppt正在制作中.../g, 'ppt制作完成'), 
                                 date: this.getDate(), 
                                 timeShow: true,
-                                content: child[i].content,
-                                cid: child[i].cid,
-                                pid: child[i].pid,
+                                content: child[k].content,
+                                cid: child[k].cid,
+                                pid: child[k].pid,
                                 cursor: false,
                                 file: this.claudeFile,
                             }
@@ -1626,7 +1632,7 @@ export default {
             this.socket = null;
             this.pptCreate = false;
             this.jumpFooter();
-            this.saveChatData();
+            // this.saveChatData();
             this.getChatList();
             this.chatTitleFormat();
             clearInterval(this.loadTimer);
@@ -1705,7 +1711,11 @@ export default {
             this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let xfData =  cacheData.filter(cd => cd.model == this.selectedModel);
+            let xfData =  cacheData.filter(cd => {
+                if (cd.key == this.selectedSess) {
+                    return cd.child;
+                }
+            });
             if (this.contextSwitch) {
                 if (xfData.length > 1) {
                     //发送的信息关联上下文
@@ -1956,18 +1966,19 @@ export default {
             Message.success(`【${rbChat[0].title}】已删除, 可在回收站恢复`);
         },
         // 锚点
-        jump(id) {
+        jump(data) {
             if (!this.show) {
                 this.showNewPage = false;
                 this.show = true;
                 this.showhi = true;
                 sessionStorage.setItem("ns", 1);
             }
-            this.selectedSess = id;
+            this.selectedSess = data.key;
+            this.recordSelectSessKey();
             setTimeout(() => {
-                location.hash = "#" + id;
-                document.getElementById(id).setAttribute("style", "color: #d9d04b;"); 
-            }, 100)
+                location.hash = "#" + data['child'][0].uuid;
+                document.getElementById(data['child'][0].uuid).setAttribute("style", "color: #d9d04b;"); 
+            }, 300)
         },
         refresh() {
             this.close();
@@ -2067,6 +2078,7 @@ export default {
         this.mountTotalPages();
         this.aiNewSesshow();
         this.dafaultIsOpenNewSess();
+        this.getSelectSessKey();
     },
 }
 </script>
