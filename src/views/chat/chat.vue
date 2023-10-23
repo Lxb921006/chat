@@ -26,8 +26,8 @@
                     active-text-color="#ffd04b"
                 >
                 <transition-group name="zoom" tag="ul">
-                    <el-menu-item :index=data.index v-for="data in chatCache" :key="data.key" @click="jump(data)" v-show="true">
-                        <i class="el-icon-delete delete" @click="removeChat(data.uuid)"></i>
+                    <el-menu-item :index=data.key v-for="data in chatCache" :key="data.key" @click="jump(data)" v-show="true">
+                        <i class="el-icon-delete delete" @click="removeChat(data)"></i>
                         <span slot="title" class="cache-title">
                             <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
@@ -53,7 +53,7 @@
                             <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'qw'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
-                            {{ data.key }}
+                            {{ data.title }}
                         </span>
                     </el-menu-item>
                 </transition-group>
@@ -783,7 +783,6 @@ export default {
             this.isOpenNewSess = true;
             sessionStorage.setItem("isOpenNewSess", 1);
             sessionStorage.setItem("ns", 2);
-            console.log(this.isOpenNewSess);
         },
         handleRemove(file, fileList) {
             this.isOpenSwitch = true;
@@ -1432,19 +1431,19 @@ export default {
                     isParent: "",
                 };
                 
-                let new_data = {}
-
+                let new_data = {};
                 if (this.isOpenNewSess) {
                     new_data['child'] = [];
                     new_data['child'].push(data);
                     new_data['key'] = key;
+                    new_data['title'] = this.chatContent;
                     data['isParent'] = 1;
                     this.selectedSess = key;
                     this.recordSelectSessKey();
                 } else {
-                    this.addConPdSess(data)
+                    new_data = this.addConPdSess(data)
                 }
-                
+
                 this.waitingData();
                 this.saveLatestId(data.uuid);
                 this.editableTabsValue = data.uuid;
@@ -1498,10 +1497,12 @@ export default {
             }, 500)
         },
         addConPdSess(data) {
-            for (let i = 0; i < this.chatCache.length; i++) {
-                if (this.chatCache[i].key == this.selectedSess) {
-                    let child = this.chatCache[i].child;
+            let add_data = this.chatCache;
+            for (let i = 0; i < add_data.length; i++) {
+                if (add_data[i].key == this.selectedSess) {
+                    let child = add_data[i].child;
                     child.push(data);
+                    return add_data[i];
                 }
             }
         },
@@ -1716,6 +1717,9 @@ export default {
                     return cd.child;
                 }
             });
+
+            console.log("xf >>> ", xfData);
+
             if (this.contextSwitch) {
                 if (xfData.length > 1) {
                     //发送的信息关联上下文
@@ -1977,7 +1981,7 @@ export default {
             this.recordSelectSessKey();
             setTimeout(() => {
                 location.hash = "#" + data['child'][0].uuid;
-                document.getElementById(data['child'][0].uuid).setAttribute("style", "color: #d9d04b;"); 
+                // document.getElementById(data['child'][0].uuid).setAttribute("style", "color: #d9d04b;"); 
             }, 300)
         },
         refresh() {
