@@ -1440,8 +1440,11 @@ export default {
                     data['isParent'] = 1;
                     this.selectedSess = key;
                     this.recordSelectSessKey();
+                    store.commit("ADD_CHAT_CACHE", new_data);
                 } else {
-                    new_data = this.addConPdSess(data)
+                    new_data = this.addConPdSess(data);
+                    console.log("new_data >>> ", new_data);
+                    store.commit("UPDATE_CHAT_CACHE", new_data);
                 }
 
                 this.waitingData();
@@ -1450,50 +1453,48 @@ export default {
                 this.isOpenNewSess = false;
                 sessionStorage.setItem("isOpenNewSess", 2);
 
-                store.commit("ADD_CHAT_CACHE", new_data);
                 this.jumpFooter();
                 this.chatTitleFormat();
 
                 if (typeof(WebSocket) === "undefined") {
                     Message.error("您的浏览器不支持socket");
-                } else {
-                    // 实例化socket
-                    switch (this.selectedModel) {
-                        case 'claude-2':
-                            this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                            break
-                        case 'chatGPT3.5':
-                            this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                            break
-                        case 'GPT-4':
-                            this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                            // this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                            break
-                        case 'chatGPT':
-                            this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                            break
-                        case 'bd':
-                            this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                            break    
-                        case 'qw':
-                            this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                            break
-                        case 'xf':
-                            this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                            break    
-                    }
-                    
-                    this.socket = new WebSocket(this.wsUrl);
-                    // 监听socket连接
-                    this.socket.onopen = this.open;
-                    // 监听socket错误信息
-                    this.socket.onerror = this.error;
-                    // 监听socket消息
-                    this.socket.onmessage = this.getMessage;
-                    // 监听socket关闭消息
-                    this.socket.onclose = this.close;
-                    
+                    return;
+                } 
+                // 实例化socket
+                switch (this.selectedModel) {
+                    case 'claude-2':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'chatGPT3.5':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'GPT-4':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        // this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'chatGPT':
+                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'bd':
+                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break    
+                    case 'qw':
+                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break
+                    case 'xf':
+                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break    
                 }
+                
+                this.socket = new WebSocket(this.wsUrl);
+                // 监听socket连接
+                this.socket.onopen = this.open;
+                // 监听socket错误信息
+                this.socket.onerror = this.error;
+                // 监听socket消息
+                this.socket.onmessage = this.getMessage;
+                // 监听socket关闭消息
+                this.socket.onclose = this.close;
             }, 500)
         },
         addConPdSess(data) {

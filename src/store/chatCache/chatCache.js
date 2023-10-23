@@ -16,6 +16,20 @@ const chatCache = {
       state.editableTabs.push(data);
       sessionStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
     },
+    UPDATE_CHAT_CACHE(state, data){
+      // 原始
+      let chatData = sessionStorage.getItem("chatCache");
+      let fcd = JSON.parse(chatData);
+      for (let i = 0;i < fcd.length; i++) {
+        if (data['key'] == fcd[i].key) {
+          fcd[i].child = data.child;
+          break
+        }
+      }
+      state.editableTabs = fcd;
+      let jd = JSON.stringify(fcd);
+      sessionStorage.setItem("chatCache", jd);
+    },
     REMOVE_CHAT_CACHE(state, data) {
       state.editableTabs = data;
       sessionStorage.setItem("chatCache", JSON.stringify(data));
