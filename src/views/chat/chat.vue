@@ -24,10 +24,11 @@
                     background-color="rgb(21, 24, 21)"
                     text-color="#fff"
                     active-text-color="#ffd04b"
+                    :default-active="selectedSess"
                 >
                 <transition-group name="zoom" tag="ul">
                     <el-menu-item :index=data.key v-for="data in chatCache" :key="data.key" @click="jump(data)" v-show="true">
-                        <i class="el-icon-delete delete" @click="removeChat(data)"></i>
+                        <i class="el-icon-delete delete" @click="removeChatParent(data.key)"></i>
                         <span slot="title" class="cache-title">
                             <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT'">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
@@ -111,8 +112,8 @@
                 <transition-group name="el-zoom-in-center">
                     <template v-if="show">
                         <div v-for="(data, index) in chatCache" :key="index+1" class="z-content">
-                            <div v-if="data.key == selectedSess">
-                                <div v-for="(data1, index1) in data.child" :key=index1+1>
+                            <div v-if="data.key == selectedSess" class="z-content-1">
+                                <div v-for="(data1, index1) in data.child" :key=index1+1 class="z-content-2">
                                     <!-- Ai模型 -->
                                     <transition name="el-zoom-in-top">
                                         <div class="platform">
@@ -262,7 +263,7 @@
                     </el-popover>
                 </div>
                 <!-- 回收站 -->
-                <div class="rb">
+                <!-- <div class="rb">
                     <el-popover
                         placement="right"
                         width="400"
@@ -310,7 +311,7 @@
                             </svg>
                         </el-button>
                     </el-popover>
-                </div>
+                </div> -->
                 <!-- 用户管理 -->
                 <div class="user rb">
                     <el-popover
@@ -757,6 +758,12 @@ export default {
         recordSelectSessKey() {
             sessionStorage.setItem('recordSelectSessKey', this.selectedSess);
         },
+        recordIsOpenNewSess(data) {
+            let d = sessionStorage.getItem("isOpenNewSess");
+            if (d != data) {
+                sessionStorage.setItem("isOpenNewSess", data);
+            }
+        },
         dafaultIsOpenNewSess() {
             let d = sessionStorage.getItem("isOpenNewSess");
             switch (d) {
@@ -885,14 +892,14 @@ export default {
             const idMap = new Map();
             const mergedArray = [];
             for (const item of arr1) {
-                if (!idMap.has(item.uuid)) {
-                idMap.set(item.uuid, true);
+                if (!idMap.has(item.key)) {
+                idMap.set(item.key, true);
                 mergedArray.push(item);
                 }
             }
             for (const item of arr2) {
-                if (!idMap.has(item.uuid)) {
-                idMap.set(item.uuid, true);
+                if (!idMap.has(item.key)) {
+                idMap.set(item.key, true);
                 mergedArray.push(item);
                 }
             }
@@ -1079,7 +1086,6 @@ export default {
             if (resp.data.status == 666) {
                 store.commit("Z_REMOVE_ALL_CHAT_CACHE", "clear");
             }
-            
         },
         // 回收站恢复数据
         restoreChat(data) {
@@ -1257,10 +1263,10 @@ export default {
         // 所有聊天记录
         getAllChatData () {
             this.setTimer = true;
-            if (sessionStorage.getItem("chatCache")) {
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            if (cacheData) {
                 store.commit("CLEAR_CHAT_CACHE");
                 this.show = true;
-                let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
                 for (let i = 0; i < cacheData.length; i++) {
                     store.commit("ADD_CHAT_CACHE", cacheData[i]);
                 }
@@ -1428,7 +1434,7 @@ export default {
                     model: this.selectedModel,
                     file: newfile,
                     key: key,
-                    isParent: "",
+                    isParent: 2,
                 };
                 
                 let new_data = {};
@@ -1437,13 +1443,14 @@ export default {
                     new_data['child'].push(data);
                     new_data['key'] = key;
                     new_data['title'] = this.chatContent;
+                    new_data['model'] = this.selectedModel;
+                    new_data['icon'] = modelIcon;
                     data['isParent'] = 1;
                     this.selectedSess = key;
                     this.recordSelectSessKey();
                     store.commit("ADD_CHAT_CACHE", new_data);
                 } else {
                     new_data = this.addConPdSess(data);
-                    console.log("new_data >>> ", new_data);
                     store.commit("UPDATE_CHAT_CACHE", new_data);
                 }
 
@@ -1451,8 +1458,7 @@ export default {
                 this.saveLatestId(data.uuid);
                 this.editableTabsValue = data.uuid;
                 this.isOpenNewSess = false;
-                sessionStorage.setItem("isOpenNewSess", 2);
-
+                this.recordIsOpenNewSess(2);
                 this.jumpFooter();
                 this.chatTitleFormat();
 
@@ -1495,13 +1501,14 @@ export default {
                 this.socket.onmessage = this.getMessage;
                 // 监听socket关闭消息
                 this.socket.onclose = this.close;
-            }, 500)
+            }, 100)
         },
         addConPdSess(data) {
             let add_data = this.chatCache;
             for (let i = 0; i < add_data.length; i++) {
                 if (add_data[i].key == this.selectedSess) {
                     let child = add_data[i].child;
+                    data['key'] = this.selectedSess;
                     child.push(data);
                     return add_data[i];
                 }
@@ -1643,7 +1650,14 @@ export default {
         async saveChatData() {
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            lastData = cacheData[cacheData.length - 1];
+            for (let i = 0; i < cacheData.length; i++) {
+                if (cacheData[i].key == this.selectedSess) {
+                    let child = cacheData[i].child;
+                    lastData = child[child.length - 1];
+                    break;
+                }
+            }
+            // lastData = cacheData[cacheData.length - 1];
             // lastData['answer'] = JSON.stringify(lastData['answer']);
             let data = {data: JSON.stringify(lastData)};
             const resp = await chatSave(data, this.callMethod);
@@ -1657,7 +1671,12 @@ export default {
             let sendData = {};
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
+            let gptData =  cacheData.filter(cd => {
+                if (cd.key == this.selectedSess && cd.model == this.selectedModel) {
+                    return cd.child;
+                }
+            });
+
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
@@ -1692,7 +1711,12 @@ export default {
             let sendData = {};
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
+            let gptData =  cacheData.filter(cd => {
+                if (cd.key == this.selectedSess && cd.model == this.selectedModel) {
+                    return cd.child;
+                }
+            });
+
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
@@ -1714,7 +1738,7 @@ export default {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let xfData =  cacheData.filter(cd => {
-                if (cd.key == this.selectedSess) {
+                if (cd.key == this.selectedSess && cd.model == this.selectedModel) {
                     return cd.child;
                 }
             });
@@ -1760,7 +1784,11 @@ export default {
             this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
+            let gptData =  cacheData.filter(cd => {
+                if (cd.key == this.selectedSess && cd.model == this.selectedModel) {
+                    return cd.child;
+                }
+            });
             let id = (100000000 - 1) * Math.random() + 1;
             let uuid = Math.floor(id);
             let file = this.pptCreate ? uuid+'.pptx': '';
@@ -1776,27 +1804,6 @@ export default {
                 sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
             }
             console.log(sendData);
-            this.socket.send(JSON.stringify(sendData));
-            this.jumpFooter();
-        },
-        // chatgpt
-        sendChatGpt() {
-            this.claudeFile = "";
-            let sendData = {};
-            let lastData = [];
-            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == 'chatGPT');
-            if (this.contextSwitch) {
-                if (gptData.length > 1) {
-                    //发送的信息关联上下文
-                    lastData = gptData[gptData.length - 2];
-                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, systemSet: this.dnSwitch ? 'open' : ''};
-                } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, systemSet: this.dnSwitch ? 'open' : ''};
-                }
-            } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, systemSet: this.dnSwitch ? 'open' : ''};
-            }
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1938,37 +1945,111 @@ export default {
             //     },0);
             // }
         },
-        // 删除对话记录, 会现在回收站保存, 最多保留200条数据
-        removeChat(targetName) {
+        async removeChatParent(key) {
             this.getAllChatData();
-            let tabs = this.chatCache;
-            let rbChat = tabs.filter(tab => tab.uuid == targetName);
-            let activeName = this.editableTabsValue;
-            if (activeName == targetName) {
-                tabs.forEach((tab, index) => {
-                    if (tab.uuid == targetName) {
-                        let nextTab = tabs[index + 1] || tabs[index - 1];
-                        if (nextTab) {
-                            activeName = nextTab.uuid;
-                        }
+            let title = "";
+            
+            let sess = key;
+            for (let i = 0; i < this.chatCache.length; i++) {
+                if (this.chatCache[i].key == sess) {
+                    let nextTab = this.chatCache[i + 1] || this.chatCache[i - 1];
+                    if (nextTab) {
+                        sess = nextTab.key;
                     }
-                });
+                    break;
+                }
             }
             
-            this.editableTabsValue = activeName;
-            let newChat = tabs.filter(tab => tab.uuid != targetName);
-            store.commit("REMOVE_CHAT_CACHE", newChat);
-            this.getContentLen();
+            let new_data = this.chatCache.filter(tab => tab.key != key);
+            let del_data = this.chatCache.map(item => {return item.key == key ? item.child : []});
+            this.selectedSess = sess;
+            this.recordSelectSessKey();
+            store.commit("REMOVE_CHAT_CACHE", new_data);
 
-            if (this.rbData) {
-                this.rbData = "";
-                this.getAllRbData();
+            let uuids = del_data.map(uuid => uuid.uuid);
+            const resp = await this.chatDel(uuids);
+            if (resp.data.status == 666) {
+                Message.success('删除成功');
+            }
+            
+            if (this.chatCache.length == 0) {
+                this.createNewPage();
             }
 
-            store.commit("Z_ADD_CHAT_CACHE", rbChat[0]);
-            this.getContentLen();
 
-            Message.success(`【${rbChat[0].title}】已删除, 可在回收站恢复`);
+        },
+        // 删除对话记录, 会现在回收站保存, 最多保留200条数据
+        async removeChat(targetName) {
+            this.getAllChatData();
+            let title = "";
+            let del_data = [];
+            for (let i = 0; i < this.chatCache.length; i++) {
+                if (this.chatCache[i].key == this.selectedSess) {
+                    let child = this.chatCache[i].child;
+                    if (child.length > 1) {
+                        child = child.filter(tab => tab.uuid != targetName);
+                        this.chatCache[i].child = child;
+                        del_data = child.filter(tab => tab.uuid == targetName);
+                        store.commit("UPDATE_CHAT_CACHE", this.chatCache[i]);
+                    } else {
+                        let sess = this.selectedSess;
+                        for (let i = 0; i < this.chatCache.length; i++) {
+                            if (this.chatCache[i].key == sess) {
+                                let nextTab = this.chatCache[i + 1] || this.chatCache[i - 1];
+                                if (nextTab) {
+                                    sess = nextTab.key;
+                                }
+                                break;
+                            }
+                        }
+      
+                        let new_data = this.chatCache.filter(tab => tab.key != this.selectedSess);
+                        this.selectedSess = sess;
+                        this.recordSelectSessKey();
+                        store.commit("REMOVE_CHAT_CACHE", new_data);
+                    }
+                    break;
+                }
+            }
+
+            if (this.chatCache.length == 0) {
+                this.createNewPage();
+            }
+
+            let uuids = del_data.map(uuid => uuid.uuid);
+            const resp = await this.chatDel(uuids);
+            if (resp.data.status == 666) {
+                Message.success('删除成功');
+            }
+
+            // let tabs = this.chatCache;
+            // let rbChat = tabs.filter(tab => tab.uuid == targetName);
+            // let activeName = this.editableTabsValue;
+            // if (activeName == targetName) {
+            //     tabs.forEach((tab, index) => {
+            //         if (tab.uuid == targetName) {
+            //             let nextTab = tabs[index + 1] || tabs[index - 1];
+            //             if (nextTab) {
+            //                 activeName = nextTab.uuid;
+            //             }
+            //         }
+            //     });
+            // }
+            
+            // this.editableTabsValue = activeName;
+            // let newChat = tabs.filter(tab => tab.uuid != targetName);
+            // store.commit("REMOVE_CHAT_CACHE", newChat);
+            // this.getContentLen();
+
+            // if (this.rbData) {
+            //     this.rbData = "";
+            //     this.getAllRbData();
+            // }
+
+            // store.commit("Z_ADD_CHAT_CACHE", rbChat[0]);
+            // this.getContentLen();
+
+            // Message.success(`【${rbChat[0].title}】已删除, 可在回收站恢复`);
         },
         // 锚点
         jump(data) {
@@ -1980,10 +2061,11 @@ export default {
             }
             this.selectedSess = data.key;
             this.recordSelectSessKey();
-            setTimeout(() => {
-                location.hash = "#" + data['child'][0].uuid;
-                // document.getElementById(data['child'][0].uuid).setAttribute("style", "color: #d9d04b;"); 
-            }, 300)
+            this.recordIsOpenNewSess(2);
+            // setTimeout(() => {
+            //     location.hash = "#" + data['child'][0].uuid;
+            //     // document.getElementById(data['child'][0].uuid).setAttribute("style", "color: #d9d04b;"); 
+            // }, 100)
         },
         refresh() {
             this.close();

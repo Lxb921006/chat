@@ -17,7 +17,6 @@ const chatCache = {
       sessionStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
     },
     UPDATE_CHAT_CACHE(state, data){
-      // 原始
       let chatData = sessionStorage.getItem("chatCache");
       let fcd = JSON.parse(chatData);
       for (let i = 0;i < fcd.length; i++) {

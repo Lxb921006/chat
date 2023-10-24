@@ -975,3 +975,6 @@ ol > li {
     position: relative;
     bottom: 108px;
 }
+.z-content-1 .z-content-2 ~ .z-content-2 {
+    margin-top: 25px;
+}
