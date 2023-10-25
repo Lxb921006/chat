@@ -214,7 +214,7 @@
                                 </el-switch>
                             </el-col>
                         </el-row>
-                        <el-row :gutter="10" class="set-item set-item-1">
+                        <!-- <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="z-col-3 col-font">是否开启角色回复: </el-col>
                             <el-col :span="1" class="z-col-4">
                                 <el-tooltip content="只对chatGPT有效" placement="top">
@@ -226,7 +226,7 @@
                                     </el-switch>
                                 </el-tooltip>
                             </el-col>
-                        </el-row>
+                        </el-row> -->
                         <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="z-col-3 col-font">是否开启滚动加载: </el-col>
                             <el-col :span="1" class="z-col-4">
@@ -405,8 +405,8 @@
                         <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
                         <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <span v-if="dnSwitch">预设角色: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>预设角色: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <!-- <span v-if="dnSwitch">预设角色: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>预设角色: 【<span class="z-model-s-c">关闭</span>】; </span> -->
                         <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="pptCreate">ppt生成: 【<span class="z-model-s">开启</span>】; </span>
