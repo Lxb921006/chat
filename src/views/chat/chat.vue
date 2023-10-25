@@ -81,7 +81,7 @@
                 </div>
             </transition>
             <!-- 新建会话 -->
-            <div class="add-new-sess" v-if="showNewPage">
+            <div class="add-new-sess" v-show="showNewPage">
                 <div class="intru-content">
                     <h3 class="intru-tt">
                         <svg class="icon intru-ic" aria-hidden="true">
@@ -92,20 +92,20 @@
                     <p class="intru-pp">可以试试如下提问:</p>
                 </div>
                 <el-row :gutter="20">
-                    <el-col :span="6" v-for="item in questions" :key="item.id">
+                    <el-col :span="6" v-for="item in questions" :key="item.id" @click.native="wsInit(item.que)">
                         <el-card>
                             {{ item.que }}
                         </el-card>
                     </el-col>
                 </el-row>
                 <div class="change-ques">
-                    <el-button icon="el-icon-refresh" size="mini" round>换一批</el-button>
+                    <el-button icon="el-icon-refresh" size="mini" round @click="changeTitle()">换一批</el-button>
                 </div>
             </div>
             <!-- Ai回复 -->
-            <div class="content" ref="wrapper" @scroll="handleScroll" v-loading="dataLoading" v-if="show">
+            <div class="content" ref="wrapper" @scroll="handleScroll" v-loading="dataLoading" v-show="show">
                 <transition name="el-zoom-in-top">
-                    <div class="reach" v-if="showhi">
+                    <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
                     </div>
                 </transition>
@@ -618,11 +618,32 @@ export default {
             setTimer: true,
             isScrollLoadDataStatus: true,
             fileData: {},
+            repeatChange: 0,
             questions: [
                 {id:1, que: "我爱我的国家, 帮我翻译成俄文"},
-                {id:2, que: "帮我规划下假期旅游攻略.........."},
+                {id:2, que: "帮我规划下假期旅游攻略"},
                 {id:3, que: "帮我写个小红书关于女生穿搭的文案"},
                 {id:4, que: "帮我画一个明星美女图片"},
+            ],
+            all_questions: [
+                [
+                    {id:1, que: "我爱我的国家, 帮我翻译成俄文"},
+                    {id:2, que: "帮我规划下假期旅游攻略"},
+                    {id:3, que: "帮我写个小红书关于女生穿搭的文案"},
+                    {id:4, que: "帮我画一个明星美女图片"},
+                ],
+                [
+                    {id:1, que: "讲个超级冷的冷笑话",},
+                    {id:2, que: "帮我写个直播带货文案"},
+                    {id:3, que: "帮我写个关于啤酒的营销文案"},
+                    {id:4, que: "帮我写个详细的工作周报"},
+                ],
+                [
+                    {id:1, que: "写个脑筋急转弯并附上答案"},
+                    {id:2, que: "帮我写个关于销售的工作简历"},
+                    {id:3, que: "帮我写一封动人的情书"},
+                    {id:4, que: "帮我起个华丽的标题,主题为：衣服"},
+                ],
             ],
             modelAll: [
                 {
@@ -640,11 +661,6 @@ export default {
                     label: 'GPT-4',
                     disabled: false,
                 },
-                // {
-                //     value: 'chatGPT',
-                //     label: 'GPT-3',
-                //     disabled: false,
-                // },
                 {
                     value: 'xf',
                     label: '讯飞星火',
@@ -699,6 +715,17 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
+        changeTitle() {
+            let tc = this.all_questions.length;
+            if (this.repeatChange + 1 >= tc) {
+                this.repeatChange = 0;
+                this.questions = this.all_questions[this.repeatChange];
+            } else {
+                this.repeatChange += 1;
+                this.questions = this.all_questions[this.repeatChange];
+            }
+            
+        },
         getSelectSessKey() {
             let key = sessionStorage.getItem('recordSelectSessKey');
             if (key) {
@@ -934,10 +961,13 @@ export default {
         },
         defaultSess(data) {
             this.selectedSess = data.key;
+
         },
         // 点击可选择页面加载数据
         async clickLoadChatData() {
+            this.recordIsOpenNewSess(2);
             this.isScrollLoadDataStatus = true;
+            this.isOpenNewSess = false;
             sessionStorage.setItem("ns", 1);
             sessionStorage.setItem("sds", 1);
             this.showNewPage = false;
@@ -978,7 +1008,9 @@ export default {
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
             let totals = parseInt(sessionStorage.getItem('totals'));
             this.pages.page = parseInt(sessionStorage.getItem('page'));
+            this.isOpenNewSess = false;
             if (this.loadCount != totals) {
+                this.recordIsOpenNewSess(2);
                 console.log('--------------滚动加载数据----------------');
                 this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
                 sessionStorage.setItem("ns", 1);
@@ -1068,7 +1100,7 @@ export default {
                     this.selectedModel = 'qw';
                     break;
                 default:
-                    this.selectedModel = 'GPT-4';
+                    this.selectedModel = 'chatGPT3.5';
                     break;
             }
         },
@@ -1258,7 +1290,11 @@ export default {
             }
         },
         // 建立websocket连接
-        wsInit () {
+        wsInit (ai_text) {
+            if (ai_text) {
+                this.chatContent = ai_text;
+            }
+
             if (!this.chatContent.replace(/[\r\n\s]+/g, '')) {
                 this.chatContent = "";
                 Message.error("请输入对话内容.");
@@ -1271,9 +1307,9 @@ export default {
             }
 
             if (this.showNewPage) {
-                this.showNewPage = false;
                 this.show = true;
                 this.showhi = true;
+                this.showNewPage = false;
                 sessionStorage.setItem("ns", 1);
             }
 
@@ -1405,7 +1441,7 @@ export default {
                 this.socket.onmessage = this.getMessage;
                 // 监听socket关闭消息
                 this.socket.onclose = this.close;
-            }, 100)
+            }, 10)
         },
         addConPdSess(data) {
             let add_data = this.chatCache;
@@ -1938,6 +1974,7 @@ export default {
                 sessionStorage.setItem("ns", 1);
             }
             this.selectedSess = data.key;
+            this.isOpenNewSess = false;
             this.recordSelectSessKey();
             this.recordIsOpenNewSess(2);
             // setTimeout(() => {
