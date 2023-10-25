@@ -80,7 +80,7 @@
                     </svg>
                 </div>
             </transition>
-            <!-- 新建页面内容 -->
+            <!-- 新建会话 -->
             <div class="add-new-sess" v-if="showNewPage">
                 <div class="intru-content">
                     <h3 class="intru-tt">
@@ -102,15 +102,15 @@
                     <el-button icon="el-icon-refresh" size="mini" round>换一批</el-button>
                 </div>
             </div>
-            <!-- Ai回复内容 -->
+            <!-- Ai回复 -->
             <div class="content" ref="wrapper" @scroll="handleScroll" v-loading="dataLoading" v-if="show">
                 <transition name="el-zoom-in-top">
-                    <div class="reach" v-show="showhi">
+                    <div class="reach" v-if="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
                     </div>
                 </transition>
                 <transition-group name="el-zoom-in-center">
-                    <template v-if="show">
+                    <template>
                         <div v-for="(data, index) in chatCache" :key="index+1" class="z-content">
                             <div v-if="data.key == selectedSess" class="z-content-1">
                                 <div v-for="(data1, index1) in data.child" :key=index1+1 class="z-content-2">
@@ -262,56 +262,6 @@
                         </el-button>
                     </el-popover>
                 </div>
-                <!-- 回收站 -->
-                <!-- <div class="rb">
-                    <el-popover
-                        placement="right"
-                        width="400"
-                        trigger="click">
-                        <div class="z-rb-title">
-                            <h2>回收站</h2>
-                        </div>
-                        <el-row :gutter="20" class="z-rb-search">
-                            <el-col :span=10>
-                                <el-input v-model="rbData" size="mini" clearable @keyup.enter.native="getSearchRbData()" @clear="getAllRbData()"></el-input>
-                            </el-col>
-                        </el-row>
-                        <el-row :gutter="20" class="z-rb-clear">
-                            <el-col :span=10>
-                                <el-button type="danger" icon="el-icon-delete-solid" round size="mini" @click="clearRbData()">清空回收站</el-button>
-                            </el-col>
-                        </el-row>
-                        <el-table :data="chatRecycle" stripe height="166">
-                            <el-table-column type="selection" width="55"></el-table-column>
-                            <el-table-column width="150" property="title" show-overflow-tooltip label="title"></el-table-column>
-                            <el-table-column width="150" property="answer" show-overflow-tooltip label="答案">
-                                <template slot-scope="scope">
-                                    <el-link :underline="false">{{ scope.row.answer }}</el-link>
-                                </template>
-                            </el-table-column>
-                            <el-table-column property="model" label="模型"></el-table-column>
-                            <el-table-column prop="operate" label="操作" width="200">
-                                <template slot-scope="scope">
-                                    <el-button size="mini" @click="restoreChat(scope.row)" type="primary">
-                                        <svg class="icon z-rb-restore-icon" aria-hidden="true">
-                                            <use xlink:href="#icon-huifu2"></use>
-                                        </svg>恢复
-                                    </el-button>
-                                    <el-button size="mini" @click="removeRbData(scope.row)" type="danger">
-                                        <svg class="icon z-rb-restore-icon" aria-hidden="true">
-                                            <use xlink:href="#icon-shanchu2"></use>
-                                        </svg>删除
-                                    </el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <el-button slot="reference">
-                            <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-huishouzhan1"></use>
-                            </svg>
-                        </el-button>
-                    </el-popover>
-                </div> -->
                 <!-- 用户管理 -->
                 <div class="user rb">
                     <el-popover
@@ -982,6 +932,9 @@ export default {
                 this.totalPages = JSON.parse(tp);
             }
         },
+        defaultSess(data) {
+            this.selectedSess = data.key;
+        },
         // 点击可选择页面加载数据
         async clickLoadChatData() {
             this.isScrollLoadDataStatus = true;
@@ -1004,6 +957,7 @@ export default {
                 Message.error("没有数据可加载.");
                 return;
             }
+            this.defaultSess(respData[0]);
             this.totalPages = resp.data.total_pages;
             sessionStorage.setItem('totalPages', JSON.stringify(this.totalPages));
             let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
@@ -1034,6 +988,11 @@ export default {
                 this.pages.page += 1;
                 const resp = await this.getChatList(200);
                 let respData = resp.data.data;
+                if (respData.length == 0) {
+                    Message.error("没有数据可加载.");
+                    return;
+                }
+                this.defaultSess(respData[0]);
                 this.totalPages = resp.data.total_pages;
                 sessionStorage.setItem('totalPages', JSON.stringify(this.totalPages));
                 let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
@@ -1078,61 +1037,6 @@ export default {
         handlePreview(file) {
             this.getFileText(file.name);
             // this.downloadFile(file.name);
-        },
-        // 清空回收站
-        async clearRbData() {
-            let uuids = this.chatRecycle.map(uuid => uuid.uuid);
-            const resp = await this.chatDel(uuids);
-            if (resp.data.status == 666) {
-                store.commit("Z_REMOVE_ALL_CHAT_CACHE", "clear");
-            }
-        },
-        // 回收站恢复数据
-        restoreChat(data) {
-            let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
-            for (let i = 0; i < chatRecycleData.length; i++) {
-                if (chatRecycleData[i].uuid == data.uuid) {
-                    console.log(chatRecycleData[i]);
-                    store.commit("ADD_CHAT_CACHE", chatRecycleData[i]);
-                    this.removeRbData(data);
-                    break;
-                }
-            }
-            this.getContentLen();
-            Message.success(`【${data.title}】已从回收站恢复`);
-        },
-        // 删除回收站的数据
-        async removeRbData(data) {
-            this.getAllRbData();
-            let tabs = this.chatRecycle;
-            let rbChat = tabs.filter(tab => tab.uuid != data.uuid);
-            let fd = [data.uuid]
-            const resp = await this.chatDel(fd);
-            if (resp.data.status == 666) {
-                store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
-
-                this.getContentLen();
-            }
-            // store.commit("Z_REMOVE_CHAT_CACHE", rbChat);
-            // this.getContentLen();
-        },
-        // 回收站的所有数据
-        getAllRbData() {
-            if (sessionStorage.getItem("chatRecycle")) {
-                store.commit("Z_CLEAR_CHAT_CACHE");
-                let chatRecycleData = JSON.parse(sessionStorage.getItem("chatRecycle"));
-                for (let i = 0; i < chatRecycleData.length; i++) {
-                    store.commit("Z_ADD_CHAT_CACHE", chatRecycleData[i]);
-                }
-            }
-        },
-        // 回收站搜索数据
-        getSearchRbData() {
-            if (this.chatRecycle.length != 0) {
-                store.commit("Z_GET_CHAT_CACHE", this.rbData);
-            } else {
-                console.log("还没有回收站数据哟");
-            }
         },
         // 重新加载页面时显示已经切换的ai平台
         checkModel() {
@@ -1566,13 +1470,6 @@ export default {
                         }
                     }
                 }
-                
-                // if (this.chatCache[i].uuid == this.editableTabsValue) {
-                //     this.chatCache[i].answer += jd.data;
-                //     this.chatCache[i].cid = jd.cid;
-                //     this.chatCache[i].pid = jd.pid;
-                //     this.chatCache[i].content = jd.content;
-                // }
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
             this.getContentLen();
@@ -1611,27 +1508,6 @@ export default {
                         }
                     }
                 }
-                // if (this.chatCache[i].uuid == this.editableTabsValue) {
-                //     if (this.chatCache[i].answer.length == 0) {
-                //         answer = '抱歉, 网络不佳, ai回复失败, 请重新提问';
-                //     } else {
-                //         answer = this.chatCache[i].answer;
-                //     }
-
-                //     let data = {
-                //         uuid: this.chatCache[i].uuid, 
-                //         answer: answer.replace(/ppt正在制作中.../g, 'ppt制作完成'), 
-                //         date: this.getDate(), 
-                //         timeShow: true,
-                //         content: this.chatCache[i].content,
-                //         cid: this.chatCache[i].cid,
-                //         pid: this.chatCache[i].pid,
-                //         cursor: false,
-                //         file: this.claudeFile,
-                //     }
-                //     store.commit("SAVE_CHAT_CACHE_ANSWER", data);
-                //     break
-                // } 
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
             this.claudeFile = "";
@@ -1641,7 +1517,7 @@ export default {
             this.socket = null;
             this.pptCreate = false;
             this.jumpFooter();
-            // this.saveChatData();
+            this.saveChatData();
             this.getChatList();
             this.chatTitleFormat();
             clearInterval(this.loadTimer);
@@ -1671,11 +1547,18 @@ export default {
             let sendData = {};
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => {
-                if (cd.key == this.selectedSess && cd.model == this.selectedModel) {
-                    return cd.child;
+            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
+
+            if (gptData) {
+                gptData = gptData.child;
+                gptData = gptData.filter(item => item.model == this.selectedModel);
+                if (!gptData) {
+                    gptData = []
                 }
-            });
+            } else {
+                gptData = [];
+            }
+
 
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
@@ -1711,11 +1594,17 @@ export default {
             let sendData = {};
             let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => {
-                if (cd.key == this.selectedSess && cd.model == this.selectedModel) {
-                    return cd.child;
+            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
+
+            if (gptData) {
+                gptData = gptData.child;
+                gptData = gptData.filter(item => item.model == this.selectedModel);
+                if (!gptData) {
+                    gptData = []
                 }
-            });
+            } else {
+                gptData = [];
+            }
 
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
@@ -1737,18 +1626,22 @@ export default {
             this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let xfData =  cacheData.filter(cd => {
-                if (cd.key == this.selectedSess && cd.model == this.selectedModel) {
-                    return cd.child;
-                }
-            });
+            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
 
-            console.log("xf >>> ", xfData);
+            if (gptData) {
+                gptData = gptData.child;
+                gptData = gptData.filter(item => item.model == this.selectedModel);
+                if (!gptData) {
+                    gptData = []
+                }
+            } else {
+                gptData = [];
+            }
 
             if (this.contextSwitch) {
-                if (xfData.length > 1) {
+                if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: xfData.slice(-4), model: this.selectedModel};
+                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: gptData.slice(-4), model: this.selectedModel};
                 } else {
                     sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
                 }
@@ -1784,11 +1677,18 @@ export default {
             this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => {
-                if (cd.key == this.selectedSess && cd.model == this.selectedModel) {
-                    return cd.child;
+            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
+
+            if (gptData) {
+                gptData = gptData.child;
+                gptData = gptData.filter(item => item.model == this.selectedModel);
+                if (!gptData) {
+                    gptData = []
                 }
-            });
+            } else {
+                gptData = [];
+            }
+
             let id = (100000000 - 1) * Math.random() + 1;
             let uuid = Math.floor(id);
             let file = this.pptCreate ? uuid+'.pptx': '';
@@ -1796,14 +1696,14 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-6), model: this.selectedModel, file: file, ppt: ppt};
+                    sendData = {data: this.chatContent, systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-6), model: this.selectedModel, file: file, ppt: ppt};
                 } else {
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
+                    sendData = {data: this.chatContent, content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
                 }
             } else {
-                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
+                sendData = {data: this.chatContent, content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
             }
-            console.log(sendData);
+            
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1960,22 +1860,27 @@ export default {
                 }
             }
             
+            let del_data = this.chatCache.find(item => item.key == key);
             let new_data = this.chatCache.filter(tab => tab.key != key);
-            let del_data = this.chatCache.map(item => {return item.key == key ? item.child : []});
+            
+            let child = del_data.child;
+
             this.selectedSess = sess;
             this.recordSelectSessKey();
             store.commit("REMOVE_CHAT_CACHE", new_data);
 
-            let uuids = del_data.map(uuid => uuid.uuid);
+            let uuids = child.map(uuid => uuid.uuid);
+
             const resp = await this.chatDel(uuids);
             if (resp.data.status == 666) {
                 Message.success('删除成功');
+            } else {
+                Message.success('删除失败');
             }
             
             if (this.chatCache.length == 0) {
                 this.createNewPage();
             }
-
 
         },
         // 删除对话记录, 会现在回收站保存, 最多保留200条数据
@@ -1987,9 +1892,9 @@ export default {
                 if (this.chatCache[i].key == this.selectedSess) {
                     let child = this.chatCache[i].child;
                     if (child.length > 1) {
+                        del_data = child.filter(tab => tab.uuid == targetName);
                         child = child.filter(tab => tab.uuid != targetName);
                         this.chatCache[i].child = child;
-                        del_data = child.filter(tab => tab.uuid == targetName);
                         store.commit("UPDATE_CHAT_CACHE", this.chatCache[i]);
                     } else {
                         let sess = this.selectedSess;
@@ -2020,36 +1925,9 @@ export default {
             const resp = await this.chatDel(uuids);
             if (resp.data.status == 666) {
                 Message.success('删除成功');
+            } else {
+                Message.success('删除失败');
             }
-
-            // let tabs = this.chatCache;
-            // let rbChat = tabs.filter(tab => tab.uuid == targetName);
-            // let activeName = this.editableTabsValue;
-            // if (activeName == targetName) {
-            //     tabs.forEach((tab, index) => {
-            //         if (tab.uuid == targetName) {
-            //             let nextTab = tabs[index + 1] || tabs[index - 1];
-            //             if (nextTab) {
-            //                 activeName = nextTab.uuid;
-            //             }
-            //         }
-            //     });
-            // }
-            
-            // this.editableTabsValue = activeName;
-            // let newChat = tabs.filter(tab => tab.uuid != targetName);
-            // store.commit("REMOVE_CHAT_CACHE", newChat);
-            // this.getContentLen();
-
-            // if (this.rbData) {
-            //     this.rbData = "";
-            //     this.getAllRbData();
-            // }
-
-            // store.commit("Z_ADD_CHAT_CACHE", rbChat[0]);
-            // this.getContentLen();
-
-            // Message.success(`【${rbChat[0].title}】已删除, 可在回收站恢复`);
         },
         // 锚点
         jump(data) {
@@ -2154,7 +2032,7 @@ export default {
         // this.defaultHideAside();
         this.checkSystemSet();
         this.getContentLen();
-        this.getAllRbData();
+        // this.getAllRbData();
         this.checkModel();
         this.checkLoadingOffset();
         // this.getChatList(100);
