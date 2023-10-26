@@ -1,5 +1,6 @@
 <template>
     <div class="chat-frame">
+        <!-- 左侧边栏 -->
         <div class="aside" v-show="ash">
             <div class="title">
                 <svg class="icon-qa-3" aria-hidden="true">
@@ -72,7 +73,9 @@
                 <el-link type="info" class="addr-size" :underline="false" href="https://github.com/Lxb921006/chat/tree/dev">项目地址</el-link>
             </div>
         </div>
+        <!-- 右侧容器 -->
         <div class="main">
+            <!-- 左侧边栏的收起跟打开按钮 -->
             <transition name="el-zoom-in-top">
                 <div class="collapse-aside" v-show="mh">
                     <svg class="icon ss-aside" aria-hidden="true" @click="showAside()">
@@ -111,8 +114,8 @@
                 </transition>
                 <transition-group name="el-zoom-in-center">
                     <template>
-                        <div v-for="(data, index) in chatCache" :key="index+1" class="z-content">
-                            <div v-if="data.key == selectedSess" class="z-content-1">
+                        <div v-for="(data, index) in filterChatData" :key="index+1" class="z-content" v-show="show">
+                            <div  class="z-content-1">
                                 <div v-for="(data1, index1) in data.child" :key=index1+1 class="z-content-2">
                                     <!-- Ai模型 -->
                                     <transition name="el-zoom-in-top">
@@ -214,19 +217,6 @@
                                 </el-switch>
                             </el-col>
                         </el-row>
-                        <!-- <el-row :gutter="10" class="set-item set-item-1">
-                            <el-col :span="1" class="z-col-3 col-font">是否开启角色回复: </el-col>
-                            <el-col :span="1" class="z-col-4">
-                                <el-tooltip content="只对chatGPT有效" placement="top">
-                                    <el-switch
-                                        @change="isOpenDay()"
-                                        v-model="dnSwitch"
-                                        active-color="#13ce66"
-                                        inactive-color="#ff4949">
-                                    </el-switch>
-                                </el-tooltip>
-                            </el-col>
-                        </el-row> -->
                         <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="z-col-3 col-font">是否开启滚动加载: </el-col>
                             <el-col :span="1" class="z-col-4">
@@ -262,7 +252,7 @@
                         </el-button>
                     </el-popover>
                 </div>
-                <!-- 用户管理 -->
+                <!-- 用户管理-TODO.... -->
                 <div class="user rb">
                     <el-popover
                         placement="right"
@@ -317,6 +307,7 @@
                         </div>
                         <div class="smbpages">
                             <el-button size="mini" type="primary" @click="clickLoadChatData()">加载数据</el-button>
+                            <el-button size="mini" type="primary" @click="loadLatestTenData()">加载最新10条</el-button>
                         </div>
                         <el-button slot="reference">
                             <svg class="icon z-rb-icon" aria-hidden="true">
@@ -405,8 +396,6 @@
                         <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
                         <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <!-- <span v-if="dnSwitch">预设角色: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>预设角色: 【<span class="z-model-s-c">关闭</span>】; </span> -->
                         <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="pptCreate">ppt生成: 【<span class="z-model-s">开启</span>】; </span>
@@ -710,11 +699,28 @@ export default {
             'chatCache': state => state.chatCache.editableTabs,
             'chatRecycle': state => state.chatRecycle.editableTabsZ
         }),
+        // 只展示选中的对话内容
+        filterChatData() {
+            this.getSelectSessKey();
+            return this.chatCache.filter(d => d.key == this.selectedSess); 
+        }
     },
     components: {
         MarkdownCodeBlock,
     },
     methods: {
+        aiNewSesshow() {
+            let showNewPage = sessionStorage.getItem("showNewPage");
+            if (showNewPage == 1) {
+                this.showNewPage = false;
+                this.show = true;
+                this.showhi = true;
+            } else {
+                this.showNewPage = true;
+                this.show = false;
+                this.showhi = false;
+            }
+        },
         changeTitle() {
             let tc = this.all_questions.length;
             if (this.repeatChange + 1 >= tc) {
@@ -766,7 +772,7 @@ export default {
             this.showhi = false;
             this.isOpenNewSess = true;
             sessionStorage.setItem("isOpenNewSess", 1);
-            sessionStorage.setItem("ns", 2);
+            sessionStorage.setItem("showNewPage", 2);
         },
         handleRemove(file, fileList) {
             this.isOpenSwitch = true;
@@ -795,42 +801,47 @@ export default {
         saveScrollLoadDataStatus() {
             this.lazyLoadData(); // 当打开开关，防止滚动条刚好在最底部无限刷新的bug
             if (this.isScrollLoadDataStatus) {
-                sessionStorage.setItem("sds", 1);
-                this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
-                this.pages.page = parseInt(sessionStorage.getItem('page'));
-                let totals = parseInt(sessionStorage.getItem('totals'));
-                if (this.pages.page && this.pages.page > 1) {
-                    if (this.loadCount == totals) {
-                        sessionStorage.setItem('totals', totals-=1);
-                    }
-                    this.handleScroll();
-                } else {
-                    this.getChatList(100);
-                }
+                this.setTimer = true;
+                sessionStorage.setItem("rollingLoadSwitch", 1);
+                // this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
+                // this.pages.page = parseInt(sessionStorage.getItem('page'));
+                // let totals = parseInt(sessionStorage.getItem('totals'));
+                // if (this.pages.page && this.pages.page > 1) {
+                //     if (this.loadCount == totals) {
+                //         sessionStorage.setItem('totals', totals-=1);
+                //     }
+                //     this.handleScroll();
+                // } else {
+                //     this.getChatList(100);
+                // }
                 
                 Message.success('滚动加载数据已开启');
             } else {
-                sessionStorage.setItem("sds", 2);
-                let loadCount = sessionStorage.getItem('loadCount');
-                let totals = sessionStorage.getItem('totals');
-                if (loadCount != totals) {
-                    sessionStorage.setItem('totals', loadCount);
-                }
+                this.setTimer = false;
+                sessionStorage.setItem("rollingLoadSwitch", 2);
+                // let loadCount = sessionStorage.getItem('loadCount');
+                // let totals = sessionStorage.getItem('totals');
+                // if (loadCount != totals) {
+                //     sessionStorage.setItem('totals', loadCount);
+                // }
                 Message.warning('滚动加载数据已关闭');
             }
         },
         // 滚动加载数据开关状态
         checkisOpenScrollLoadData() {
-            let sds = sessionStorage.getItem('sds');
-            switch (sds) {
+            let rollingLoadSwitch = sessionStorage.getItem('rollingLoadSwitch');
+            switch (rollingLoadSwitch) {
                 case '1':
                     this.isScrollLoadDataStatus = true;
+                    this.setTimer = true;
                     break
                 case '2':
                     this.isScrollLoadDataStatus = false;
+                    this.setTimer = false;
                     break
                 default:
                     this.isScrollLoadDataStatus = false;
+                    this.setTimer = false;
                     break;
             }
             // this.saveScrollLoadDataStatus();
@@ -945,13 +956,16 @@ export default {
             }
         },
         scrollLoadChatDataStatus() {
-            let td = sessionStorage.getItem('loadCount');
-            let totals = sessionStorage.getItem('totals');
-            if (td == totals) {
-                this.scrollLoading = false;
-            } else {
-                this.scrollLoading = true;
+            if (this.isScrollLoadDataStatus) {
+                let td = sessionStorage.getItem('loadCount');
+                let totals = sessionStorage.getItem('totals');
+                if (td == totals) {
+                    this.scrollLoading = false;
+                } else {
+                    this.scrollLoading = true;
+                }
             }
+            
         },
         mountTotalPages () {
             let tp = sessionStorage.getItem('totalPages');
@@ -961,46 +975,101 @@ export default {
         },
         defaultSess(data) {
             this.selectedSess = data.key;
+            this.recordSelectSessKey();
+        },
+        // 重新加载
+        async loadLatestTenData() {
+            this.recordIsOpenNewSess(2);
+            this.isScrollLoadDataStatus = true;
+            this.isOpenNewSess = false;
+            sessionStorage.setItem("showNewPage", 1);
+            sessionStorage.setItem("rollingLoadSwitch", 1);
+            this.showNewPage = false;
+            this.show = true;
+            this.showhi = true;
+            this.setTimer = false;
+            this.scrollLoading = true;
 
+            this.pages.page = 1;
+            this.loadCount = 0;
+            const resp = await this.getChatList();
+            let respData = resp.data.data;
+            if (respData.length == 0) {
+                Message.error("没有数据可加载.");
+                return;
+            }
+
+            this.defaultSess(respData[0]);
+
+            store.commit("CLEAR_CHAT_CACHE");
+            let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
+            for (let i = 0; i < historyData.length; i++) {
+                store.commit("ADD_CHAT_CACHE", historyData[i]);
+            }
+            
+            this.loadCount += respData.length;
+            this.totalPages = resp.data.total_pages;
+            sessionStorage.setItem('loadCount', this.loadCount);
+            sessionStorage.setItem('page', this.pages.page);
+            sessionStorage.setItem('totals', resp.data.totals);
+            sessionStorage.setItem('totalPages', JSON.stringify(this.totalPages));
+            this.chatTitleFormat();
+            
+            // 必须等数据加载完才能让handleScroll继续监听滚动条
+            this.setTimer = true; 
+            this.scrollLoading = false;
+            
         },
         // 点击可选择页面加载数据
         async clickLoadChatData() {
             this.recordIsOpenNewSess(2);
             this.isScrollLoadDataStatus = true;
             this.isOpenNewSess = false;
-            sessionStorage.setItem("ns", 1);
-            sessionStorage.setItem("sds", 1);
+            sessionStorage.setItem("showNewPage", 1);
+            sessionStorage.setItem("rollingLoadSwitch", 1);
             this.showNewPage = false;
             this.show = true;
             this.showhi = true;
+            this.setTimer = false;
+            this.scrollLoading = true;
+
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
             let totals = parseInt(sessionStorage.getItem('totals'));
             this.pages.page = parseInt(sessionStorage.getItem('page'));
+            this.totalPages = JSON.parse(sessionStorage.getItem('totalPages'));
+
             console.log('--------------点击加载数据----------------');
-            this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
-            this.setTimer = false;
-            this.scrollLoading = true;
-            this.pages.page += 1;
+            this.pages.page = this.selectPage;
+            sessionStorage.setItem('page', this.pages.page);
             const resp = await this.getChatList(100);
             let respData = resp.data.data;
             if (respData.length == 0) {
                 Message.error("没有数据可加载.");
                 return;
             }
+
             this.defaultSess(respData[0]);
+
             this.totalPages = resp.data.total_pages;
             sessionStorage.setItem('totalPages', JSON.stringify(this.totalPages));
+
+            let old_data = this.chatCache.length;
             let historyData = this.mergeUniqueByUUid(this.chatCache, respData);
             store.commit("CLEAR_CHAT_CACHE");
             for (let i = 0; i < historyData.length; i++) {
                 store.commit("ADD_CHAT_CACHE", historyData[i]);
             }
-            this.loadCount += respData.length;
-            sessionStorage.setItem('loadCount', this.loadCount);
-            sessionStorage.setItem('page', this.pages.page);
+
+            if (old_data != historyData.length) {
+                this.loadCount += respData.length;
+                sessionStorage.setItem('loadCount', this.loadCount);
+            }
+
             sessionStorage.setItem('totals', resp.data.totals);
             this.chatTitleFormat();
-            this.setTimer = true; // 必须等数据加载完才能让handleScroll继续监听滚动条
+
+            // 必须等数据加载完才能让handleScroll继续监听滚动条
+            this.setTimer = true; 
             this.scrollLoading = false;
         },
         // 滚动到底部就加载数据
@@ -1013,7 +1082,7 @@ export default {
                 this.recordIsOpenNewSess(2);
                 console.log('--------------滚动加载数据----------------');
                 this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
-                sessionStorage.setItem("ns", 1);
+                sessionStorage.setItem("showNewPage", 1);
                 this.showNewPage = false;
                 this.setTimer = false;
                 this.scrollLoading = true;
@@ -1295,6 +1364,13 @@ export default {
                 this.chatContent = ai_text;
             }
 
+            // 如果滚动加载按钮打开就关闭，不然如果历史记录多，在ai回复的时候会一直加载历史数据
+            if (this.isScrollLoadDataStatus) {
+                this.setTimer = false;
+                this.isScrollLoadDataStatus = false;
+                sessionStorage.setItem('rollingLoadSwitch', 2);
+            }
+
             if (!this.chatContent.replace(/[\r\n\s]+/g, '')) {
                 this.chatContent = "";
                 Message.error("请输入对话内容.");
@@ -1310,7 +1386,7 @@ export default {
                 this.show = true;
                 this.showhi = true;
                 this.showNewPage = false;
-                sessionStorage.setItem("ns", 1);
+                sessionStorage.setItem("showNewPage", 1);
             }
 
             setTimeout(() => {
@@ -1441,7 +1517,7 @@ export default {
                 this.socket.onmessage = this.getMessage;
                 // 监听socket关闭消息
                 this.socket.onclose = this.close;
-            }, 10)
+            }, 1)
         },
         addConPdSess(data) {
             let add_data = this.chatCache;
@@ -1971,7 +2047,7 @@ export default {
                 this.showNewPage = false;
                 this.show = true;
                 this.showhi = true;
-                sessionStorage.setItem("ns", 1);
+                sessionStorage.setItem("showNewPage", 1);
             }
             this.selectedSess = data.key;
             this.isOpenNewSess = false;
@@ -2034,16 +2110,6 @@ export default {
             this.$refs.dialog.style.left = `${newLeft}px`;  
             this.$refs.dialog.style.top = `${newTop}px`;  
         },
-        aiNewSesshow() {
-            let ns = sessionStorage.getItem("ns");
-            if (ns == 1) {
-                this.showNewPage = false;
-            } else {
-                this.showNewPage = true;
-                this.show = false;
-                this.shiwhi = false;
-            }
-        },
         callMethod() {},
     },
     filters: {
@@ -2074,7 +2140,7 @@ export default {
         this.checkLoadingOffset();
         // this.getChatList(100);
         this.chatTitleFormat();
-        this.scrollLoadChatDataStatus();
+        // this.scrollLoadChatDataStatus();
         this.getCurrentUser();
         this.checkisOpenScrollLoadData();
         this.mountTotalPages();

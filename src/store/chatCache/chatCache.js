@@ -45,6 +45,11 @@ const chatCache = {
           return cd
         }
       });
+
+      if (newChat.length != 0) {
+        sessionStorage.setItem('recordSelectSessKey', newChat[0].key);
+      }
+
       state.editableTabs = newChat;
     },
     SAVE_CHAT_CACHE_ANSWER(state, data) {
