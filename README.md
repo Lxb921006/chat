@@ -1,5 +1,5 @@
 # chatAI
-这是一个聚合了国内外主流AI大模型网站，可无缝访问如：chatgpt，claude，文心一言，讯飞星火等。更多AI大模型持续添加中....
+这是一个聚合了国内外主流AI大模型网站，可无缝访问如：chatgpt，claude，文心一言，讯飞星火，通义千问等。更多AI大模型持续添加中....
 
 ## 安装
 ```
@@ -33,6 +33,7 @@ v16.4.0
 &emsp;&emsp;gpt3.5-turbo(已完成);  
 &emsp;&emsp;讯飞星火(已完成);  
 &emsp;&emsp;文心一言(已完成);  
+&emsp;&emsp;通义千问(已完成); 
 
 ### web部分ui展示
 ![chat-ui-1](main-1.png)  
