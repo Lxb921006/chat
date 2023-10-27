@@ -20,9 +20,10 @@
                     clearable>
                 </el-input>
             </div>
+            <!-- 提问标题 -->
             <div class="tab">
                 <el-menu
-                    background-color="rgb(21, 24, 21)"
+                    background-color="#151815"
                     text-color="#fff"
                     active-text-color="#ffd04b"
                     :default-active="selectedSess"
@@ -31,28 +32,7 @@
                     <el-menu-item :index=data.key v-for="data in chatCache" :key="data.key" @click="jump(data)" v-show="true">
                         <i class="el-icon-delete delete" @click="removeChatParent(data.key)"></i>
                         <span slot="title" class="cache-title">
-                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT'">
-                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
-                            </span>
-                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'GPT-4'">
-                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
-                            </span>
-                            <span slot="title" class="cache-title title-model-icon" v-if="data.model == 'chatGPT3.5'">
-                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
-                            </span>
-                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'claude-2'">
-                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
-                            </span>
-                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'xf'">
-                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
-                            </span>
-                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'ai-assistant'">
-                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
-                            </span>
-                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'bd'">
-                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
-                            </span>
-                            <span slot="title" class="cache-title title-model-icon" v-else-if="data.model == 'qw'">
+                            <span slot="title" class="cache-title title-model-icon">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
                             {{ data.title }}
@@ -1943,19 +1923,6 @@ export default {
                 // 滚动指定距离
                 tab.scrollTop = tabScroll;
             }, 8)
-
-
-            // if(content.scrollHeight > content.clientHeight) {
-                
-            //     setTimeout(function(){
-            //         //设置滚动条到最顶部
-            //         content.scrollTop = 0;
-            //     },0);
-            //     setTimeout(function(){
-            //         //设置滚动条到最顶部
-            //         tab.scrollTop = 0;
-            //     },0);
-            // }
         },
         async removeChatParent(key) {
             this.getAllChatData();
@@ -2132,15 +2099,11 @@ export default {
         this.checkContextStatus();
         this.getAllChatData();
         this.getAllChatRecycleData();
-        // this.defaultHideAside();
         this.checkSystemSet();
         this.getContentLen();
-        // this.getAllRbData();
         this.checkModel();
         this.checkLoadingOffset();
-        // this.getChatList(100);
         this.chatTitleFormat();
-        // this.scrollLoadChatDataStatus();
         this.getCurrentUser();
         this.checkisOpenScrollLoadData();
         this.mountTotalPages();
