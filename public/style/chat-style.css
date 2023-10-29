@@ -532,10 +532,10 @@ pre code {
 }
 @media only screen and (max-height: 800px) {
     .content,.add-new-sess {
-        height: 63%;
+        height: 63%!important;
     }
     .tab {
-        height: 51%;
+        height: 37%;
     }
 }
 /* 适应手机 */
