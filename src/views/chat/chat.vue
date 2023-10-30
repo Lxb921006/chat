@@ -761,10 +761,6 @@ export default {
             let pre = name.split(".")[0];
             let suf = name.split(".")[1];
             let file = suf == "docx" ? pre + ".pdf" : pre + ".docx";
-            // const resp = await downloadFile({file: file, user: this.currentUser})
-            // if (resp.data.status == 444) {
-            //     Message.error(resp.data.msg);
-            // }
             let url = `http://43.153.55.148:8091/chat/download/?user=${sessionStorage.getItem('user')}&file=${file}`;
             window.open(url, "_self")
             this.fileList = [];
@@ -782,27 +778,10 @@ export default {
             if (this.isScrollLoadDataStatus) {
                 this.setTimer = true;
                 sessionStorage.setItem("rollingLoadSwitch", 1);
-                // this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
-                // this.pages.page = parseInt(sessionStorage.getItem('page'));
-                // let totals = parseInt(sessionStorage.getItem('totals'));
-                // if (this.pages.page && this.pages.page > 1) {
-                //     if (this.loadCount == totals) {
-                //         sessionStorage.setItem('totals', totals-=1);
-                //     }
-                //     this.handleScroll();
-                // } else {
-                //     this.getChatList(100);
-                // }
-                
                 Message.success('滚动加载数据已开启');
             } else {
                 this.setTimer = false;
                 sessionStorage.setItem("rollingLoadSwitch", 2);
-                // let loadCount = sessionStorage.getItem('loadCount');
-                // let totals = sessionStorage.getItem('totals');
-                // if (loadCount != totals) {
-                //     sessionStorage.setItem('totals', loadCount);
-                // }
                 Message.warning('滚动加载数据已关闭');
             }
         },
@@ -846,9 +825,11 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            // console.log('nt[i].clientHeight >>> ', nt[i].clientHeight);
-                            if (nt[i].clientHeight  > 80) {
+                            if (nt[i].clientHeight > 100) {
+                                // console.log('nt[i].clientHeight >>> ', nt[i].clientHeight);
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
+                            } else {
+                                nt[i].setAttribute("style", "white-space: break-spaces;text-align: unset");
                             }
                         }
                     }
@@ -993,12 +974,12 @@ export default {
             sessionStorage.setItem('page', this.pages.page);
             sessionStorage.setItem('totals', resp.data.totals);
             sessionStorage.setItem('totalPages', JSON.stringify(this.totalPages));
-            this.chatTitleFormat();
+            
             
             // 必须等数据加载完才能让handleScroll继续监听滚动条
             this.setTimer = true; 
             this.scrollLoading = false;
-            
+            this.chatTitleFormat();
         },
         // 点击可选择页面加载数据
         async clickLoadChatData() {
@@ -1046,11 +1027,12 @@ export default {
             }
 
             sessionStorage.setItem('totals', resp.data.totals);
-            this.chatTitleFormat();
+            
 
             // 必须等数据加载完才能让handleScroll继续监听滚动条
             this.setTimer = true; 
             this.scrollLoading = false;
+            this.chatTitleFormat();
         },
         // 滚动到底部就加载数据
         async scrollLoadChatData() {
@@ -1087,9 +1069,10 @@ export default {
                 
                 sessionStorage.setItem('totals', resp.data.totals);
             }
-            this.chatTitleFormat();
+            
             this.setTimer = true; // 必须等数据加载完才能让handleScroll继续监听滚动条
             this.scrollLoading = false;
+            this.chatTitleFormat();
         },
         uploadUrl () {
             return `${baseUrl}/claude/upload/`
@@ -1656,12 +1639,12 @@ export default {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
-                    sendData = {cid: "", pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: lastData.title};
+                    sendData = {cid: "", pid: lastData.pid, data: this.chatContent, model: this.selectedModel, context: lastData.title};
                 } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: ''};
+                    sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel, context: ''};
                 }
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: ''};
+                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel, context: ''};
             }
 
             this.socket.send(JSON.stringify(sendData));
@@ -1673,9 +1656,9 @@ export default {
             // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             if (this.contextSwitch) {
                 //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: 'open'};
+                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent, model: this.selectedModel, context: 'open'};
             } else {
-                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, context: ''};
+                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent, model: this.selectedModel, context: ''};
             }
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
@@ -1702,12 +1685,12 @@ export default {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
                     lastData = gptData[gptData.length - 2];
-                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: lastData.title};
+                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel, content: lastData.title};
                 } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: ''};
+                    sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel, content: ''};
                 }
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent.replace(/[\r\n\s]+/g, ''), model: this.selectedModel, content: ''};
+                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel, content: ''};
             }
 
             this.socket.send(JSON.stringify(sendData));
@@ -1733,12 +1716,12 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: gptData.slice(-4), model: this.selectedModel};
+                    sendData = {data: this.chatContent, content: gptData.slice(-4), model: this.selectedModel};
                 } else {
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                    sendData = {data: this.chatContent, content: '', model: this.selectedModel};
                 }
             } else {
-                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', model: this.selectedModel};
+                sendData = {data: this.chatContent, content: '', model: this.selectedModel};
             }
             
             this.socket.send(JSON.stringify(sendData));
@@ -1753,12 +1736,12 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-10), model: this.selectedModel};
+                    sendData = {data: this.chatContent, systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-10), model: this.selectedModel};
                 } else {
-                    sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+                    sendData = {data: this.chatContent, content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
                 }
             } else {
-                sendData = {data: this.chatContent.replace(/[\r\n\s]+/g, ''), content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+                sendData = {data: this.chatContent, content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
             }
 
             this.socket.send(JSON.stringify(sendData));
@@ -2020,10 +2003,10 @@ export default {
             this.isOpenNewSess = false;
             this.recordSelectSessKey();
             this.recordIsOpenNewSess(2);
-            // setTimeout(() => {
-            //     location.hash = "#" + data['child'][0].uuid;
-            //     // document.getElementById(data['child'][0].uuid).setAttribute("style", "color: #d9d04b;"); 
-            // }, 100)
+            
+            setTimeout(() => {
+                this.chatTitleFormat();
+            }, 50)
         },
         refresh() {
             this.close();

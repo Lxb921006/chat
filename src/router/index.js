@@ -54,7 +54,7 @@ router.beforeEach((to, from, next) => {
       next('/login');
   } else {
       if (to.path == '/login' && user) {
-          next('/index'); 
+          next('/chat'); 
       } else {
           // 必须调用next(), 否则死循环
           next(); 

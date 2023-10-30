@@ -3,7 +3,7 @@
         <el-card>
             <el-row :gutter="10" class="content">
                 <el-col>
-                    <h3 class="title">谷歌认证登录</h3>
+                    <h3 class="title">ChatAi登录</h3>
                 </el-col>
             </el-row>
             <el-row :gutter="10" class="content" v-if="isShowQr == 1">
@@ -24,7 +24,7 @@
                     <el-input v-model="user" placeholder="请输入用户名" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
                 </el-col>
                 <el-col class="col-2">
-                    <el-input v-model="gacode" placeholder="请输入谷歌认证码" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
+                    <el-input v-model="gacode" placeholder="请输入chatai码" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
                 </el-col>
             </el-row>
             <el-row :gutter="10" class="content">
@@ -66,7 +66,7 @@ export default {
             }
 
             if (!this.gacode) {
-                return Message.error("请输入谷歌验证码");
+                return Message.error("请输入chatai码");
             }
 
             this.finished = true;
@@ -83,7 +83,7 @@ export default {
             }
 
             sessionStorage.setItem("user", resp.data.user);
-            this.$router.replace('/chat').catch((err) => err);
+            this.$router.push('/chat');
             this.submitLoad = false;
             this.finished = false;
             this.logintext = "确定";

@@ -300,6 +300,7 @@
 }
 .question {
     padding: 11px 20px 21px 20px;
+    color: #409eff;
 }
 .answer-loop {
     text-align: justify;
