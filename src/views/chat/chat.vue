@@ -469,7 +469,6 @@ import { chatList, chatSave, getFileText, chatDel, downloadFile } from '../../ap
 import { v4 as uuidv4 } from 'uuid';
 
 
-// 所有对话数据都存储在浏览器本地，如果浏览器没有做相应的保存设置将无法保存对话记录(如需保存对话可在谷歌浏览器里边找到，设置->启动时->继续浏览上次打开的网页，即可)
 export default {
     name: "chat",
     // 弹窗可拖拽
@@ -847,6 +846,7 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
+                            // console.log('nt[i].clientHeight >>> ', nt[i].clientHeight);
                             if (nt[i].clientHeight  > 80) {
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             }
@@ -1611,7 +1611,7 @@ export default {
             this.jumpFooter();
             this.saveChatData();
             this.getChatList();
-            this.chatTitleFormat();
+            // this.chatTitleFormat();
             clearInterval(this.loadTimer);
         },
         // 保存对话记录
