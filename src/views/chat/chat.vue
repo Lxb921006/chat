@@ -1943,7 +1943,6 @@ export default {
             if (this.chatCache.length == 0) {
                 this.createNewPage();
             }
-
         },
         // 删除对话记录, 会现在回收站保存, 最多保留200条数据
         async removeChat(targetName) {
@@ -1954,6 +1953,7 @@ export default {
                 if (this.chatCache[i].key == this.selectedSess) {
                     let child = this.chatCache[i].child;
                     if (child.length > 1) {
+
                         del_data = child.filter(tab => tab.uuid == targetName);
                         child = child.filter(tab => tab.uuid != targetName);
                         this.chatCache[i].child = child;
