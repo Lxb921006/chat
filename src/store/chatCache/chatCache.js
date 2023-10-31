@@ -12,7 +12,6 @@ const chatCache = {
   },
   mutations: {
     ADD_CHAT_CACHE(state, data){
-      // 原始
       state.editableTabs.push(data);
       sessionStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
     },
@@ -22,6 +21,9 @@ const chatCache = {
       for (let i = 0;i < fcd.length; i++) {
         if (data['key'] == fcd[i].key) {
           fcd[i].child = data.child;
+          fcd[i].title =  data['title'];
+          fcd[i].icon =  data['icon'];
+          fcd[i].isParent =  data['isParent'];
           break
         }
       }

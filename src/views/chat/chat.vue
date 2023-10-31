@@ -465,7 +465,7 @@ import { wssSinUrl, wssUsUrl, wssSinApiUrl } from "../../utils/wssUrl";
 import 'highlight.js/styles/atom-one-dark-reasonable.css'  //这里有多个样式，自己可以根据需要切换
 import MarkdownCodeBlock from './markdownBlock';
 import baseUrl from "../../utils/baseUrl";
-import { chatList, chatSave, getFileText, chatDel, downloadFile } from '../../api';
+import { chatList, chatSave, getFileText, chatDel, chatUpdate, downloadFile } from '../../api';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -639,11 +639,11 @@ export default {
                     label: '文心一言',
                     disabled: false,
                 },
-                {
-                    value: 'qw',
-                    label: '通义千问',
-                    disabled: false,
-                },
+                // {
+                //     value: 'qw',
+                //     label: '通义千问',
+                //     disabled: false,
+                // },
             ],
             allowFile: ['.txt', '.pdf', '.docx'],
             loadCount: 0,
@@ -955,6 +955,19 @@ export default {
             this.loadCount = 0;
             const resp = await this.getChatList();
             let respData = resp.data.data;
+            if (resp.data.totals == 0) {
+                this.scrollLoading = false;
+                this.showNewPage = true;
+                this.isOpenNewSess = true;
+                this.show = false;
+                this.showhi = false;
+                sessionStorage.setItem("showNewPage", 2);
+                sessionStorage.setItem("rollingLoadSwitch", 2);
+                this.recordIsOpenNewSess(1);
+                Message.error("还没有任何对话记录.");
+                return;
+            }
+
             if (respData.length == 0) {
                 Message.error("没有数据可加载.");
                 return;
@@ -1003,8 +1016,21 @@ export default {
             this.pages.page = this.selectPage;
             sessionStorage.setItem('page', this.pages.page);
             const resp = await this.getChatList(100);
+            if (resp.data.totals == 0) {
+                this.scrollLoading = false;
+                this.showNewPage = true;
+                this.isOpenNewSess = true;
+                this.show = false;
+                this.showhi = false;
+                sessionStorage.setItem("showNewPage", 2);
+                sessionStorage.setItem("rollingLoadSwitch", 2);
+                this.recordIsOpenNewSess(1);
+                Message.error("还没有任何对话记录.");
+                return;
+            }
             let respData = resp.data.data;
             if (respData.length == 0) {
+                this.scrollLoading = false;
                 Message.error("没有数据可加载.");
                 return;
             }
@@ -1424,6 +1450,7 @@ export default {
                     new_data['title'] = this.chatContent;
                     new_data['model'] = this.selectedModel;
                     new_data['icon'] = modelIcon;
+                    new_data['isParent'] = 1;
                     data['isParent'] = 1;
                     this.selectedSess = key;
                     this.recordSelectSessKey();
@@ -1907,6 +1934,15 @@ export default {
                 tab.scrollTop = tabScroll;
             }, 8)
         },
+        async chatUpdate(data) {
+            const resp = await chatUpdate({key: data.key, title: data.title, isParent: data.isParent});
+            if (resp == undefined || resp.data.status != 666) {
+                Message.error(resp.data.msg);
+                return;
+            }
+
+            Message.success(resp.data.msg);
+        },
         async removeChatParent(key) {
             this.getAllChatData();
             let title = "";
@@ -1947,17 +1983,49 @@ export default {
         // 删除对话记录, 会现在回收站保存, 最多保留200条数据
         async removeChat(targetName) {
             this.getAllChatData();
-            let title = "";
+            // let title = "";
             let del_data = [];
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].key == this.selectedSess) {
                     let child = this.chatCache[i].child;
                     if (child.length > 1) {
-
-                        del_data = child.filter(tab => tab.uuid == targetName);
-                        child = child.filter(tab => tab.uuid != targetName);
-                        this.chatCache[i].child = child;
-                        store.commit("UPDATE_CHAT_CACHE", this.chatCache[i]);
+                        for (let c = 0; c < child.length; c++) {
+                            if (child[c].uuid == targetName) {
+                                if (child[c].isParent == 1) {
+                                    let nextChild = "";
+                                    let index = 0;
+                                    if (child[c + 1]) {
+                                        nextChild = child[c + 1];
+                                        index = c + 1;
+                                    } else if (child[c - 1]) {
+                                        nextChild = child[c - 1];
+                                        index = c - 1;
+                                    }
+                                    let data = {
+                                        uuid: nextChild.uuid,
+                                        isParent: 1,
+                                    }
+                                    // let nextChild = child[c + 1] || child[c - 1];
+                                    this.chatCache[i].title = nextChild.title;
+                                    this.chatCache[i].icon = nextChild.icon;
+                                    this.chatCache[i].isParent = 1;
+                                    child[index].isParent = 1;
+                                    
+                                    del_data = child.filter(tab => tab.uuid == targetName);
+                                    child = child.filter(tab => tab.uuid != targetName);
+                                    this.chatCache[i].child = child;
+                                    
+                                    console.log("this.chatCache[i] >>> ", this.chatCache[i]);
+                                    store.commit("UPDATE_CHAT_CACHE", this.chatCache[i]);
+                                    this.chatUpdate(data);
+                                } else {
+                                    del_data = child.filter(tab => tab.uuid == targetName);
+                                    child = child.filter(tab => tab.uuid != targetName);
+                                    this.chatCache[i].child = child;
+                                    store.commit("UPDATE_CHAT_CACHE", this.chatCache[i]);
+                                }
+                            }
+                        }
                     } else {
                         let sess = this.selectedSess;
                         for (let i = 0; i < this.chatCache.length; i++) {
