@@ -1935,8 +1935,7 @@ export default {
             }, 8)
         },
         async chatUpdate(data) {
-            const resp = await chatUpdate({uuid: data.uuid, isParent: data.isParent});
-            console.log("chatUpdate >>> ", resp);
+            const resp = await chatUpdate({uuid: data.uuid, isParent: data.isParent}, this.callMethod);
             if (resp == undefined || resp.data.status != 666) {
                 Message.error(resp.data.msg);
                 return;
