@@ -1935,13 +1935,14 @@ export default {
             }, 8)
         },
         async chatUpdate(data) {
-            const resp = await chatUpdate({key: data.key, title: data.title, isParent: data.isParent});
+            const resp = await chatUpdate({uuid: data.uuid, isParent: data.isParent});
+            console.log("chatUpdate >>> ", resp);
             if (resp == undefined || resp.data.status != 666) {
                 Message.error(resp.data.msg);
                 return;
             }
 
-            Message.success(resp.data.msg);
+            // Message.success(resp.data.msg);
         },
         async removeChatParent(key) {
             this.getAllChatData();
@@ -2005,7 +2006,6 @@ export default {
                                         uuid: nextChild.uuid,
                                         isParent: 1,
                                     }
-                                    // let nextChild = child[c + 1] || child[c - 1];
                                     this.chatCache[i].title = nextChild.title;
                                     this.chatCache[i].icon = nextChild.icon;
                                     this.chatCache[i].isParent = 1;
@@ -2015,7 +2015,6 @@ export default {
                                     child = child.filter(tab => tab.uuid != targetName);
                                     this.chatCache[i].child = child;
                                     
-                                    console.log("this.chatCache[i] >>> ", this.chatCache[i]);
                                     store.commit("UPDATE_CHAT_CACHE", this.chatCache[i]);
                                     this.chatUpdate(data);
                                 } else {
