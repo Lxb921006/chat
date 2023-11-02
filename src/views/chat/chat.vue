@@ -616,7 +616,7 @@ export default {
             modelAll: [
                 {
                     value: 'claude-2',
-                    label: 'claude',
+                    label: 'Claude',
                     disabled: false,
                 },
                 {
@@ -825,7 +825,7 @@ export default {
                 if (nt) {
                     if (nt.length != 0) {
                         for (let i = 0; i < nt.length; i++) {
-                            if (nt[i].clientHeight > 100) {
+                            if (nt[i].clientHeight > 90) {
                                 // console.log('nt[i].clientHeight >>> ', nt[i].clientHeight);
                                 nt[i].setAttribute("style", "white-space: break-spaces;text-align: justify");
                             } else {
@@ -1621,7 +1621,7 @@ export default {
             this.jumpFooter();
             this.saveChatData();
             this.getChatList();
-            // this.chatTitleFormat();
+            this.chatTitleFormat();
             clearInterval(this.loadTimer);
         },
         // 保存对话记录
