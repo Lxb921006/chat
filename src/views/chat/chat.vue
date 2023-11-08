@@ -1970,9 +1970,7 @@ export default {
             let uuids = child.map(uuid => uuid.uuid);
 
             const resp = await this.chatDel(uuids);
-            if (resp.data.status == 666) {
-                Message.success('删除成功');
-            } else {
+            if (resp.data.status != 666) {
                 Message.success('删除失败');
             }
             
