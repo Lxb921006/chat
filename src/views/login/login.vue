@@ -1,12 +1,12 @@
 <template>
     <div class="box">
         <el-card>
-            <el-row :gutter="10" class="content">
+            <el-row :gutter="10" class="login-content">
                 <el-col>
                     <h3 class="title">ChatAi登录</h3>
                 </el-col>
             </el-row>
-            <el-row :gutter="10" class="content" v-if="isShowQr == 1">
+            <el-row :gutter="10" class="login-content" v-if="isShowQr == 1">
                 <el-col>
                     <vue-qr 
                         :logo-src="appSrc"
@@ -19,7 +19,7 @@
                     <p class="notice">打开谷歌验证器Authenticator扫码</p>
                 </el-col>
             </el-row>
-            <el-row :gutter="10" class="content">
+            <el-row :gutter="10" class="login-content">
                 <el-col class="col-1">
                     <el-input v-model="user" placeholder="请输入用户名" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
                 </el-col>
@@ -27,7 +27,7 @@
                     <el-input v-model="gacode" placeholder="请输入chatai码" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
                 </el-col>
             </el-row>
-            <el-row :gutter="10" class="content">
+            <el-row :gutter="10" class="login-content">
                 <el-col>
                     <el-button type="success" plain @click="GaLogin()" :loading="submitLoad">{{ logintext }}</el-button>
                 </el-col>
@@ -117,7 +117,7 @@ export default {
     bottom: 30px;
     background-color: #1ab395;
 }
-.content {
+.login-content {
     margin-top: 10px;
 }
 .notice {
