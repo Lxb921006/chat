@@ -1,9 +1,9 @@
 <template>
-    <div class="box">
+    <div class="login-box">
         <el-card>
             <el-row :gutter="10" class="login-content">
                 <el-col>
-                    <h3 class="title">ChatAi登录</h3>
+                    <h3 class="login-title">ChatAi登录</h3>
                 </el-col>
             </el-row>
             <el-row :gutter="10" class="login-content" v-if="isShowQr == 1">
@@ -20,10 +20,10 @@
                 </el-col>
             </el-row>
             <el-row :gutter="10" class="login-content">
-                <el-col class="col-1">
+                <el-col class="login-col-1">
                     <el-input v-model="user" placeholder="请输入用户名" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
                 </el-col>
-                <el-col class="col-2">
+                <el-col class="login-col-2">
                     <el-input v-model="gacode" placeholder="请输入chatai码" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
                 </el-col>
             </el-row>
@@ -102,12 +102,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.box {
+.login-box {
     padding-top: 150px;
     // height: 100%;
     // background-color: #e9e9e9;
 }
-.title {
+.login-title {
     position: relative;
     width: 400px;
     height: 45px;
@@ -131,7 +131,7 @@ export default {
     width: 400px;
     margin: 0 auto;
 }
-.col-2 {
+.login-col-2 {
     margin-top: 15px;
     margin-bottom: 15px;
 }
@@ -140,7 +140,7 @@ export default {
     // .aside {
     //     display: none;
     // }
-    .el-card, .title {
+    .el-card, .login-title {
         width: 346px;
     }
     
