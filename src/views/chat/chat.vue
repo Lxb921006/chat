@@ -58,7 +58,7 @@
             <!-- 左侧边栏的收起跟打开按钮 -->
             <transition name="el-zoom-in-top">
                 <div class="collapse-aside" v-show="mh">
-                    <svg class="icon ss-aside" aria-hidden="true" @click="showAside()">
+                    <svg class="icon z-aside" aria-hidden="true" @click="showAside()">
                         <use xlink:href="#icon-wmf-common43"></use>
                     </svg>
                 </div>
@@ -198,6 +198,19 @@
                             </el-col>
                         </el-row>
                         <el-row :gutter="10" class="set-item set-item-1">
+                            <el-col :span="1" class="z-col-3 col-font">是否开启预设角色: </el-col>
+                            <el-col :span="1" class="z-col-4">
+                                <el-tooltip content="只对chatGPT有效" placement="top">
+                                    <el-switch
+                                        @change="isRoleResp()"
+                                        v-model="roleResp"
+                                        active-color="#13ce66"
+                                        inactive-color="#ff4949">
+                                    </el-switch>
+                                </el-tooltip>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="z-col-3 col-font">是否开启滚动加载: </el-col>
                             <el-col :span="1" class="z-col-4">
                                 <el-tooltip content="建议关闭" placement="top">
@@ -297,7 +310,7 @@
                     </el-popover>
                 </div>
                 <!-- 插件 -->
-                <div class="user rb">
+                <div class="user rb" v-if="false">
                     <el-popover
                         placement="right"
                         width="400"
@@ -376,10 +389,12 @@
                         <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
                         <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <span v-if="roleResp">预设角色回复: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>预设角色回复: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <span v-if="pptCreate">ppt生成: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>ppt生成: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <!-- <span v-if="pptCreate">ppt生成: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>ppt生成: 【<span class="z-model-s-c">关闭</span>】; </span> -->
                     </div>
                     <div class="send-input">
                          <el-input
@@ -557,7 +572,7 @@ export default {
             contextSwitch: "",
             findChatData: "",
             rbData: "",
-            dnSwitch: false,
+            roleResp: false,
             showAsideView: false,
             userData: [],
             id: 0,
@@ -1763,12 +1778,12 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent, systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-10), model: this.selectedModel};
+                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: gptData.slice(-10), model: this.selectedModel};
                 } else {
-                    sendData = {data: this.chatContent, content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+                    sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel};
                 }
             } else {
-                sendData = {data: this.chatContent, content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel};
+                sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel};
             }
 
             this.socket.send(JSON.stringify(sendData));
@@ -1798,12 +1813,12 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent, systemSet: this.dnSwitch ? 'open' : '', content: gptData.slice(-6), model: this.selectedModel, file: file, ppt: ppt};
+                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: gptData.slice(-6), model: this.selectedModel, file: file, ppt: ppt};
                 } else {
-                    sendData = {data: this.chatContent, content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
+                    sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
                 }
             } else {
-                sendData = {data: this.chatContent, content: '', systemSet: this.dnSwitch ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
+                sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
             }
             
             this.socket.send(JSON.stringify(sendData));
@@ -1832,23 +1847,23 @@ export default {
         },
         // 检查预设状态
         checkSystemSet() {
-            let dnSwitch = sessionStorage.getItem('ss');
-            if (dnSwitch == 1) {
-                this.dnSwitch = true;
-            } else if (dnSwitch == 2) {
-                this.dnSwitch = false;
+            let roleResp = sessionStorage.getItem('roleResp');
+            if (roleResp == 1) {
+                this.roleResp = true;
+            } else if (roleResp == 2) {
+                this.roleResp = false;
             } else {
-                this.dnSwitch = false; //预设默认关闭
+                this.roleResp = true; //预设默认开启
             }
         },
         // 预设开关-仅对chatGPT有效
-        isOpenDay() {
-            if (this.dnSwitch) {
+        isRoleResp() {
+            if (this.roleResp) {
                 Message.success('已启用预设角色回复');
-                sessionStorage.setItem("ss", 1);
+                sessionStorage.setItem("roleResp", 1);
             } else {
                 Message.warning('已关闭预设角色回复');
-                sessionStorage.setItem("ss", 2);
+                sessionStorage.setItem("roleResp", 2);
             }
         },
         // 滚动到最底部

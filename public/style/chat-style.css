@@ -12,7 +12,7 @@
 .set-item {
     margin-top: 6px;
 }
-.ss-aside:hover {
+.z-aside:hover {
     color: #585858;
 }
 .context-switch {
@@ -247,7 +247,7 @@
 }
 .footer {
     position: relative;
-    width: 571px;
+    width: 578px;
     margin: 0 auto;
     top: 16px
 }
