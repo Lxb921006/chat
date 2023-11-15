@@ -53,7 +53,7 @@ export default {
             submitLoad: false,
             finished: false,
             logintext:"确定",
-            url: "otpauth://totp/lxb?secret=NR4GEYLMNRQTAMLMNNQWI&issuer=cmdb&algorithm=SHA1&digits=6&period=30",
+            url: "",
         }
     },
     components: {
@@ -104,8 +104,6 @@ export default {
 <style lang="scss" scoped>
 .login-box {
     padding-top: 150px;
-    // height: 100%;
-    // background-color: #e9e9e9;
 }
 .login-title {
     position: relative;
@@ -127,7 +125,7 @@ export default {
 :deep .el-button--success.is-plain {
     width: 100%;
 }
-.el-card {
+.login-box .el-card {
     width: 400px;
     margin: 0 auto;
 }
@@ -137,9 +135,6 @@ export default {
 }
 //适应手机
 @media only screen and (max-width: 500px) {
-    // .aside {
-    //     display: none;
-    // }
     .el-card, .login-title {
         width: 346px;
     }
