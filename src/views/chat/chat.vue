@@ -198,9 +198,9 @@
                             </el-col>
                         </el-row>
                         <el-row :gutter="10" class="set-item set-item-1">
-                            <el-col :span="1" class="z-col-3 col-font">是否开启预设角色: </el-col>
+                            <el-col :span="1" class="z-col-3 col-font">是否开启预设角色回复: </el-col>
                             <el-col :span="1" class="z-col-4">
-                                <el-tooltip content="只对chatGPT有效" placement="top">
+                                <el-tooltip content="只对GPT的模型有效" placement="top">
                                     <el-switch
                                         @change="isRoleResp()"
                                         v-model="roleResp"
@@ -211,7 +211,7 @@
                             </el-col>
                         </el-row>
                         <el-row :gutter="10" class="set-item set-item-1">
-                            <el-col :span="1" class="z-col-3 col-font">是否开启滚动加载: </el-col>
+                            <el-col :span="1" class="z-col-7 col-font">是否开启滚动加载: </el-col>
                             <el-col :span="1" class="z-col-4">
                                 <el-tooltip content="建议关闭" placement="top">
                                     <el-switch
@@ -1124,6 +1124,7 @@ export default {
             this.fileData.file = file.name;
         },
         checkUploadFileType(file) {
+            this.isOpenSwitch = true;
             this.fileData.user = sessionStorage.getItem('user');
 
             var filePath = file.name;

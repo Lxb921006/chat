@@ -726,7 +726,7 @@ ol > li {
     bottom: 2px;
 }
 .z-col-3 {
-    width: 121px;
+    width: 145px;
     padding-left: 6px!important;
 }
 .z-col-4 {
@@ -743,6 +743,10 @@ ol > li {
     position: relative;
     bottom: 7px;
     right: 14px;
+}
+.z-col-7 {
+    width: 120px;
+    padding-left: 6px!important;
 }
 .el-popover__title {
     font-weight: 900!important;
