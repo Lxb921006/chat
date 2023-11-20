@@ -1294,6 +1294,15 @@ export default {
         },
         // 搜索聊天记录
         getSearchData() {
+            if (this.showNewPage) {
+                this.showNewPage = false;
+                this.show = true;
+                this.showhi = true;
+                this.isOpenNewSess = false;
+                sessionStorage.setItem("isOpenNewSess", 2);
+                sessionStorage.setItem("showNewPage", 1);
+            }
+
             this.setTimer = false;
             if (this.chatCache.length != 0) {
                 store.commit("GET_CHAT_CACHE", this.input);
