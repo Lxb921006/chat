@@ -291,7 +291,9 @@
                                 v-for="item in totalPages"
                                 :key="item"
                                 :label="item"
-                                :value="item">
+                                :value="item"
+                                :disabled="item==pages.page"
+                                >
                                 </el-option>
                             </el-select>
                         </div>
@@ -703,6 +705,13 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
+        afterLoginDataOnce() {
+            let fld = sessionStorage.getItem('firstLoadData');
+            if (!fld) {
+                this.clickLoadChatData();
+                sessionStorage.setItem('firstLoadData', 'firstdone');
+            }
+        },
         aiNewSesshow() {
             let showNewPage = sessionStorage.getItem("showNewPage");
             if (showNewPage == 1) {
@@ -2165,7 +2174,8 @@ export default {
     mounted() {
         if (window.innerWidth < 600) {
             this.ash = false;
-        }
+        };
+        
         this.checkContextStatus();
         this.getAllChatData();
         this.getAllChatRecycleData();
@@ -2180,6 +2190,7 @@ export default {
         this.aiNewSesshow();
         this.dafaultIsOpenNewSess();
         this.getSelectSessKey();
+        this.afterLoginDataOnce();
     },
 }
 </script>
