@@ -100,8 +100,12 @@
                                     <!-- Ai模型 -->
                                     <transition name="el-zoom-in-top">
                                         <div class="platform">
-                                            <p>
+                                            <p class="model-icon-name">
                                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
+                                            </p>
+                                            <!-- 选择的上下文 -->
+                                            <p class="add-context">
+                                                <el-checkbox v-model="data1.checked" size="medium" @change="addContext(data1.uuid)" ref="checkbox"></el-checkbox>
                                             </p>
                                         </div>
                                     </transition>
@@ -336,13 +340,15 @@
                         </el-button>
                     </el-popover>
                 </div>
-                <!-- 提示词 -->
-                <div class="user rb" v-show="false">
-                    <el-button @click="isOpenNoticeWord()">
-                        <svg class="icon z-rb-icon" aria-hidden="true">
-                            <use xlink:href="#icon-bangzhu"></use>
-                        </svg>
-                    </el-button>
+                <!-- 清空选择的上下文 -->
+                <div class="user rb">
+                    <el-tooltip content="清空选择的上下文" placement="top">
+                        <el-button @click="clearContext()">
+                            <svg class="icon z-rb-icon" aria-hidden="true">
+                                <use xlink:href="#icon-qingkong"></use>
+                            </svg>
+                        </el-button>
+                    </el-tooltip>
                 </div>
                 <!-- 工具-pdf-word文档互转 -->
                 <div class="user rb">
@@ -535,6 +541,8 @@ export default {
     },
     data()  {
         return {
+            checked: null,
+            specifiedContexts: [],
             isOpenNewSess: false,
             selectedSess: "",
             showNewPage: false,
@@ -705,6 +713,70 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
+        contextStatus() {
+            this.$nextTick(function () {
+                this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
+                if (this.specifiedContexts.length > 0) {
+                    let cd = this.chatCache;
+                    for (let i = 0; i < cd.length; i++) {
+                        if(cd[i].key == this.selectedSess) {
+                            let child = cd[i].child;
+                            for (let t = 0; t < child.length; t++) {
+                                if (this.specifiedContexts.includes(child[t].uuid)) {
+                                    child[t].checked = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        },
+        clearContext() {
+            this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
+            let cd = this.chatCache;
+            for (let i = 0; i < cd.length; i++) {
+                if(cd[i].key == this.selectedSess) {
+                    let child = cd[i].child;
+                    for (let t = 0; t < child.length; t++) {
+                        if (this.specifiedContexts.includes(child[t].uuid)) {
+                            child[t].checked = false;
+                        }
+                    }
+                }
+            }
+            this.specifiedContexts = [];
+            sessionStorage.setItem('specifiedContexts', JSON.stringify(this.specifiedContexts));
+        },
+        submitSpecifiedContext() {
+            this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
+            let data = [];
+            let cd = this.chatCache;
+            for (let i = 0; i < cd.length; i++) {
+                if(cd[i].key == this.selectedSess) {
+                    let child = cd[i].child;
+                    for (let t = 0; t < child.length; t++) {
+                        if (this.specifiedContexts.includes(child[t].uuid)) {
+                            data.push(child[t]);
+                        }
+                    }
+                }
+            }
+
+            
+            return data;
+        },
+        addContext(data) {
+            if (this.specifiedContexts.includes(data)) {
+                let index = this.specifiedContexts.indexOf(data);
+                if (index !== -1) {
+                    this.specifiedContexts.splice(index, 1);
+                }
+            } else {
+                this.specifiedContexts.push(data);
+            }
+
+            sessionStorage.setItem('specifiedContexts', JSON.stringify(this.specifiedContexts));
+        },
         afterLoginDataOnce() {
             let fld = sessionStorage.getItem('firstLoadData');
             if (!fld) {
@@ -1474,6 +1546,7 @@ export default {
                     file: newfile,
                     key: key,
                     isParent: 2,
+                    checked: false,
                 };
                 
                 let new_data = {};
@@ -1592,6 +1665,7 @@ export default {
         },
         // 接收数据
         getMessage (msg) {
+            
             let jd = JSON.parse(msg.data);
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
@@ -1603,6 +1677,9 @@ export default {
                             child[k].cid = jd.cid;
                             child[k].pid = jd.pid;
                             child[k].content = jd.content;
+                            if (this.specifiedContexts.includes(child[k].uuid)) {
+                                child[k] = true;
+                            }
                         }
                     }
                 }
@@ -1637,6 +1714,9 @@ export default {
                                 pid: child[k].pid,
                                 cursor: false,
                                 file: this.claudeFile,
+                            }
+                            if (this.specifiedContexts.includes(child[k].uuid)) {
+                                child[k] = true;
                             }
                             
                             store.commit("SAVE_CHAT_CACHE_ANSWER", data);
@@ -1741,7 +1821,6 @@ export default {
             } else {
                 gptData = [];
             }
-
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
@@ -1773,11 +1852,23 @@ export default {
             } else {
                 gptData = [];
             }
-
+            
+            let context = null;
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent, content: gptData.slice(-4), model: this.selectedModel};
+                    console.log("xfxh specifiedContexts >>> ", this.specifiedContexts);
+                    if (this.specifiedContexts.length > 0) {
+                        context = this.submitSpecifiedContext();
+                        console.log("xfxh context >>> ", context);
+                    } else {
+                        context = gptData.slice(gptData.length - 5, gptData.length - 1);
+                        if (context.length < 3) {
+                            context = gptData.slice(0, gptData.length - 1);
+                        }
+                    }
+                    
+                    sendData = {data: this.chatContent, content: context, model: this.selectedModel};
                 } else {
                     sendData = {data: this.chatContent, content: '', model: this.selectedModel};
                 }
@@ -1785,6 +1876,7 @@ export default {
                 sendData = {data: this.chatContent, content: '', model: this.selectedModel};
             }
             
+            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1797,6 +1889,12 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
+                    if (this.specifiedContexts.length > 0) {
+                        context = this.submitSpecifiedContext();
+                        console.log("context >>> ", context);
+                    } else {
+                        context = gptData.slice(-10);
+                    }
                     sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: gptData.slice(-10), model: this.selectedModel};
                 } else {
                     sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel};
@@ -1829,10 +1927,21 @@ export default {
             let uuid = Math.floor(id);
             let file = this.pptCreate ? uuid+'.pptx': '';
             let ppt = this.pptCreate ? 'ppt': '';
+            let context = null;
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: gptData.slice(-6), model: this.selectedModel, file: file, ppt: ppt};
+                    console.log("xfxh specifiedContexts >>> ", this.specifiedContexts);
+                    if (this.specifiedContexts.length > 0) {
+                        context = this.submitSpecifiedContext();
+                        console.log("xfxh context >>> ", context);
+                    } else {
+                        context = gptData.slice(gptData.length - 9, gptData.length - 1);
+                        if (context.length < 7) {
+                            context = gptData.slice(0, gptData.length - 1);
+                        }
+                    }
+                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: context, model: this.selectedModel, file: file, ppt: ppt};
                 } else {
                     sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
                 }
@@ -2176,6 +2285,7 @@ export default {
             this.ash = false;
         };
         
+        this.contextStatus();
         this.checkContextStatus();
         this.getAllChatData();
         this.getAllChatRecycleData();

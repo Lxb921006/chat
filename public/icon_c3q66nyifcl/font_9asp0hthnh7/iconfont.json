@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "16631942",
+      "name": "清空",
+      "font_class": "qingkong",
+      "unicode": "e64b",
+      "unicode_decimal": 58955
+    },
+    {
       "icon_id": "1453454",
       "name": "pages",
       "font_class": "pages",

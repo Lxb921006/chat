@@ -1004,3 +1004,42 @@ ol > li {
 .z-content-1 .z-content-2 ~ .z-content-2 {
     margin-top: 25px;
 }
+.model-icon-name {
+    display: inline-block;
+}
+.add-context {
+    float: right;
+    position: relative;
+    right: 1px;
+}
+.add-context .el-checkbox__inner {
+    width: 35px;
+    height: 35px;
+    border-radius: 11px;
+    /* padding-left: 31px; */
+    border-color: #424242;
+    border-bottom: none;
+    background-color: #373737;
+}
+.add-context .el-checkbox__input.is-checked .el-checkbox__inner::after {
+    transform: rotate(43deg) scaleY(3);
+    padding-left: -1px;
+    padding-right: 3px;
+}
+.add-context .el-checkbox__inner::after {
+    left: 14px;
+    top: 12px;
+}
+.add-context .el-checkbox {
+    border-color: #424242;
+}
+.add-context .el-checkbox__input .is-focus {
+    border-color: #424242;
+}
+.add-context .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+    background-color: #424242;
+    border-color: #424242;
+}
+.add-context .el-checkbox__input.is-focus .el-checkbox__inner {
+    border-color: #424242;
+}
