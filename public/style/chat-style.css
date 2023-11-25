@@ -1043,3 +1043,41 @@ ol > li {
 .add-context .el-checkbox__input.is-focus .el-checkbox__inner {
     border-color: #424242;
 }
+.context-list {
+    position: absolute;
+    width: 9%;
+    top: 101px;
+    height: 300px;
+    /* padding-left: 10px; */
+    overflow-x: hidden;
+    border: 1px solid #424242;
+    border-radius: 10px;
+    background-color: #373737;
+}
+.context-list .el-row {
+    color: #fff;
+    font-size: 12px;
+    padding: 0px 6px;
+    /* text-align: left; */
+}
+.context-list-title {
+    color: #fff;
+    padding-top: 7px;
+    /* text-align: left; */
+}
+.context-list::-webkit-scrollbar {
+    width: 2px!important; /* 设置滚动条宽度 */
+  }
+  /* 设置滚动条背景颜色 */
+  /* .content::-webkit-scrollbar-track {
+    background-color: #262626!important; 
+  } */
+  .context-list::-webkit-scrollbar-thumb {
+    background-color: #cecece!important; /* 设置滚动条滑块颜色 */
+    border-radius: 3px; /* 设置滑块的圆角 */
+    cursor: pointer;
+  }
+  
+  .context-list::-webkit-scrollbar-thumb:hover {
+    background-color: #eeeded!important; /* 设置滚动条滑块悬停时的颜色 */
+  }

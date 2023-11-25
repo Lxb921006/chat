@@ -63,6 +63,26 @@
                     </svg>
                 </div>
             </transition>
+            <!-- 选中的上下文列表 -->
+            <div>
+                <transition name="el-zoom-in-center">
+                    <div class="context-list" v-show="checked">
+                    <h3 class="context-list-title">
+                        选中的上下文
+                        <el-divider></el-divider>
+                    </h3>
+                    
+                    <transition-group name="el-zoom-in-center">
+                    
+                    <el-row :gutter="10" v-for="(data, index) in specifiedContextsTitle" :key="index">
+                        {{ data }}
+                        <el-divider></el-divider>
+                    </el-row>
+                </transition-group>
+            </div>
+                </transition>
+            </div>
+            
             <!-- 新建会话 -->
             <div class="add-new-sess" v-show="showNewPage">
                 <div class="intru-content">
@@ -105,7 +125,9 @@
                                             </p>
                                             <!-- 选择的上下文 -->
                                             <p class="add-context">
-                                                <el-checkbox v-model="data1.checked" size="medium" @change="addContext(data1.uuid)" ref="checkbox"></el-checkbox>
+                                                <el-tooltip content="勾选上下文进行连续提问" placement="top">
+                                                    <el-checkbox v-model="data1.checked" size="medium" @change="addContext(data1)" ref="checkbox"></el-checkbox>
+                                                </el-tooltip>
                                             </p>
                                         </div>
                                     </transition>
@@ -491,7 +513,7 @@ import baseUrl from "../../utils/baseUrl";
 import { chatList, chatSave, getFileText, chatDel, chatUpdate, downloadFile } from '../../api';
 import { v4 as uuidv4 } from 'uuid';
 
-
+// 1 关闭 false, 2 开启 true
 export default {
     name: "chat",
     // 弹窗可拖拽
@@ -541,8 +563,9 @@ export default {
     },
     data()  {
         return {
-            checked: null,
+            checked: false,
             specifiedContexts: [],
+            specifiedContextsTitle: [],
             isOpenNewSess: false,
             selectedSess: "",
             showNewPage: false,
@@ -716,7 +739,9 @@ export default {
         contextStatus() {
             this.$nextTick(function () {
                 this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
-                if (this.specifiedContexts.length > 0) {
+                let checked = sessionStorage.getItem("checked");
+                this.checked = checked == "1" ? true : false;
+                if (this.specifiedContexts && this.specifiedContexts.length > 0) {
                     let cd = this.chatCache;
                     for (let i = 0; i < cd.length; i++) {
                         if(cd[i].key == this.selectedSess) {
@@ -724,10 +749,14 @@ export default {
                             for (let t = 0; t < child.length; t++) {
                                 if (this.specifiedContexts.includes(child[t].uuid)) {
                                     child[t].checked = true;
+                                    this.specifiedContextsTitle.push(child[t].title);
                                 }
                             }
                         }
                     }
+                } else {
+                    this.specifiedContexts = [];
+                    this.specifiedContextsTitle = [];
                 }
             })
         },
@@ -745,7 +774,11 @@ export default {
                 }
             }
             this.specifiedContexts = [];
+            this.specifiedContextsTitle = [];
+            this.checked = false;
             sessionStorage.setItem('specifiedContexts', JSON.stringify(this.specifiedContexts));
+            sessionStorage.setItem('checked', this.checked ? "1" : "2");
+            Message.success("勾选的上下文已取消.");
         },
         submitSpecifiedContext() {
             this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
@@ -762,20 +795,28 @@ export default {
                 }
             }
 
-            
             return data;
         },
         addContext(data) {
-            if (this.specifiedContexts.includes(data)) {
-                let index = this.specifiedContexts.indexOf(data);
-                if (index !== -1) {
-                    this.specifiedContexts.splice(index, 1);
+            if (this.specifiedContexts.includes(data.uuid)) {
+                let indexUuid = this.specifiedContexts.indexOf(data.uuid);
+                let indextitle = this.specifiedContextsTitle.indexOf(data.title);
+                if (indexUuid !== -1) {
+                    this.specifiedContexts.splice(indexUuid, 1);
+                    this.specifiedContextsTitle.splice(indextitle, 1);
                 }
             } else {
-                this.specifiedContexts.push(data);
+                this.specifiedContexts.push(data.uuid);
+                this.specifiedContextsTitle.push(data.title);
             }
 
+            if (this.specifiedContextsTitle.length > 0 ) {
+                this.checked = true;
+            } else {
+                this.checked = false;
+            }
             sessionStorage.setItem('specifiedContexts', JSON.stringify(this.specifiedContexts));
+            sessionStorage.setItem('checked', this.checked ? "1" : "2");
         },
         afterLoginDataOnce() {
             let fld = sessionStorage.getItem('firstLoadData');
