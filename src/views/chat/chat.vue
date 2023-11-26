@@ -773,9 +773,11 @@ export default {
                     }
                 }
             }
+        
             this.specifiedContexts = [];
             this.specifiedContextsTitle = [];
             this.checked = false;
+      
             sessionStorage.setItem('specifiedContexts', JSON.stringify(this.specifiedContexts));
             sessionStorage.setItem('checked', this.checked ? "1" : "2");
             Message.success("勾选的上下文已取消.");
@@ -883,12 +885,15 @@ export default {
                 Message.info("已是最新对话");
                 return;
             }
+
+            this.checked = false;
             this.showNewPage = true;
             this.show = false;
             this.showhi = false;
             this.isOpenNewSess = true;
             sessionStorage.setItem("isOpenNewSess", 1);
             sessionStorage.setItem("showNewPage", 2);
+            // sessionStorage.setItem("checked", this.checked ? 1 : 2);
         },
         handleRemove(file, fileList) {
             this.isOpenSwitch = true;
@@ -2245,6 +2250,8 @@ export default {
                 this.showhi = true;
                 sessionStorage.setItem("showNewPage", 1);
             }
+            let checked = sessionStorage.getItem("checked");
+            this.checked = checked == "1" ? true : false;
             this.selectedSess = data.key;
             this.isOpenNewSess = false;
             this.recordSelectSessKey();
