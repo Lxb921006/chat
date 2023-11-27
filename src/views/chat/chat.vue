@@ -67,22 +67,24 @@
             <div>
                 <transition name="el-zoom-in-center">
                     <div class="context-list" v-show="checked">
-                    <h3 class="context-list-title">
-                        选中的上下文
-                        <el-divider></el-divider>
-                    </h3>
-                    
-                    <transition-group name="el-zoom-in-center">
-                    
-                    <el-row :gutter="10" v-for="(data, index) in specifiedContextsTitle" :key="index">
-                        {{ data }}
-                        <el-divider></el-divider>
-                    </el-row>
-                </transition-group>
-            </div>
+                        <h3 class="context-list-title">
+                            选中的上下文
+                            <!-- <svg class="icon context-close-1" aria-hidden="true" @click="clearContext()">
+                                            <use xlink:href="#icon-a-icon_huaban1" ></use>
+                                        </svg> -->
+                            <el-divider></el-divider>
+                        </h3>
+                        <transition-group name="el-zoom-in-center">
+                            <el-row :gutter="10" v-for="(data, index) in specifiedContextsTitle" :key="index">
+                                {{ data | getContextTitle() }}<svg class="icon context-close-2" aria-hidden="true" @click="removeContext(data)">
+                                            <use xlink:href="#icon-a-icon_huaban1" ></use>
+                                        </svg>
+                                <el-divider></el-divider>
+                            </el-row>
+                        </transition-group>
+                    </div>
                 </transition>
             </div>
-            
             <!-- 新建会话 -->
             <div class="add-new-sess" v-show="showNewPage">
                 <div class="intru-content">
@@ -123,9 +125,9 @@
                                             <p class="model-icon-name">
                                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
                                             </p>
-                                            <!-- 选择的上下文 -->
+                                            <!-- 勾选上下文提交给ai针对同类问题进行连续提问 -->
                                             <p class="add-context">
-                                                <el-tooltip content="勾选上下文进行连续提问" placement="top">
+                                                <el-tooltip content="勾选上下文进行连续提问, 如果未勾选, 且上下文开关打开默认是拿最近的7条上下文" placement="top">
                                                     <el-checkbox v-model="data1.checked" size="medium" @change="addContext(data1)" ref="checkbox"></el-checkbox>
                                                 </el-tooltip>
                                             </p>
@@ -749,7 +751,7 @@ export default {
                             for (let t = 0; t < child.length; t++) {
                                 if (this.specifiedContexts.includes(child[t].uuid)) {
                                     child[t].checked = true;
-                                    this.specifiedContextsTitle.push(child[t].title);
+                                    this.specifiedContextsTitle.push(child[t].title+"_"+child[t].uuid);
                                 }
                             }
                         }
@@ -764,12 +766,10 @@ export default {
             this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
             let cd = this.chatCache;
             for (let i = 0; i < cd.length; i++) {
-                if(cd[i].key == this.selectedSess) {
-                    let child = cd[i].child;
-                    for (let t = 0; t < child.length; t++) {
-                        if (this.specifiedContexts.includes(child[t].uuid)) {
-                            child[t].checked = false;
-                        }
+                let child = cd[i].child;
+                for (let t = 0; t < child.length; t++) {
+                    if (this.specifiedContexts.includes(child[t].uuid)) {
+                        child[t].checked = false;
                     }
                 }
             }
@@ -802,14 +802,14 @@ export default {
         addContext(data) {
             if (this.specifiedContexts.includes(data.uuid)) {
                 let indexUuid = this.specifiedContexts.indexOf(data.uuid);
-                let indextitle = this.specifiedContextsTitle.indexOf(data.title);
+                let indextitle = this.specifiedContextsTitle.indexOf(data.title+"_"+data.uuid);
                 if (indexUuid !== -1) {
                     this.specifiedContexts.splice(indexUuid, 1);
                     this.specifiedContextsTitle.splice(indextitle, 1);
                 }
             } else {
                 this.specifiedContexts.push(data.uuid);
-                this.specifiedContextsTitle.push(data.title);
+                this.specifiedContextsTitle.push(data.title+"_"+data.uuid);
             }
 
             if (this.specifiedContextsTitle.length > 0 ) {
@@ -817,7 +817,42 @@ export default {
             } else {
                 this.checked = false;
             }
+
             sessionStorage.setItem('specifiedContexts', JSON.stringify(this.specifiedContexts));
+            sessionStorage.setItem('checked', this.checked ? "1" : "2");
+        },
+        unCheck(uuid) {
+            this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
+            let cd = this.chatCache;
+            for (let i = 0; i < cd.length; i++) {
+                let child = cd[i].child;
+                for (let t = 0; t < child.length; t++) {
+                    if (uuid == child[t].uuid) {
+                        child[t].checked = false;
+                        let indexUuid = this.specifiedContexts.indexOf(child[t].uuid);
+                        this.specifiedContexts.splice(indexUuid, 1);
+                    }
+                }
+            }
+
+            sessionStorage.setItem('specifiedContexts', JSON.stringify(this.specifiedContexts));
+        },
+        removeContext(params) {
+            let data = {data: params.split("_")[0], uuid: parseInt(params.split("_")[1])};
+            if (this.specifiedContextsTitle.includes(params)) {
+                let indextitle = this.specifiedContextsTitle.indexOf(params);
+                if (indextitle !== -1) {
+                    this.specifiedContextsTitle.splice(indextitle, 1);
+                }
+            }
+
+            this.unCheck(data.uuid);
+            if (this.specifiedContextsTitle.length > 0 ) {
+                this.checked = true;
+            } else {
+                this.checked = false;
+            }
+            
             sessionStorage.setItem('checked', this.checked ? "1" : "2");
         },
         afterLoginDataOnce() {
@@ -2326,6 +2361,14 @@ export default {
                 return label ? label.label : "";
             }
             return data;
+        },
+        getContextTitle(data) {
+            let title = data.split("_");
+            return title[0];
+        },
+        getContextUUID(data) {
+            let title = data.split("_");
+            return title[1];
         },
     },
     mounted() {

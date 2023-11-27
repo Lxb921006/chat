@@ -1046,7 +1046,7 @@ ol > li {
 .context-list {
     position: absolute;
     width: 9%;
-    top: 101px;
+    top: 126px;
     height: 300px;
     /* padding-left: 10px; */
     overflow-x: hidden;
@@ -1067,17 +1067,54 @@ ol > li {
 }
 .context-list::-webkit-scrollbar {
     width: 2px!important; /* 设置滚动条宽度 */
-  }
-  /* 设置滚动条背景颜色 */
-  /* .content::-webkit-scrollbar-track {
-    background-color: #262626!important; 
-  } */
-  .context-list::-webkit-scrollbar-thumb {
+}
+.context-list::-webkit-scrollbar-thumb {
     background-color: #cecece!important; /* 设置滚动条滑块颜色 */
     border-radius: 3px; /* 设置滑块的圆角 */
     cursor: pointer;
-  }
-  
-  .context-list::-webkit-scrollbar-thumb:hover {
+}
+.context-list::-webkit-scrollbar-thumb:hover {
     background-color: #eeeded!important; /* 设置滚动条滑块悬停时的颜色 */
-  }
+}
+/* .context-close {
+    height: 25px;
+    width: 25px;
+    position: relative;
+    top: 74px;
+    left: 125px;
+}
+.context-close button {
+    height: 25px;
+    width: 25px;
+    background-color: #262626;
+    border: none;
+}
+.context-close button:hover {
+    background-color: #262626;
+}
+.context-close button:focus {
+    background-color: #262626;
+} */
+/* .context-list svg {
+    font-size: 7px;
+    position: relative;
+    top: 5px;
+    left: 5px;
+} */
+.context-list svg:hover {
+    color: #009844;
+}
+.context-close-1 {
+    font-size: 7px;
+    position: relative;
+    top: 5px;
+    /* bottom: 17px; */
+    left: 5px;
+}
+.context-close-2 {
+    font-size: 7px;
+    position: relative;
+    top: 5px;
+    /* bottom: 17px; */
+    left: 5px;
+}
