@@ -127,7 +127,7 @@
                                             </p>
                                             <!-- 勾选上下文提交给ai针对同类问题进行连续提问 -->
                                             <p class="add-context">
-                                                <el-tooltip content="勾选上下文进行连续提问, 如果未勾选, 且上下文开关打开默认是拿最近的7条上下文" placement="top">
+                                                <el-tooltip content="勾选上下文进行连续提问, 如果未勾选, 且上下文开关打开默认是拿最近的5条上下文" placement="top">
                                                     <el-checkbox v-model="data1.checked" size="medium" @change="addContext(data1)" ref="checkbox"></el-checkbox>
                                                 </el-tooltip>
                                             </p>
@@ -1938,13 +1938,14 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    console.log("xfxh specifiedContexts >>> ", this.specifiedContexts);
                     if (this.specifiedContexts.length > 0) {
                         context = this.submitSpecifiedContext();
-                        console.log("xfxh context >>> ", context);
+                        if (context.length >= 4) {
+                            context = context.slice(context.length-3, context.length);
+                        } 
                     } else {
-                        context = gptData.slice(gptData.length - 5, gptData.length - 1);
-                        if (context.length < 3) {
+                        context = gptData.slice(gptData.length - 4, gptData.length - 1);
+                        if (context.length < 2) {
                             context = gptData.slice(0, gptData.length - 1);
                         }
                     }
@@ -1972,7 +1973,6 @@ export default {
                     //发送的信息关联上下文
                     if (this.specifiedContexts.length > 0) {
                         context = this.submitSpecifiedContext();
-                        console.log("context >>> ", context);
                     } else {
                         context = gptData.slice(-10);
                     }
@@ -2012,13 +2012,14 @@ export default {
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
-                    console.log("xfxh specifiedContexts >>> ", this.specifiedContexts);
                     if (this.specifiedContexts.length > 0) {
                         context = this.submitSpecifiedContext();
-                        console.log("xfxh context >>> ", context);
+                        if (context.length >= 6) {
+                            context = context.slice(context.length - 5, context.length);
+                        } 
                     } else {
-                        context = gptData.slice(gptData.length - 9, gptData.length - 1);
-                        if (context.length < 7) {
+                        context = gptData.slice(gptData.length - 6, gptData.length - 1);
+                        if (context.length < 4) {
                             context = gptData.slice(0, gptData.length - 1);
                         }
                     }
