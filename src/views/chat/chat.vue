@@ -1737,7 +1737,6 @@ export default {
                     break
                 case 'GPT-4':
                     this.chatGPT35();
-                    // this.chatLLAM();
                     break
                 case 'xf':
                     this.sendXF();
@@ -1875,7 +1874,6 @@ export default {
         // claude
         sendClaude() {
             let sendData = {};
-            // let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             if (this.contextSwitch) {
                 //发送的信息关联上下文
                 sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent, model: this.selectedModel, context: 'open'};

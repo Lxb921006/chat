@@ -1076,31 +1076,6 @@ ol > li {
 .context-list::-webkit-scrollbar-thumb:hover {
     background-color: #eeeded!important; /* 设置滚动条滑块悬停时的颜色 */
 }
-/* .context-close {
-    height: 25px;
-    width: 25px;
-    position: relative;
-    top: 74px;
-    left: 125px;
-}
-.context-close button {
-    height: 25px;
-    width: 25px;
-    background-color: #262626;
-    border: none;
-}
-.context-close button:hover {
-    background-color: #262626;
-}
-.context-close button:focus {
-    background-color: #262626;
-} */
-/* .context-list svg {
-    font-size: 7px;
-    position: relative;
-    top: 5px;
-    left: 5px;
-} */
 .context-list svg:hover {
     color: #009844;
 }
