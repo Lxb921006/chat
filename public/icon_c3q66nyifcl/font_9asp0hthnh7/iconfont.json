@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "27063788",
+      "name": "智能分析能力",
+      "font_class": "zhinengfenxinengli",
+      "unicode": "e62f",
+      "unicode_decimal": 58927
+    },
+    {
+      "icon_id": "33703571",
+      "name": "Advantages of artificial",
+      "font_class": "a-Advantagesofartificial",
+      "unicode": "e6eb",
+      "unicode_decimal": 59115
+    },
+    {
       "icon_id": "26770255",
       "name": "关闭",
       "font_class": "a-icon_huaban1",

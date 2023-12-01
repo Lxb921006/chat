@@ -4,9 +4,9 @@
         <div class="aside" v-show="ash">
             <div class="title">
                 <svg class="icon-qa-3" aria-hidden="true">
-                    <use xlink:href="#icon-daima"></use>
+                    <use xlink:href="#icon-a-Advantagesofartificial"></use>
                 </svg>
-                <h2>DaVinci AI</h2>
+                <h2>Chat AI</h2>
             </div>
             <div class="add_new_sess">
                 <el-button type="primary" size="medium" icon="el-icon-document-add" round @click="createNewPage()">新建对话</el-button>
