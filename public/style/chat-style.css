@@ -1043,6 +1043,37 @@ ol > li {
 .add-context .el-checkbox__input.is-focus .el-checkbox__inner {
     border-color: #424242;
 }
+.context-close {
+    position: absolute;
+    width: 9%;
+    top: 106px;
+    text-align: right;
+}
+.context-close span {
+    padding-right: 6px;
+    border: 1px solid #55575b;
+    border-radius: 2px;
+    border-bottom: none;
+    position: relative;
+    top: 0;
+    display: inline-block;
+    height: 24px;
+    cursor: pointer;
+}
+.context-close span:hover {
+    background-color: #009844;
+    border-color: #009844;
+}
+.context-close svg {
+    position: relative;
+    font-size: 8px;
+    top: 1px;
+    left: 3px;
+    color: #55575b;
+}
+.context-close svg:hover {
+    color: #55575b;
+}
 .context-list {
     position: absolute;
     width: 9%;
@@ -1051,19 +1082,21 @@ ol > li {
     /* padding-left: 10px; */
     overflow-x: hidden;
     border: 1px solid #424242;
-    border-radius: 10px;
+    border-radius: 3px;
     background-color: #373737;
 }
 .context-list .el-row {
     color: #fff;
     font-size: 12px;
-    padding: 0px 6px;
-    /* text-align: left; */
+    margin-left: 0!important;
+    margin-right: 0!important;
+}
+.context-list .el-row span {
+    padding: 0 4px;
 }
 .context-list-title {
-    color: #fff;
+    color: #409eff;
     padding-top: 7px;
-    /* text-align: left; */
 }
 .context-list::-webkit-scrollbar {
     width: 2px!important; /* 设置滚动条宽度 */
@@ -1087,7 +1120,7 @@ ol > li {
     left: 5px;
 }
 .context-close-2 {
-    font-size: 7px;
+    font-size: 6px;
     position: relative;
     top: 5px;
     /* bottom: 17px; */

@@ -63,22 +63,34 @@
                     </svg>
                 </div>
             </transition>
+            <!-- 清空所有选中的上下文 -->
+            <div>
+                <transition name="el-zoom-in-center">
+                    <div class="context-close" v-show="checked">
+                        <span @click="clearContext()">
+                            <svg class="icon" aria-hidden="true">
+                                <use xlink:href="#icon-a-icon_huaban1" ></use>
+                            </svg>
+                        </span>
+                </div>
+                </transition>
+            </div>
             <!-- 选中的上下文列表 -->
             <div>
                 <transition name="el-zoom-in-center">
                     <div class="context-list" v-show="checked">
                         <h3 class="context-list-title">
                             选中的上下文
-                            <!-- <svg class="icon context-close-1" aria-hidden="true" @click="clearContext()">
-                                            <use xlink:href="#icon-a-icon_huaban1" ></use>
-                                        </svg> -->
                             <el-divider></el-divider>
                         </h3>
                         <transition-group name="el-zoom-in-center">
                             <el-row :gutter="10" v-for="(data, index) in specifiedContextsTitle" :key="index">
-                                {{ data | getContextTitle() }}<svg class="icon context-close-2" aria-hidden="true" @click="removeContext(data)">
-                                            <use xlink:href="#icon-a-icon_huaban1" ></use>
-                                        </svg>
+                                <span>
+                                    {{ data | getContextTitle() }}
+                                    <svg class="icon context-close-2" aria-hidden="true" @click="removeContext(data)">
+                                        <use xlink:href="#icon-a-icon_huaban1" ></use>
+                                    </svg>
+                                </span>
                                 <el-divider></el-divider>
                             </el-row>
                         </transition-group>
@@ -365,7 +377,7 @@
                     </el-popover>
                 </div>
                 <!-- 清空选择的上下文 -->
-                <div class="user rb">
+                <div class="user rb" v-if="false">
                     <el-tooltip content="清空选择的上下文" placement="top">
                         <el-button @click="clearContext()">
                             <svg class="icon z-rb-icon" aria-hidden="true">
@@ -1202,7 +1214,7 @@ export default {
                 sessionStorage.setItem("showNewPage", 2);
                 sessionStorage.setItem("rollingLoadSwitch", 2);
                 this.recordIsOpenNewSess(1);
-                Message.error("还没有任何对话记录.");
+                Message.warning("还没有对话记录, 开始提问吧.");
                 return;
             }
             let respData = resp.data.data;
@@ -2163,8 +2175,6 @@ export default {
                 Message.error(resp.data.msg);
                 return;
             }
-
-            // Message.success(resp.data.msg);
         },
         async removeChatParent(key) {
             this.getAllChatData();
@@ -2201,10 +2211,9 @@ export default {
                 this.createNewPage();
             }
         },
-        // 删除对话记录, 会现在回收站保存, 最多保留200条数据
+        // 删除对话记录
         async removeChat(targetName) {
             this.getAllChatData();
-            // let title = "";
             let del_data = [];
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].key == this.selectedSess) {
@@ -2364,6 +2373,10 @@ export default {
         getContextTitle(data) {
             let title = data.split("_");
             return title[0];
+        },
+        getContextIcon(data, icon) {
+            let icon_name = icon.split("_");
+            return icon_name[2];
         },
         getContextUUID(data) {
             let title = data.split("_");
