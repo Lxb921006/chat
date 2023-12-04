@@ -175,6 +175,9 @@
 .title {
     padding: 14px 0;
 }
+.title svg {
+    font-size: 24px;
+}
 .tab {
     height: 54%;
     overflow-y: auto;
