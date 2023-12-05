@@ -342,7 +342,7 @@
                         </div>
                         <div class="smbpages">
                             <el-button size="mini" type="primary" @click="clickLoadChatData()">加载数据</el-button>
-                            <el-button size="mini" type="primary" @click="loadLatestTenData()">加载最新10条</el-button>
+                            <el-button size="mini" type="primary" @click="loadLatestTenData()" :loading="tenDataLoading">加载最新10条</el-button>
                         </div>
                         <el-button slot="reference">
                             <svg class="icon z-rb-icon" aria-hidden="true">
@@ -350,41 +350,6 @@
                             </svg>
                         </el-button>
                     </el-popover>
-                </div>
-                <!-- 插件 -->
-                <div class="user rb" v-if="false">
-                    <el-popover
-                        placement="right"
-                        width="400"
-                        trigger="click">
-                        <div class="z-rb-title">
-                            <h2>插件</h2>
-                        </div>
-                        <el-row :gutter="20">
-                            <el-col :span=10>
-                                <el-checkbox v-model="pptCreate" size="medium">
-                                    <svg class="icon z-rb-icon z-ppt-icon" aria-hidden="true">
-                                        <use xlink:href="#icon-ppt"></use>
-                                    </svg>ppt生成(只能用GPT-3.5-turbo模型来生成)
-                                </el-checkbox>
-                            </el-col>
-                        </el-row>
-                        <el-button slot="reference">
-                            <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-chajian"></use>
-                            </svg>
-                        </el-button>
-                    </el-popover>
-                </div>
-                <!-- 清空选择的上下文 -->
-                <div class="user rb" v-if="false">
-                    <el-tooltip content="清空选择的上下文" placement="top">
-                        <el-button @click="clearContext()">
-                            <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-qingkong"></use>
-                            </svg>
-                        </el-button>
-                    </el-tooltip>
                 </div>
                 <!-- 工具-pdf-word文档互转 -->
                 <div class="user rb">
@@ -577,6 +542,7 @@ export default {
     },
     data()  {
         return {
+            tenDataLoading: false,
             checked: false,
             specifiedContexts: [],
             specifiedContextsTitle: [],
@@ -1129,6 +1095,7 @@ export default {
         },
         // 重新加载
         async loadLatestTenData() {
+            this.tenDataLoading = true;
             this.recordIsOpenNewSess(2);
             this.isScrollLoadDataStatus = true;
             this.isOpenNewSess = false;
@@ -1154,11 +1121,13 @@ export default {
                 sessionStorage.setItem("rollingLoadSwitch", 2);
                 this.recordIsOpenNewSess(1);
                 Message.error("还没有任何对话记录.");
+                this.tenDataLoading = false;
                 return;
             }
 
             if (respData.length == 0) {
                 Message.error("没有数据可加载.");
+                this.tenDataLoading = false;
                 return;
             }
 
@@ -1181,6 +1150,7 @@ export default {
             // 必须等数据加载完才能让handleScroll继续监听滚动条
             this.setTimer = true; 
             this.scrollLoading = false;
+            this.tenDataLoading = false;
             this.chatTitleFormat();
         },
         // 点击可选择页面加载数据
