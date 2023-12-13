@@ -3,7 +3,7 @@
         <!-- 左侧边栏 -->
         <div class="aside" v-show="ash">
             <div class="title">
-                <svg class="icon-qa-3" aria-hidden="true">
+                <svg class="icon-qa-5" aria-hidden="true">
                     <use xlink:href="#icon-a-Advantagesofartificial"></use>
                 </svg>
                 <h2>Chat AI</h2>

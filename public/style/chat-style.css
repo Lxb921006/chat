@@ -401,6 +401,39 @@
     fill: currentColor;
     overflow: hidden;
 }
+.icon-qa-5 {
+    position: relative;
+    top: 3px;
+    width: 2em;
+    height: 2em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden; 
+    animation: shine 2s ease-out infinite;
+}
+@keyframes shine {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.3);
+    }
+}  
+.icon-qa-5::before {
+    content: '';
+    width: 2em;
+    height: 2em;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%); 
+    background: white;
+    border-radius: 50%;
+}
 .icon-qa-2 {
     display: block; 
     position: relative;
