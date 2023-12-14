@@ -117,18 +117,18 @@
             </div>
             <!-- Ai回复 -->
             <div class="content" ref="wrapper" @scroll="handleScroll" v-loading="dataLoading" v-show="show">
-                <transition name="el-zoom-in-top">
+                <transition name="el-fade-in-linear">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span>顶部</span>
                     </div>
                 </transition>
-                <transition-group name="el-zoom-in-center">
+                <transition-group name="el-fade-in-linear">
                     <template>
                         <div v-for="(data, index) in filterChatData" :key="index+1" class="z-content" v-show="show">
                             <div  class="z-content-1">
                                 <div v-for="(data1, index1) in data.child" :key=index1+1 class="z-content-2">
                                     <!-- Ai模型 -->
-                                    <transition name="el-zoom-in-top">
+                                    <transition name="el-fade-in-linear">
                                         <div class="platform">
                                             <p class="model-icon-name">
                                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data1.icon"></use></svg> <span @click="chatGptUrl(data1.model)" v-if="data1.title" class="z-model-name">{{ data1.model | getModelLabel(modelAll) }}</span>
@@ -187,7 +187,7 @@
                         </div>
                     </template>
                 </transition-group>
-                <transition name="el-zoom-in-top">
+                <transition name="el-fade-in-linear">
                     <div class="reach" v-show="showhi">
                         <svg class="icon-qa-3" aria-hidden="true"><use xlink:href="#icon-tishi1"></use></svg> <span v-loading="scrollLoading" v-if="scrollLoading"></span>
                         <span v-else>底部</span>
@@ -196,13 +196,13 @@
             </div>
             <!-- 是否停止ai响应 -->
             <div class="stop">
-                <transition name="el-zoom-in-top">
+                <transition name="el-fade-in-linear">
                     <div class="jump-top">
                         <el-button v-show="showhi" circle mini @click="juamTop()"><span class="iconfont icon-cs-dw-xs-1"></span></el-button>
                     </div>
                 </transition>
                 <!-- 是否停止ai响应 -->
-                <transition name="el-zoom-in-center">
+                <transition name="el-fade-in-linear">
                     <el-button :style="{ visibility: stopResp ? 'visible' : 'hidden' }" round class="stop-b" @click="stopChat()" ><span class="iconfont icon-lujing"></span> 停止</el-button>
                 </transition>
                 <transition name="el-zoom-in-top">
