@@ -1119,10 +1119,16 @@ ol > li {
     overflow-x: hidden;
     border: 1px solid #424242;
     border-radius: 3px;
-    background-color: #373737;
+    background-color: #262626;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+}
+.context-list .el-row:nth-of-type(1) {
+    margin-top: 5px;
 }
 .context-list .el-row {
-    color: #fff;
+    color: #e6a547;
     font-size: 12px;
     margin-left: 0!important;
     margin-right: 0!important;

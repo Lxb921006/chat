@@ -65,7 +65,7 @@
             </transition>
             <!-- 清空所有选中的上下文 -->
             <div>
-                <transition name="el-zoom-in-center">
+                <transition name="el-fade-in">
                     <div class="context-close" v-show="checked">
                         <span @click="clearContext()">
                             <svg class="icon" aria-hidden="true">
@@ -77,13 +77,9 @@
             </div>
             <!-- 选中的上下文列表 -->
             <div>
-                <transition name="el-zoom-in-center">
+                <transition name="el-fade-in">
                     <div class="context-list" v-show="checked">
-                        <h3 class="context-list-title">
-                            选中的上下文
-                            <el-divider></el-divider>
-                        </h3>
-                        <transition-group name="el-zoom-in-center">
+                        <transition-group name="el-fade-in">
                             <el-row :gutter="10" v-for="(data, index) in specifiedContextsTitle" :key="index">
                                 <span>
                                     {{ data | getContextTitle() }}
