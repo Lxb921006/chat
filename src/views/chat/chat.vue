@@ -113,6 +113,7 @@
                 </el-row>
                 <div class="change-ques">
                     <el-button icon="el-icon-refresh" size="mini" round @click="changeTitle()">换一批</el-button>
+                    <el-button icon="el-icon-back" size="mini" round @click="returnChat()">返回</el-button>
                 </div>
             </div>
             <!-- Ai回复 -->
@@ -391,15 +392,42 @@
                 <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
-                        <span>模型: 【<span class="z-model-s">{{ selectedModel | getModelLabel2(modelAll) }}</span>】; </span>
+                        <span>模型: 
+                            <el-popover
+                            placement="right"
+                            width="400"
+                            trigger="click">
+                                <div class="z-rb-title">
+                                    <h2>模型选择</h2>
+                                </div>
+                                <el-row :gutter="10" class="set-item">
+                                    <el-col :span="1" class="z-col-5 col-font">模型选择: </el-col>
+                                    <el-col :span="1" class="z-col-6">
+                                        <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
+                                            <el-option
+                                            v-for="item in modelAll"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value"
+                                            :disabled="item.disabled"
+                                            >
+                                            </el-option>
+                                        </el-select>
+                                    </el-col>
+                                </el-row>
+                                    <el-link slot="reference" type="success" :underline="false"  class="z-model-s">
+                                        <el-badge is-dot class="item">
+                                            【{{ selectedModel | getModelLabel2(modelAll) }}】
+                                        </el-badge>
+                                    </el-link>
+                            </el-popover>
+                        </span>
                         <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="roleResp">预设角色回复: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>预设角色回复: 【<span class="z-model-s-c">关闭</span>】; </span>
                         <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <!-- <span v-if="pptCreate">ppt生成: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>ppt生成: 【<span class="z-model-s-c">关闭</span>】; </span> -->
                     </div>
                     <div class="send-input">
                          <el-input
@@ -538,6 +566,7 @@ export default {
     },
     data()  {
         return {
+            modelSwitchNotice: "点我",
             tenDataLoading: false,
             checked: false,
             specifiedContexts: [],
@@ -601,6 +630,7 @@ export default {
             claudeIcon: "#icon-Claude2",
             defaultIcon: "#icon-a-5_moxingtongbu",
             chatGptIcon: "#icon-a-Chatgpt35",
+            geminiIcon: "#icon-gooIcon",
             gpt4: "#icon-a-Chatgpt4",
             assistantIcon: "#icon-a-Chatgpt35",
             xfIcon: "#icon-xunfeilogo",
@@ -651,7 +681,7 @@ export default {
                 {
                     value: 'GPT-4',
                     label: 'GPT-4',
-                    disabled: false,
+                    disabled: true,
                 },
                 {
                     value: 'xf',
@@ -663,11 +693,11 @@ export default {
                     label: '文心一言',
                     disabled: false,
                 },
-                // {
-                //     value: 'qw',
-                //     label: '通义千问',
-                //     disabled: false,
-                // },
+                {
+                    value: 'Gemini',
+                    label: '谷歌Gemini',
+                    disabled: false,
+                },
             ],
             allowFile: ['.txt', '.pdf', '.docx'],
             loadCount: 0,
@@ -704,14 +734,17 @@ export default {
         }),
         // 只展示选中的对话内容
         filterChatData() {
-            this.getSelectSessKey();
-            return this.chatCache.filter(d => d.key == this.selectedSess); 
+            return this.filterChatDataZ();
         }
     },
     components: {
         MarkdownCodeBlock,
     },
     methods: {
+        filterChatDataZ() {
+            this.getSelectSessKey();
+            return this.chatCache.filter(d => d.key == this.selectedSess); 
+        },
         contextStatus() {
             this.$nextTick(function () {
                 this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
@@ -857,7 +890,6 @@ export default {
                 this.repeatChange += 1;
                 this.questions = this.all_questions[this.repeatChange];
             }
-            
         },
         getSelectSessKey() {
             let key = sessionStorage.getItem('recordSelectSessKey');
@@ -1313,6 +1345,9 @@ export default {
                 case '8':
                     this.selectedModel = 'qw';
                     break;
+                case '9':
+                    this.selectedModel = 'Gemini';
+                    break;    
                 default:
                     this.selectedModel = 'chatGPT3.5';
                     break;
@@ -1345,6 +1380,9 @@ export default {
                 case 'qw':
                     window.sessionStorage.setItem('modelSelect', 8);
                     break
+                case 'Gemini':
+                    window.sessionStorage.setItem('modelSelect', 9);
+                    break    
             }
         },
         // 检查chatCache的长度
@@ -1372,7 +1410,7 @@ export default {
                     break;
                 case 'chatGPT3.5':
                     window.open('https://openai.com/');
-                    break;
+                    break;    
                 case 'GPT-4':
                     window.open('https://openai.com/');
                     break;
@@ -1382,6 +1420,9 @@ export default {
                 case 'qw':
                     window.open('https://qianwen.aliyun.com/');
                     break;  
+                case 'Gemini':
+                    window.open('https://ai.google.dev/');
+                    break;
             }   
         },
         // 时间格式化
@@ -1569,7 +1610,7 @@ export default {
                     break;
                 case 'chatGPT3.5':
                     modelIcon = this.chatGptIcon;
-                    break;    
+                    break;   
                 case 'ai-assistant':
                     modelIcon = this.assistantIcon;
                     break;
@@ -1581,7 +1622,10 @@ export default {
                     break;    
                 case 'qw':
                     modelIcon = this.qwIcon;
-                    break;   
+                    break;
+                case 'Gemini':
+                    modelIcon = this.geminiIcon;
+                    break;    
                 default:
                     modelIcon = this.defaultIcon;
                     break;
@@ -1662,6 +1706,9 @@ export default {
                     case 'xf':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
+                    case 'Gemini':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break     
                 }
                 
                 this.socket = new WebSocket(this.wsUrl);
@@ -1719,11 +1766,13 @@ export default {
                 case 'xf':
                     this.sendXF();
                     break
+                case 'Gemini':
+                    this.gemini();
+                    break    
             }
         },
         // 接收数据
         getMessage (msg) {
-            
             let jd = JSON.parse(msg.data);
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {
@@ -1938,33 +1987,55 @@ export default {
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
-        // assistant(第三方提供的api)
-        chatLLAM() {
+        // chatGPT3.5,gpt-4
+        chatGPT35() {
             this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.filter(cd => cd.model == this.selectedModel);
+            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
+
+            if (gptData) {
+                gptData = gptData.child;
+                gptData = gptData.filter(item => item.model == this.selectedModel);
+                if (!gptData) {
+                    gptData = []
+                }
+            } else {
+                gptData = [];
+            }
+
+            let id = (100000000 - 1) * Math.random() + 1;
+            let uuid = Math.floor(id);
+            let file = this.pptCreate ? uuid+'.pptx': '';
+            let ppt = this.pptCreate ? 'ppt': '';
+            let context = null;
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
                     //发送的信息关联上下文
                     if (this.specifiedContexts.length > 0) {
                         context = this.submitSpecifiedContext();
+                        if (context.length >= 6) {
+                            context = context.slice(context.length - 5, context.length);
+                        } 
                     } else {
-                        context = gptData.slice(-10);
+                        context = gptData.slice(gptData.length - 6, gptData.length - 1);
+                        if (context.length < 4) {
+                            context = gptData.slice(0, gptData.length - 1);
+                        }
                     }
-                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: gptData.slice(-10), model: this.selectedModel};
+                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: context, model: this.selectedModel, file: file, ppt: ppt};
                 } else {
-                    sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel};
+                    sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
                 }
             } else {
-                sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel};
+                sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
             }
-
+            
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
-        // chatGPT3.5,gpt-4
-        chatGPT35() {
+        // 谷歌ai
+        gemini() {
             this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
@@ -2262,6 +2333,27 @@ export default {
             let checked = sessionStorage.getItem("checked");
             this.checked = checked == "1" ? true : false;
             this.selectedSess = data.key;
+            this.isOpenNewSess = false;
+            this.recordSelectSessKey();
+            this.recordIsOpenNewSess(2);
+            
+            setTimeout(() => {
+                this.chatTitleFormat();
+                
+            }, 50)
+        },
+        returnChat() {
+            if (!this.show) {
+                this.showNewPage = false;
+                this.show = true;
+                this.showhi = true;
+                sessionStorage.setItem("showNewPage", 1);
+            }
+            let checked = sessionStorage.getItem("checked");
+
+            this.checked = checked == "1" ? true : false;
+            let selectedSess = sessionStorage.getItem("recordSelectSessKey");
+            this.selectedSess = selectedSess;
             this.isOpenNewSess = false;
             this.recordSelectSessKey();
             this.recordIsOpenNewSess(2);

@@ -854,6 +854,18 @@ ol > li {
     font-size: 12px;
     bottom: 6px;
 }
+.z-model-show .el-link.el-link--success {
+    color: #28ae64;
+    position: relative;
+    font-size: 12px;
+    bottom: 2px;
+}
+.z-model-show .el-link.el-link--success:hover {
+    color: #0dfd79;
+}
+.z-model-show span:nth-of-type(2) {
+    margin-left: 9px;
+}
 .answer-icon {
     position: relative;
     top: 24px;

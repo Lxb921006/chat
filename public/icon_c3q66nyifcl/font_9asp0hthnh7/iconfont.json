@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "30942008",
+      "name": "gooIcon",
+      "font_class": "gooIcon",
+      "unicode": "e629",
+      "unicode_decimal": 58921
+    },
+    {
       "icon_id": "27063788",
       "name": "智能分析能力",
       "font_class": "zhinengfenxinengli",
