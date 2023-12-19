@@ -112,8 +112,8 @@
                     </el-col>
                 </el-row>
                 <div class="change-ques">
-                    <el-button icon="el-icon-refresh" size="mini" round @click="changeTitle()">换一批</el-button>
-                    <el-button icon="el-icon-back" size="mini" round @click="returnChat()">返回</el-button>
+                    <el-button type="primary" icon="el-icon-refresh" size="mini" round @click="changeTitle()">换一批</el-button>
+                    <el-button type="primary" icon="el-icon-back" size="mini" round @click="returnChat()">返回</el-button>
                 </div>
             </div>
             <!-- Ai回复 -->
@@ -260,7 +260,7 @@
                                 </el-tooltip>
                             </el-col>
                         </el-row>
-                        <el-row :gutter="10" class="set-item set-item-1">
+                        <!-- <el-row :gutter="10" class="set-item set-item-1">
                             <el-col :span="1" class="z-col-5 col-font">模型选择: </el-col>
                             <el-col :span="1" class="z-col-6">
                                 <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
@@ -274,7 +274,7 @@
                                     </el-option>
                                 </el-select>
                             </el-col>
-                        </el-row>
+                        </el-row> -->
                         <el-button slot="reference">
                             <svg class="icon sessing-svg" aria-hidden="true">
                                 <use xlink:href="#icon-shezhi3"></use>
@@ -405,19 +405,20 @@
                                     <el-col :span="1" class="z-col-6">
                                         <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
                                             <el-option
-                                            v-for="item in modelAll"
-                                            :key="item.value"
-                                            :label="item.label"
-                                            :value="item.value"
-                                            :disabled="item.disabled"
+                                                v-for="item in modelAll"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value"
+                                                :disabled="item.disabled"
+                                                ref="opt"
                                             >
                                             </el-option>
                                         </el-select>
                                     </el-col>
                                 </el-row>
                                     <el-link slot="reference" type="success" :underline="false"  class="z-model-s">
-                                        <el-badge is-dot class="item">
-                                            【{{ selectedModel | getModelLabel2(modelAll) }}】
+                                        <el-badge is-dot class="item-z">
+                                            <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="filterModelIcon"></use></svg> 【{{ selectedModel | getModelLabel2(modelAll) }}】
                                         </el-badge>
                                     </el-link>
                             </el-popover>
@@ -566,6 +567,7 @@ export default {
     },
     data()  {
         return {
+            selectedModelIcon: "",
             modelSwitchNotice: "点我",
             tenDataLoading: false,
             checked: false,
@@ -672,31 +674,37 @@ export default {
                     value: 'claude-2',
                     label: 'Claude',
                     disabled: false,
+                    icon: '#icon-Claude2',
                 },
                 {
                     value: 'chatGPT3.5',
                     label: 'GPT-3.5-turbo',
                     disabled: false,
+                    icon: '#icon-a-Chatgpt35',
                 },
                 {
                     value: 'GPT-4',
                     label: 'GPT-4',
                     disabled: true,
+                    icon: '#icon-a-Chatgpt4',
                 },
                 {
                     value: 'xf',
                     label: '讯飞星火',
                     disabled: false,
+                    icon: '#icon-xunfeilogo',
                 },
                 {
                     value: 'bd',
                     label: '文心一言',
                     disabled: false,
+                    icon: '#icon-baidu',
                 },
                 {
                     value: 'Gemini',
                     label: '谷歌Gemini',
                     disabled: false,
+                    icon: '#icon-gooIcon',
                 },
             ],
             allowFile: ['.txt', '.pdf', '.docx'],
@@ -735,12 +743,20 @@ export default {
         // 只展示选中的对话内容
         filterChatData() {
             return this.filterChatDataZ();
-        }
+        },
+        filterModelIcon() {
+            return this.filterModelIconZ()
+        },
     },
     components: {
         MarkdownCodeBlock,
     },
     methods: {
+        filterModelIconZ () {
+            let label = this.modelAll.find(item => item.value == this.selectedModel);
+            // console.log(label.icon);
+            return label ? label.icon : "";
+        },
         filterChatDataZ() {
             this.getSelectSessKey();
             return this.chatCache.filter(d => d.key == this.selectedSess); 
@@ -2445,7 +2461,7 @@ export default {
         if (window.innerWidth < 600) {
             this.ash = false;
         };
-        
+        console.log(this.$refs.opt);
         this.contextStatus();
         this.checkContextStatus();
         this.getAllChatData();

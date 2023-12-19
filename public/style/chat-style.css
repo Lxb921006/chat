@@ -858,7 +858,7 @@ ol > li {
     color: #28ae64;
     position: relative;
     font-size: 12px;
-    bottom: 2px;
+    bottom: 3px;
 }
 .z-model-show .el-link.el-link--success:hover {
     color: #0dfd79;
@@ -1180,4 +1180,9 @@ ol > li {
     top: 5px;
     /* bottom: 17px; */
     left: 5px;
+}
+.item-z svg {
+    font-size: 7px;
+    left: 3px;
+    top: 1px;
 }
