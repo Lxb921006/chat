@@ -304,6 +304,8 @@
 .question {
     padding: 11px 20px 21px 20px;
     color: #409eff;
+    white-space: break-spaces;
+    text-align: justify;
 }
 .answer-loop {
     text-align: justify;
