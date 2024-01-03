@@ -1714,7 +1714,7 @@ export default {
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'bd':
-                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
                     case 'qw':
                         this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
