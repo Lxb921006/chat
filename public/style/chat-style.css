@@ -1188,3 +1188,7 @@ ol > li {
     left: 3px;
     top: 1px;
 }
+.ai-img {
+    width: 600px;
+    height: 500px;
+}

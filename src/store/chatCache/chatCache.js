@@ -71,26 +71,13 @@ const chatCache = {
                 lfcd['content'] = data['content']; 
                 lfcd['date'] = data['date'];
                 lfcd['file'] = data['file'];
+                lfcd['imageUrl'] = data['imageUrl'];
                 break
               }
             }
           }
           
       }
-        // for (let i = 0;i < fcd.length; i++) {
-        //     if (fcd[i].uuid == data.uuid) {
-        //         let lfcd = fcd[i];
-        //         lfcd['answer'] = data['answer'];
-        //         lfcd['cursor'] = false;
-        //         lfcd['timeShow'] = true;
-        //         lfcd['pid'] = data['pid'];
-        //         lfcd['cid'] = data['cid'];
-        //         lfcd['content'] = data['content'];
-        //         lfcd['date'] = data['date'];
-        //         lfcd['file'] = data['file'];
-        //         break
-        //     }
-        // }
         state.editableTabs = fcd;
         let jd = JSON.stringify(fcd);
         sessionStorage.setItem("chatCache", jd);

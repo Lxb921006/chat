@@ -148,7 +148,9 @@
                                             <svg class="icon-qa" aria-hidden="true">
                                                 <use xlink:href="#icon-changjianwenti"></use>
                                             </svg>
-                                            {{ data1.title }}  <el-link :underline="false" v-if="data1.file" @click="getFileText(data1.file)">{{ data1.file }}</el-link>
+                                            {{ data1.title }}  
+                                            <el-image class="ai-img" v-if="data1.imageUrl" :src="data1.imageUrl"></el-image>
+                                            <el-link :underline="false" v-else-if="data1.file" @click="getFileText(data1.file)">{{ data1.file }}</el-link>
                                             <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
                                         </p>
                                     </h2>
@@ -234,7 +236,7 @@
                                 </el-switch>
                             </el-col>
                         </el-row>
-                        <el-row :gutter="10" class="set-item set-item-1">
+                        <el-row :gutter="10" class="set-item set-item-1" v-if="false">
                             <el-col :span="1" class="z-col-3 col-font">是否开启预设角色回复: </el-col>
                             <el-col :span="1" class="z-col-4">
                                 <el-tooltip content="只对GPT的模型有效" placement="top">
@@ -260,21 +262,6 @@
                                 </el-tooltip>
                             </el-col>
                         </el-row>
-                        <!-- <el-row :gutter="10" class="set-item set-item-1">
-                            <el-col :span="1" class="z-col-5 col-font">模型选择: </el-col>
-                            <el-col :span="1" class="z-col-6">
-                                <el-select v-model="selectedModel" placeholder="请选择" class="c-select" @change="modelSwitch()">
-                                    <el-option
-                                    v-for="item in modelAll"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value"
-                                    :disabled="item.disabled"
-                                    >
-                                    </el-option>
-                                </el-select>
-                            </el-col>
-                        </el-row> -->
                         <el-button slot="reference">
                             <svg class="icon sessing-svg" aria-hidden="true">
                                 <use xlink:href="#icon-shezhi3"></use>
@@ -348,47 +335,6 @@
                         </el-button>
                     </el-popover>
                 </div>
-                <!-- 工具-pdf-word文档互转 -->
-                <div class="user rb">
-                    <el-popover
-                        placement="right"
-                        width="400"
-                        trigger="click">
-                        <div class="z-rb-title">
-                            <h2>pdf-word文档互转</h2>
-                        </div>
-                        <el-upload
-                            class="upload-demo-1"
-                            drag
-                            :action=uploadUrl()
-                            :on-preview="handlePreview"
-                            :before-upload="checkUploadFileType"
-                            :on-success="successUpload"
-                            :limit="1"
-                            :on-remove="handleRemove"
-                            :on-exceed="handleExceed"
-                            multiple
-                            :data="fileData"
-                            :file-list="fileList"
-                            >
-                            <i class="el-icon-upload"></i>
-                            <div class="el-upload__text">将pdf或者word文档拖到此处, 或<em>点击上传</em></div>
-                        </el-upload>
-                        <el-row :gutter="10" class="z-pdf-word-row">
-                            <el-col :span="8">
-                                <el-button type="success " size="mini" :disabled="isOpenSwitch" @click="downloadFile()">下载</el-button>
-                            </el-col>
-                            <!-- <el-col :span="1">
-                                <el-button type="primary" size="mini" :disabled="isOpenSwitch" @click="downloadFile()">word文档转pdf</el-button>
-                            </el-col> -->
-                        </el-row>
-                        <el-button slot="reference">
-                            <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-gongju"></use>
-                            </svg>
-                        </el-button>
-                    </el-popover> 
-                </div>
                 <!-- 对话输入 -->
                 <div class="send-question">
                     <div class="z-model-show">
@@ -425,8 +371,8 @@
                         </span>
                         <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
-                        <span v-if="roleResp">预设角色回复: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>预设角色回复: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <!-- <span v-if="roleResp" >预设角色回复: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>预设角色回复: 【<span class="z-model-s-c">关闭</span>】; </span> -->
                         <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
                     </div>
@@ -450,7 +396,7 @@
                         </el-button>
                         <!-- 目前只支持claude上传附件 -->
                         <el-upload
-                            :style="{ visibility: selectedModel=='claude-2' ? 'visible' : 'hidden' }"
+                            :style="{ visibility: selectedModel=='claude-2' || selectedModel=='Gemini' ? 'visible' : 'hidden' }"
                             class="upload-demo"
                             :action=uploadUrl()
                             :on-preview="handlePreview"
@@ -462,7 +408,7 @@
                             :file-list="fileList"
                             :on-exceed="handleExceed"
                             >
-                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .pdf, .docx文件; 目前只支持claude上传附件" placement="top-start">
+                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .png文件; 目前只支持claude/gemini上传附件" placement="top-start">
                                 <el-button size="small" type="primary">
                                     <svg class="icon z-send-button" aria-hidden="true">
                                         <use xlink:href="#icon-fujian"></use>
@@ -707,7 +653,7 @@ export default {
                     icon: '#icon-gooIcon',
                 },
             ],
-            allowFile: ['.txt', '.pdf', '.docx'],
+            allowFile: ['.txt', '.png'],
             loadCount: 0,
             historyDataLoading: false,
             pages: {
@@ -987,6 +933,7 @@ export default {
         // 滚动加载数据开关状态
         checkisOpenScrollLoadData() {
             let rollingLoadSwitch = sessionStorage.getItem('rollingLoadSwitch');
+            console.log("rollingLoadSwitch >>> ", rollingLoadSwitch);
             switch (rollingLoadSwitch) {
                 case '1':
                     this.isScrollLoadDataStatus = true;
@@ -1365,7 +1312,7 @@ export default {
                     this.selectedModel = 'Gemini';
                     break;    
                 default:
-                    this.selectedModel = 'chatGPT3.5';
+                    this.selectedModel = 'Gemini';
                     break;
             }
         },
@@ -1608,7 +1555,7 @@ export default {
                 let modelIcon= "";
                 let newfile = "";
 
-                if (this.selectedModel == 'claude-2') {
+                if (this.selectedModel == 'claude-2' || this.selectedModel == 'Gemini') {
                     newfile = this.claudeFile;
                 } else {
                     newfile = "";
@@ -1659,6 +1606,8 @@ export default {
                     timeShow: false,
                     cid: "",
                     pid: "",
+                    imageUrl: "",
+                    img: newfile,
                     icon: modelIcon,
                     content: "",
                     model: this.selectedModel,
@@ -1800,6 +1749,7 @@ export default {
                             child[k].cid = jd.cid;
                             child[k].pid = jd.pid;
                             child[k].content = jd.content;
+                            child[k].imageUrl = jd.img;
                             if (this.specifiedContexts.includes(child[k].uuid)) {
                                 child[k] = true;
                             }
@@ -1829,7 +1779,7 @@ export default {
                             let data = {
                                 key: this.selectedSess,
                                 uuid: child[k].uuid, 
-                                answer: answer.replace(/ppt正在制作中.../g, 'ppt制作完成'), 
+                                answer: answer, 
                                 date: this.getDate(), 
                                 timeShow: true,
                                 content: child[k].content,
@@ -1837,6 +1787,7 @@ export default {
                                 pid: child[k].pid,
                                 cursor: false,
                                 file: this.claudeFile,
+                                imageUrl: child[k].imageUrl,
                             }
                             if (this.specifiedContexts.includes(child[k].uuid)) {
                                 child[k] = true;
@@ -2052,7 +2003,6 @@ export default {
         },
         // 谷歌ai
         gemini() {
-            this.claudeFile = "";
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
@@ -2067,10 +2017,7 @@ export default {
                 gptData = [];
             }
 
-            let id = (100000000 - 1) * Math.random() + 1;
-            let uuid = Math.floor(id);
-            let file = this.pptCreate ? uuid+'.pptx': '';
-            let ppt = this.pptCreate ? 'ppt': '';
+            let file = this.claudeFile;
             let context = null;
             if (this.contextSwitch) {
                 if (gptData.length > 1) {
@@ -2086,12 +2033,12 @@ export default {
                             context = gptData.slice(0, gptData.length - 1);
                         }
                     }
-                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: context, model: this.selectedModel, file: file, ppt: ppt};
+                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: context, model: this.selectedModel, file: file};
                 } else {
-                    sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
+                    sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file};
                 }
             } else {
-                sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
+                sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file};
             }
             
             this.socket.send(JSON.stringify(sendData));
@@ -2461,7 +2408,8 @@ export default {
         if (window.innerWidth < 600) {
             this.ash = false;
         };
-        console.log(this.$refs.opt);
+        // console.log(this.$refs.opt);
+        // this.loadLatestTenData()
         this.contextStatus();
         this.checkContextStatus();
         this.getAllChatData();
