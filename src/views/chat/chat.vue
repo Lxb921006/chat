@@ -215,6 +215,14 @@
                 </transition>
             </div>
             <el-divider></el-divider>
+            <div class="ai-wx">
+                <p>微信小程序</p>
+                <el-image
+                    style="width: 100px; height: 100px"
+                    src="../img/ai-wx.jpg"
+                    :fit="contain">
+                </el-image>
+            </div>
             <!-- 所有设置 -->
             <div class="footer list-group"  id="sortable">
                 <!-- 设置 -->
@@ -377,7 +385,7 @@
                         <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
                     </div>
                     <div class="send-input">
-                         <el-input
+                        <el-input
                             type="textarea"
                             autocomplete="on"
                             show-word-limit

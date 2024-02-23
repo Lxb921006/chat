@@ -1192,3 +1192,6 @@ ol > li {
     width: 600px;
     height: 500px;
 }
+.ai-wx {
+    float: left;
+}
