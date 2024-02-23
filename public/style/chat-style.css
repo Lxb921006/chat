@@ -1195,3 +1195,8 @@ ol > li {
 .ai-wx {
     float: left;
 }
+.ai-wx p {
+    font-size: 13px;
+    color: #fff;
+    margin-bottom: 6px;
+}
