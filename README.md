@@ -25,26 +25,17 @@ v16.4.0
 ### 主要功能
 1.无需翻墙;  
 2.多用户访问, 数据隔离, 相同用户可同时登录使用;  
-3.持续的, 可选定的, 上下文对话, 对话永久保存, 删除, 恢复;  
+3.持续的, 可选定的, 上下文对话, 对话保存, 删除, 恢复;  
 4.代码高亮, 丝滑响应;  
-5.图片生成，文件内容分析, pdf, word文档互转;  
+5.图片生成，图片分析，文件内容分析;  
 6.多平台ai切换:  
 &emsp;&emsp;claude(已完成);  
 &emsp;&emsp;Google Gemini(已完成);  
 &emsp;&emsp;gpt3.5-turbo(已完成);  
 &emsp;&emsp;讯飞星火(已完成);  
 &emsp;&emsp;文心一言(已完成);  
-<<<<<<< HEAD
-<<<<<<< HEAD
-&emsp;&emsp;通义千问(已完成);  
-=======
-&emsp;&emsp;通义千问(已完成); 
->>>>>>> dev
-=======
->>>>>>> dev
 
 ### web部分ui展示
-![chat-ui-1](main-1.png)  
-![chat-ui-2](main-2.png)  
-![chat-ui-3](main-3.png)  
+![chat-ui-1](main-1.png)   
+![chat-ui-1](main-2.png)   
 
