@@ -12,7 +12,6 @@ const chatCache = {
   },
   mutations: {
     ADD_CHAT_CACHE(state, data){
-      // 原始
       state.editableTabs.push(data);
       sessionStorage.setItem("chatCache", JSON.stringify(state.editableTabs));
     },
@@ -22,6 +21,9 @@ const chatCache = {
       for (let i = 0;i < fcd.length; i++) {
         if (data['key'] == fcd[i].key) {
           fcd[i].child = data.child;
+          fcd[i].title =  data['title'];
+          fcd[i].icon =  data['icon'];
+          fcd[i].isParent =  data['isParent'];
           break
         }
       }
@@ -69,26 +71,13 @@ const chatCache = {
                 lfcd['content'] = data['content']; 
                 lfcd['date'] = data['date'];
                 lfcd['file'] = data['file'];
+                lfcd['imageUrl'] = data['imageUrl'];
                 break
               }
             }
           }
           
       }
-        // for (let i = 0;i < fcd.length; i++) {
-        //     if (fcd[i].uuid == data.uuid) {
-        //         let lfcd = fcd[i];
-        //         lfcd['answer'] = data['answer'];
-        //         lfcd['cursor'] = false;
-        //         lfcd['timeShow'] = true;
-        //         lfcd['pid'] = data['pid'];
-        //         lfcd['cid'] = data['cid'];
-        //         lfcd['content'] = data['content'];
-        //         lfcd['date'] = data['date'];
-        //         lfcd['file'] = data['file'];
-        //         break
-        //     }
-        // }
         state.editableTabs = fcd;
         let jd = JSON.stringify(fcd);
         sessionStorage.setItem("chatCache", jd);
