@@ -2025,6 +2025,22 @@ export default {
                 gptData = [];
             }
 
+            let text = `
+                我的问题是: ${this.chatContent}。作为提问者，我会尽量明确和具体地提出问题。如果我的问题不够具体或存在不确定性，我希望你能通过追问或请求澄清来帮助理解我的需求，以提供最相关的回答。
+
+                你需要在答案中考虑：
+                
+                - 使用上下文相关性来为我提供连贯、准确并且全面的回复。
+                - 使用简明的自然语言并避免不必要的专业术语。
+                - 在涉及具体概念或代码时使用清晰、易读的格式，包含注释以帮助理解。
+                - 力求提供新颖有价值的见解，避免重复已有的内容。
+                - 保护我的隐私，不将我的对话记录与真实身份相关联或与第三方共享。
+                - 如回答涉及特定专业知识或角色，使用【{角色}】标记来提示。
+                
+                如果需要更多信息以提供更准确的回答，我愿意接受你的追问。
+                最重要的一点请根据你对问题的理解和回答，生成3个有深度的与问题内容和回答相关联的后续问题以引导进一步的讨论。
+                `
+
             let file = this.claudeFile;
             let context = null;
             if (this.contextSwitch) {
@@ -2041,12 +2057,12 @@ export default {
                             context = gptData.slice(0, gptData.length - 1);
                         }
                     }
-                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: context, model: this.selectedModel, file: file};
+                    sendData = {data: text, systemSet: this.roleResp ? 'open' : '', content: context, model: this.selectedModel, file: file};
                 } else {
-                    sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file};
+                    sendData = {data: text, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file};
                 }
             } else {
-                sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file};
+                sendData = {data: text, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file};
             }
             
             this.socket.send(JSON.stringify(sendData));
