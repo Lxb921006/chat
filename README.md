@@ -43,6 +43,11 @@ v16.4.0
 ### wx小程序体验码
 ![chat-ui-1](ai-wx.jpg)   
 
+
+### web端体验地址  
+[体验地址](http://43.156.8.45:8092/chat)  
+
+
 ### web部分ui展示
 ![chat-ui-1](main-1.png)   
 
