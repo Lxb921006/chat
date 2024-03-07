@@ -50,7 +50,7 @@
             </div>
             <div class="item-url">
                 <span class="iconfont icon-githubb icon-git"></span>
-                <el-link type="info" class="addr-size" :underline="false" href="https://github.com/Lxb921006/chat/tree/dev">项目地址</el-link>
+                <el-link type="info" class="addr-size" :underline="false" href="https://github.com/Lxb921006/chat">项目地址</el-link>
             </div>
         </div>
         <!-- 右侧容器 -->
