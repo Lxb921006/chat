@@ -233,7 +233,7 @@
                         width="200"
                         trigger="click"
                         >
-                        <el-row :gutter="10" class="set-item set-item-1">
+                        <el-row :gutter="10" class="set-item set-item-1" v-if="false">
                             <el-col :span="1" class="context-switch col-font">是否开启上下文: </el-col>
                             <el-col :span="1" class="z-col-2">
                                 <el-switch
@@ -1873,15 +1873,43 @@ export default {
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
-        // claude
+        // claude3
         sendClaude() {
             let sendData = {};
-            if (this.contextSwitch) {
-                //发送的信息关联上下文
-                sendData = {cid: "claude", pid: "", file: this.claudeFile, data: this.chatContent, model: this.selectedModel, context: 'open'};
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
+
+            if (gptData) {
+                gptData = gptData.child;
+                gptData = gptData.filter(item => item.model == this.selectedModel);
+                if (!gptData) {
+                    gptData = []
+                }
             } else {
-                sendData = {cid: "", pid: "", file: this.claudeFile, data: this.chatContent, model: this.selectedModel, context: ''};
+                gptData = [];
             }
+
+            let file = this.claudeFile;
+            let context = [];
+     
+            if (gptData.length > 1) {
+                //发送的信息关联上下文
+                if (this.specifiedContexts.length > 0) {
+                    context = this.submitSpecifiedContext();
+                    if (context.length >= 6) {
+                        context = context.slice(context.length - 5, context.length);
+                    } 
+                } else {
+                    context = gptData.slice(gptData.length - 6, gptData.length - 1);
+                    if (context.length < 4) {
+                        context = gptData.slice(0, gptData.length - 1);
+                    }
+                }
+                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: file};
+            } else {
+                sendData = {data: this.chatContent, context: [], model: this.selectedModel, file: file};
+            }
+            
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1998,12 +2026,12 @@ export default {
                             context = gptData.slice(0, gptData.length - 1);
                         }
                     }
-                    sendData = {data: this.chatContent, systemSet: this.roleResp ? 'open' : '', content: context, model: this.selectedModel, file: file, ppt: ppt};
+                    sendData = {data: this.chatContent, content: context, model: this.selectedModel, file: file};
                 } else {
-                    sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
+                    sendData = {data: this.chatContent, content: '', model: this.selectedModel, file: file};
                 }
             } else {
-                sendData = {data: this.chatContent, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file, ppt: ppt};
+                sendData = {data: this.chatContent, content: '', model: this.selectedModel, file: file};
             }
             
             this.socket.send(JSON.stringify(sendData));
@@ -2059,12 +2087,12 @@ export default {
                             context = gptData.slice(0, gptData.length - 1);
                         }
                     }
-                    sendData = {data: text, systemSet: this.roleResp ? 'open' : '', content: context, model: this.selectedModel, file: file};
+                    sendData = {data: text, content: context, model: this.selectedModel, file: file};
                 } else {
-                    sendData = {data: text, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file};
+                    sendData = {data: text, content: '', model: this.selectedModel, file: file};
                 }
             } else {
-                sendData = {data: text, content: '', systemSet: this.roleResp ? 'open' : '', model: this.selectedModel, file: file};
+                sendData = {data: text, content: '', model: this.selectedModel, file: file};
             }
             
             this.socket.send(JSON.stringify(sendData));
