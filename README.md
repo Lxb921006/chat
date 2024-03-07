@@ -6,12 +6,12 @@
 npm install
 ```
 
-### 运行
+## 运行
 ```
 npm run serve
 ```
 
-### 编译部署
+## 编译部署
 ```
 npm run build
 ```
