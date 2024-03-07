@@ -29,7 +29,7 @@ v16.4.0
 4.代码高亮, 丝滑响应;  
 5.图片生成，图片分析，文件内容分析;  
 6.多平台ai切换:  
-&emsp;&emsp;claude(已完成);  
+&emsp;&emsp;claude3(当前全球最牛模型, 已完成);  
 &emsp;&emsp;Google Gemini(已完成);  
 &emsp;&emsp;gpt3.5-turbo(已完成);  
 &emsp;&emsp;讯飞星火(已完成);  
