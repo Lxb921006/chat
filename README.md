@@ -1,5 +1,5 @@
 # chatAI
-这是一个聚合了国内外主流AI大模型网站, 可无缝访问如：Google Gemini, chatgpt, claude, 文心一言, 讯飞星火等. 更多AI大模型持续添加中....
+这是一个聚合了国内外主流AI大模型网站, 可无缝访问如：Google Gemini, chatgpt, claude, 文心一言, 讯飞星火等. 更多AI大模型持续添加中(如您有想要用的ai大模型需要集成到当前网站使用请联系我,pythongolangvue@gmail.com)....
 
 ## 安装
 ```
@@ -29,7 +29,7 @@ v16.4.0
 4.代码高亮, 丝滑响应;  
 5.图片生成，图片分析，文件内容分析;  
 6.多平台ai切换:  
-&emsp;&emsp;claude3(当前全球最牛模型, 已完成);  
+&emsp;&emsp;claude3(当前全世界最牛模型, 已完成);  
 &emsp;&emsp;Google Gemini(已完成);  
 &emsp;&emsp;gpt3.5-turbo(已完成);  
 &emsp;&emsp;讯飞星火(已完成);  
