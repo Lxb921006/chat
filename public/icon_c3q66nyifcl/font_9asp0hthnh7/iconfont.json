@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "37305447",
+      "name": "讯飞星火",
+      "font_class": "xunfeichatgpt",
+      "unicode": "e6a3",
+      "unicode_decimal": 59043
+    },
+    {
       "icon_id": "15459679",
       "name": "产品管理",
       "font_class": "chanpinguanli",

@@ -598,7 +598,7 @@ export default {
             geminiIcon: "#icon-gooIcon",
             gpt4: "#icon-a-Chatgpt4",
             assistantIcon: "#icon-a-Chatgpt35",
-            xfIcon: "#icon-xunfeilogo",
+            xfIcon: "#icon-xunfeichatgpt",
             wxIcon: "#icon-baidu",
             qwIcon: "#icon-a-result4",
             txIcon: "#icon-chanpinguanli",
@@ -656,7 +656,7 @@ export default {
                     value: 'xf',
                     label: '讯飞星火',
                     disabled: false,
-                    icon: '#icon-xunfeilogo',
+                    icon: '#icon-xunfeichatgpt',
                 },
                 {
                     value: 'bd',
