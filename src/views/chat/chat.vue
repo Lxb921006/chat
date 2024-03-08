@@ -1354,6 +1354,7 @@ export default {
         },
         getModelLabelRdo(val) {
             this.selectedModel = val;
+            this.modelSwitch();
         },
         // ai平台切换
         modelSwitch() {
