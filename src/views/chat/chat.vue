@@ -385,8 +385,8 @@
                                     </el-link>
                             </el-popover>
                         </span>
-                        <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <!-- <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span> -->
                         <!-- <span v-if="roleResp" >预设角色回复: 【<span class="z-model-s">开启</span>】; </span>
                         <span v-else>预设角色回复: 【<span class="z-model-s-c">关闭</span>】; </span> -->
                         <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
