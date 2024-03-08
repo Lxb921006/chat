@@ -30,15 +30,15 @@ v16.4.0
 5.图片生成，图片分析，文件内容分析;  
 
 ### 模型
-&emsp;&emsp;claude3(当前全世界最牛模型, 已完成);  
-&emsp;&emsp;Google Gemini(已完成);  
-&emsp;&emsp;gpt3.5-turbo(已完成);  
-&emsp;&emsp;讯飞星火(已完成);  
+&emsp;&emsp;Anthropic-claude3(当前全世界最牛模型, 已完成);  
+&emsp;&emsp;Google-Gemini(已完成);  
+&emsp;&emsp;OpenAi-gpt3.5-turbo(已完成);  
+&emsp;&emsp;科大讯飞-讯飞星火(已完成);  
 &emsp;&emsp;百度-文心一言(已完成);  
 &emsp;&emsp;阿里巴巴-通义千问(已完成);  
 &emsp;&emsp;腾迅-混元大模型(已完成);  
 &emsp;&emsp;华为-盘古大模型(TODO);  
-&emsp;&emsp;GPT-4(TODO);  
+&emsp;&emsp;OpenAi-GPT-4(TODO);  
 
 ### wx小程序体验码
 ![chat-ui-1](ai-wx.jpg)   
