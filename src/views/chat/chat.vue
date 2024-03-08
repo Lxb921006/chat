@@ -108,7 +108,7 @@
                         <svg class="icon intru-ic" aria-hidden="true">
                             <use xlink:href="#icon-a-5_moxingtongbu"></use>
                         </svg>
-                        你好, 这里是聚合了国内外主流ai的网站
+                        尊贵的老板, 您好, 这里是聚合了国内外主流ai的网站
                     </h3>
                     <p class="intru-pp">可以试试如下提问:</p>
                 </div>
