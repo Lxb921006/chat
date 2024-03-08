@@ -37,6 +37,8 @@ import { Loading } from 'element-ui';
 import { Dialog } from 'element-ui';
 import { Checkbox } from 'element-ui';
 import { Badge } from 'element-ui';
+import { RadioGroup } from 'element-ui';
+import { Radio } from 'element-ui';
 // import { Collapse } from 'element-ui';
 // import { CollapseItem } from 'element-ui';
 import VuePageTransition from 'vue-page-transition'
@@ -45,6 +47,8 @@ import VuePageTransition from 'vue-page-transition'
 // Vue.use(Collapse);
 // Vue.use(CollapseItem);
 Vue.use(Checkbox);
+Vue.use(RadioGroup);
+Vue.use(Radio);
 Vue.use(Badge);
 Vue.use(Button);
 Vue.use(Input);

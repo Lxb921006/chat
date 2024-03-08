@@ -501,6 +501,7 @@
 }
 .collapse-aside {
     position: fixed;
+    top: 0;
     z-index: 10000;
 }
 .btu1 {
@@ -565,7 +566,7 @@ pre code {
     color: #fff;
 }
 @media only screen and (min-width: 2000px) {
-    .content,.stop,.footer,.add-new-sess {
+    .content,.stop,.footer,.add-new-sess,.model-select-box {
         padding-right: 568px;
     }
 }
@@ -1199,4 +1200,15 @@ ol > li {
     font-size: 13px;
     color: #fff;
     margin-bottom: 6px;
+}
+.model-select-box {
+    height: 40px;
+    line-height: 40px;
+}
+.el-radio-group {
+    height: 39px;
+    line-height: 48px;
+    background-color: #e4e7ed;
+    padding: 0 6px;
+    border-radius: 15px;
 }

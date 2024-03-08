@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "15459679",
+      "name": "产品管理",
+      "font_class": "chanpinguanli",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
       "icon_id": "30942008",
       "name": "gooIcon",
       "font_class": "gooIcon",

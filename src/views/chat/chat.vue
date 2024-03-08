@@ -50,11 +50,19 @@
             </div>
             <div class="item-url">
                 <span class="iconfont icon-githubb icon-git"></span>
-                <el-link type="info" class="addr-size" :underline="false" href="https://github.com/Lxb921006/chat">项目地址</el-link>
+                <el-link type="info" class="addr-size" :underline="false" @click="chatGptUrl('github')">项目地址</el-link>
             </div>
         </div>
         <!-- 右侧容器 -->
         <div class="main">
+            <!-- 模型选择 -->
+            <div class="model-select-box">
+                <div class="contain">
+                    <el-radio-group v-model="modelSelected">
+                        <el-radio :key="index" :label="data.label" :disabled="data.disabled" v-for="(data, index) in modelAll" @click.native="getModelLabelRdo(data.value)">{{ data.label }}</el-radio>
+                    </el-radio-group>
+                </div>
+            </div>
             <!-- 左侧边栏的收起跟打开按钮 -->
             <transition name="el-zoom-in-top">
                 <div class="collapse-aside" v-show="mh">
@@ -220,7 +228,7 @@
                 <el-image
                     style="width: 100px; height: 100px"
                     src="../img/ai-wx.jpg"
-                    :fit="contain">
+                    fit="contain">
                 </el-image>
             </div>
             <!-- 所有设置 -->
@@ -521,6 +529,7 @@ export default {
     },
     data()  {
         return {
+            modelSelected: "谷歌Gemini",
             selectedModelIcon: "",
             modelSwitchNotice: "点我",
             tenDataLoading: false,
@@ -592,6 +601,7 @@ export default {
             xfIcon: "#icon-xunfeilogo",
             wxIcon: "#icon-baidu",
             qwIcon: "#icon-a-result4",
+            txIcon: "#icon-chanpinguanli",
             scrollLoading: false,
             setTimer: true,
             isScrollLoadDataStatus: true,
@@ -626,7 +636,7 @@ export default {
             modelAll: [
                 {
                     value: 'claude-2',
-                    label: 'Claude',
+                    label: 'Claude3',
                     disabled: false,
                     icon: '#icon-Claude2',
                 },
@@ -660,6 +670,24 @@ export default {
                     disabled: false,
                     icon: '#icon-gooIcon',
                 },
+                {
+                    value: 'tx',
+                    label: '腾讯混元大模型',
+                    disabled: false,
+                    icon: '#icon-chanpinguanli',
+                },
+                {
+                    value: 'qt',
+                    label: '阿里巴巴通义千问',
+                    disabled: false,
+                    icon: '#icon-a-result4',
+                },
+                {
+                    value: 'pg',
+                    label: '华为盘古大模型',
+                    disabled: true,
+                    icon: '#icon-gooIcon',
+                }
             ],
             allowFile: ['.txt', '.png'],
             loadCount: 0,
@@ -941,7 +969,6 @@ export default {
         // 滚动加载数据开关状态
         checkisOpenScrollLoadData() {
             let rollingLoadSwitch = sessionStorage.getItem('rollingLoadSwitch');
-            console.log("rollingLoadSwitch >>> ", rollingLoadSwitch);
             switch (rollingLoadSwitch) {
                 case '1':
                     this.isScrollLoadDataStatus = true;
@@ -1299,7 +1326,7 @@ export default {
                     this.selectedModel = 'chatGPT';
                     break;
                 case '3':
-                    this.selectedModel = 'ai-assistant';
+                    this.selectedModel = 'tx';
                     break;
                 case '4':
                     this.selectedModel = 'xf';
@@ -1314,7 +1341,7 @@ export default {
                     this.selectedModel = 'GPT-4';
                     break;
                 case '8':
-                    this.selectedModel = 'qw';
+                    this.selectedModel = 'qt';
                     break;
                 case '9':
                     this.selectedModel = 'Gemini';
@@ -1323,9 +1350,14 @@ export default {
                     this.selectedModel = 'Gemini';
                     break;
             }
+            this.modelSelected = this.$options.filters.getModelLabel(this.selectedModel, this.modelAll);
+        },
+        getModelLabelRdo(val) {
+            this.selectedModel = val;
         },
         // ai平台切换
         modelSwitch() {
+            this.modelSelected = this.$options.filters.getModelLabel(this.selectedModel, this.modelAll);
             switch (this.selectedModel) {
                 case 'claude-2':
                     window.sessionStorage.setItem('modelSelect', 1);
@@ -1333,7 +1365,7 @@ export default {
                 case 'chatGPT':
                     window.sessionStorage.setItem('modelSelect', 2);
                     break
-                case 'ai-assistant':
+                case 'tx':
                     window.sessionStorage.setItem('modelSelect', 3);
                     break
                 case 'xf':
@@ -1348,8 +1380,8 @@ export default {
                 case 'GPT-4':
                     window.sessionStorage.setItem('modelSelect', 7);
                     break
-                case 'qw':
-                    window.sessionStorage.setItem('modelSelect', 8);
+                case 'qt':
+                    window.sessionStorage.setItem('qt', 8);
                     break
                 case 'Gemini':
                     window.sessionStorage.setItem('modelSelect', 9);
@@ -1376,8 +1408,8 @@ export default {
                 case 'bd':
                     window.open('https://yiyan.baidu.com/');
                     break;    
-                case 'ai-assistant':
-                    window.open('https://openai.com/');
+                case 'tx':
+                    window.open('https://hunyuan.tencent.com/');
                     break;
                 case 'chatGPT3.5':
                     window.open('https://openai.com/');
@@ -1388,12 +1420,19 @@ export default {
                 case 'xf':
                     window.open('https://xinghuo.xfyun.cn/');
                     break;    
-                case 'qw':
+                case 'qt':
                     window.open('https://qianwen.aliyun.com/');
                     break;  
+                case 'pg':
+                    window.open('https://qianwen.aliyun.com/');
+                    break;          
                 case 'Gemini':
                     window.open('https://ai.google.dev/');
                     break;
+                case 'github':
+                    window.open('https://github.com/Lxb921006/chat');
+                    break;    
+
             }   
         },
         // 时间格式化
@@ -1582,8 +1621,8 @@ export default {
                 case 'chatGPT3.5':
                     modelIcon = this.chatGptIcon;
                     break;   
-                case 'ai-assistant':
-                    modelIcon = this.assistantIcon;
+                case 'tx':
+                    modelIcon = this.txIcon;
                     break;
                 case 'bd':
                     modelIcon = this.wxIcon;
@@ -1591,7 +1630,7 @@ export default {
                 case 'xf':
                     modelIcon = this.xfIcon;
                     break;    
-                case 'qw':
+                case 'qt':
                     modelIcon = this.qwIcon;
                     break;
                 case 'Gemini':
@@ -1673,9 +1712,12 @@ export default {
                     case 'bd':
                         this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
-                    case 'qw':
-                        this.wsUrl = `${wssSinUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                    case 'qt':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break
+                    case 'tx':
+                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        break    
                     case 'xf':
                         this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
@@ -1727,8 +1769,11 @@ export default {
                 case 'bd':
                     this.sendBd();
                     break
-                case 'qw':
+                case 'qt':
                     this.sendQw();
+                    break
+                case 'tx':
+                    this.sendTx();
                     break
                 case 'chatGPT3.5':
                     this.chatGPT35();
@@ -1839,11 +1884,17 @@ export default {
                 Message.error('保存数据失败>>>', resp.data.msg);
             }
         },
+        sendTx() {
+            let file = this.claudeFile;
+            let sendData = {};
+            sendData = {data: this.chatContent, context: [], model: this.selectedModel, file: file};
+            console.log(sendData);
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
         // 通义千问
         sendQw() {
-            this.claudeFile = "";
             let sendData = {};
-            let lastData = [];
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
 
@@ -1857,19 +1908,27 @@ export default {
                 gptData = [];
             }
 
-
-            if (this.contextSwitch) {
-                if (gptData.length > 1) {
-                    //发送的信息关联上下文
-                    lastData = gptData[gptData.length - 2];
-                    sendData = {cid: "", pid: lastData.pid, data: this.chatContent, model: this.selectedModel, context: lastData.title};
+            let file = this.claudeFile;
+            let context = [];
+     
+            if (gptData.length > 1) {
+                //发送的信息关联上下文
+                if (this.specifiedContexts.length > 0) {
+                    context = this.submitSpecifiedContext();
+                    if (context.length >= 6) {
+                        context = context.slice(context.length - 5, context.length);
+                    } 
                 } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel, context: ''};
+                    context = gptData.slice(gptData.length - 6, gptData.length - 1);
+                    if (context.length < 4) {
+                        context = gptData.slice(0, gptData.length - 1);
+                    }
                 }
+                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: file};
             } else {
-                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel, context: ''};
+                sendData = {data: this.chatContent, context: [], model: this.selectedModel, file: file};
             }
-
+            
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
