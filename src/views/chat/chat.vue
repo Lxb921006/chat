@@ -1990,14 +1990,11 @@ export default {
             } else {
                 gptData = [];
             }
-            if (this.contextSwitch) {
-                if (gptData.length > 1) {
-                    //发送的信息关联上下文
-                    lastData = gptData[gptData.length - 2];
-                    sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel, content: lastData.title};
-                } else {
-                    sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel, content: ''};
-                }
+
+            if (gptData.length > 1) {
+                //发送的信息关联上下文
+                lastData = gptData[gptData.length - 2];
+                sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel, content: lastData.title};
             } else {
                 sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel, content: ''};
             }
@@ -2023,30 +2020,25 @@ export default {
             }
             
             let context = null;
-            if (this.contextSwitch) {
-                if (gptData.length > 1) {
-                    //发送的信息关联上下文
-                    if (this.specifiedContexts.length > 0) {
-                        context = this.submitSpecifiedContext();
-                        if (context.length >= 4) {
-                            context = context.slice(context.length-3, context.length);
-                        } 
-                    } else {
-                        context = gptData.slice(gptData.length - 4, gptData.length - 1);
-                        if (context.length < 2) {
-                            context = gptData.slice(0, gptData.length - 1);
-                        }
-                    }
-                    
-                    sendData = {data: this.chatContent, content: context, model: this.selectedModel};
+            if (gptData.length > 1) {
+                //发送的信息关联上下文
+                if (this.specifiedContexts.length > 0) {
+                    context = this.submitSpecifiedContext();
+                    if (context.length >= 4) {
+                        context = context.slice(context.length-3, context.length);
+                    } 
                 } else {
-                    sendData = {data: this.chatContent, content: '', model: this.selectedModel};
+                    context = gptData.slice(gptData.length - 4, gptData.length - 1);
+                    if (context.length < 2) {
+                        context = gptData.slice(0, gptData.length - 1);
+                    }
                 }
+                
+                sendData = {data: this.chatContent, content: context, model: this.selectedModel};
             } else {
                 sendData = {data: this.chatContent, content: '', model: this.selectedModel};
             }
-            
-            console.log(sendData);
+           
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -2067,31 +2059,23 @@ export default {
                 gptData = [];
             }
 
-            let id = (100000000 - 1) * Math.random() + 1;
-            let uuid = Math.floor(id);
-            let file = this.pptCreate ? uuid+'.pptx': '';
-            let ppt = this.pptCreate ? 'ppt': '';
-            let context = null;
-            if (this.contextSwitch) {
-                if (gptData.length > 1) {
-                    //发送的信息关联上下文
-                    if (this.specifiedContexts.length > 0) {
-                        context = this.submitSpecifiedContext();
-                        if (context.length >= 6) {
-                            context = context.slice(context.length - 5, context.length);
-                        } 
-                    } else {
-                        context = gptData.slice(gptData.length - 6, gptData.length - 1);
-                        if (context.length < 4) {
-                            context = gptData.slice(0, gptData.length - 1);
-                        }
-                    }
-                    sendData = {data: this.chatContent, content: context, model: this.selectedModel, file: file};
+            let context = [];
+            if (gptData.length > 1) {
+                //发送的信息关联上下文
+                if (this.specifiedContexts.length > 0) {
+                    context = this.submitSpecifiedContext();
+                    if (context.length >= 6) {
+                        context = context.slice(context.length - 5, context.length);
+                    } 
                 } else {
-                    sendData = {data: this.chatContent, content: '', model: this.selectedModel, file: file};
+                    context = gptData.slice(gptData.length - 6, gptData.length - 1);
+                    if (context.length < 4) {
+                        context = gptData.slice(0, gptData.length - 1);
+                    }
                 }
+                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: ""};
             } else {
-                sendData = {data: this.chatContent, content: '', model: this.selectedModel, file: file};
+                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: ""};
             }
             
             this.socket.send(JSON.stringify(sendData));
@@ -2133,24 +2117,20 @@ export default {
 
             let file = this.claudeFile;
             let context = null;
-            if (this.contextSwitch) {
-                if (gptData.length > 1) {
-                    //发送的信息关联上下文
-                    if (this.specifiedContexts.length > 0) {
-                        context = this.submitSpecifiedContext();
-                        if (context.length >= 6) {
-                            context = context.slice(context.length - 5, context.length);
-                        } 
-                    } else {
-                        context = gptData.slice(gptData.length - 6, gptData.length - 1);
-                        if (context.length < 4) {
-                            context = gptData.slice(0, gptData.length - 1);
-                        }
-                    }
-                    sendData = {data: text, content: context, model: this.selectedModel, file: file};
+            if (gptData.length > 1) {
+                //发送的信息关联上下文
+                if (this.specifiedContexts.length > 0) {
+                    context = this.submitSpecifiedContext();
+                    if (context.length >= 6) {
+                        context = context.slice(context.length - 5, context.length);
+                    } 
                 } else {
-                    sendData = {data: text, content: '', model: this.selectedModel, file: file};
+                    context = gptData.slice(gptData.length - 6, gptData.length - 1);
+                    if (context.length < 4) {
+                        context = gptData.slice(0, gptData.length - 1);
+                    }
                 }
+                sendData = {data: text, content: context, model: this.selectedModel, file: file};
             } else {
                 sendData = {data: text, content: '', model: this.selectedModel, file: file};
             }
