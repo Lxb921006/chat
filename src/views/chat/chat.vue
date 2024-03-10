@@ -2502,8 +2502,6 @@ export default {
         if (window.innerWidth < 600) {
             this.ash = false;
         };
-        // console.log(this.$refs.opt);
-        // this.loadLatestTenData()
         this.contextStatus();
         this.checkContextStatus();
         this.getAllChatData();
