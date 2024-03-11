@@ -845,9 +845,8 @@ export default {
         addContext(data) {
             if (!this.contextIcon || this.contextIcon == data.icon) {
                 this.contextIcon = data.icon;
-                data.checked = true;
             } else {
-                data.checked = false;
+                data.checked = !data.checked;
                 Message.error("必须选择相同模型的会话");
                 return;
             }
