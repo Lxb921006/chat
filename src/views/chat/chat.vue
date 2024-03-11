@@ -154,7 +154,7 @@
                                             </p>
                                             <!-- 勾选上下文提交给ai针对同类问题进行连续提问 -->
                                             <p class="add-context">
-                                                <el-tooltip content="勾选上下文提交给ai针对同类问题进一步深度提问, 必须是相同模型的会话" placement="top">
+                                                <el-tooltip content="勾选上下文提交给ai针对同类问题进一步深度讨论, 必须是相同模型的会话" placement="top">
                                                     <el-checkbox v-model="data1.checked" size="medium" @change="addContext(data1)" ref="checkbox"></el-checkbox>
                                                 </el-tooltip>
                                             </p>
