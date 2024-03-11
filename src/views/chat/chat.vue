@@ -30,7 +30,9 @@
                 >
                 <transition-group name="zoom" tag="ul">
                     <el-menu-item :index=data.key v-for="data in chatCache" :key="data.key" @click="jump(data)" v-show="true">
-                        <i class="el-icon-delete delete" @click="removeChatParent(data.key)"></i>
+                        <el-tooltip content="删除该组的所有会话, 请谨慎操作!" placement="top" effect="light">
+                            <i class="el-icon-delete delete" @click="removeChatParent(data.key)"></i>
+                        </el-tooltip>
                         <span slot="title" class="cache-title">
                             <span slot="title" class="cache-title title-model-icon">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
@@ -59,7 +61,7 @@
             <div class="model-select-box">
                 <div class="contain">
                     <el-radio-group v-model="modelSelected">
-                        <el-radio :key="index" :label="data.label" :disabled="data.disabled" v-for="(data, index) in modelAll" @click.native="getModelLabelRdo(data.value)">{{ data.label }}</el-radio>
+                        <el-radio :key="index" :label="data.label" :disabled="data.disabled" v-for="(data, index) in modelAll" @click.native="getModelLabelRdo(data)">{{ data.label }}</el-radio>
                     </el-radio-group>
                 </div>
             </div>
@@ -106,7 +108,7 @@
                 <div class="intru-content">
                     <h3 class="intru-tt">
                         <svg class="icon intru-ic" aria-hidden="true">
-                            <use xlink:href="#icon-a-5_moxingtongbu"></use>
+                            <use xlink:href="#icon-a-Advantagesofartificial"></use>
                         </svg>
                         尊贵的老板, 您好, 这里是聚合了国内外主流ai的网站
                     </h3>
@@ -378,19 +380,42 @@
                                         </el-select>
                                     </el-col>
                                 </el-row>
-                                    <el-link slot="reference" type="success" :underline="false"  class="z-model-s">
-                                        <el-badge is-dot class="item-z">
-                                            <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="filterModelIcon"></use></svg> 【{{ selectedModel | getModelLabel2(modelAll) }}】
-                                        </el-badge>
-                                    </el-link>
+                                <el-link slot="reference" type="success" :underline="false"  class="z-model-s">
+                                    <el-badge is-dot class="item-z">
+                                        <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="filterModelIcon"></use></svg> 【{{ selectedModel | getModelLabel2(modelAll) }}】
+                                    </el-badge>
+                                </el-link>
                             </el-popover>
                         </span>
-                        <!-- <span v-if="contextSwitch">上下文: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>上下文: 【<span class="z-model-s-c">关闭</span>】; </span> -->
-                        <!-- <span v-if="roleResp" >预设角色回复: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>预设角色回复: 【<span class="z-model-s-c">关闭</span>】; </span> -->
-                        <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span>
+                        <span>滚动加载: 
+                            <el-popover
+                                placement="right"
+                                width="400"
+                                title="滚动加载开关"
+                                trigger="click">
+                                <el-row :gutter="10" class="set-item set-item-1">
+                                    <el-col :span="1" class="z-col-7 col-font">是否开启滚动加载: </el-col>
+                                    <el-col :span="1" class="z-col-4">
+                                        <el-tooltip content="建议关闭" placement="top">
+                                            <el-switch
+                                                @change="saveScrollLoadDataStatus()"
+                                                v-model="isScrollLoadDataStatus"
+                                                active-color="#13ce66"
+                                                inactive-color="#ff4949">
+                                            </el-switch>
+                                        </el-tooltip>
+                                    </el-col>
+                                </el-row>
+                                <el-link slot="reference" type="success" :underline="false"  class="z-model-s">
+                                    <el-badge is-dot class="item-z">
+                                        <span v-if="isScrollLoadDataStatus">【<span class="z-model-s">开启</span>】</span>
+                                        <span v-else>【<span class="z-model-s-c">关闭</span>】</span>
+                                    </el-badge>
+                                </el-link>
+                            </el-popover>
+                        </span>
+                        <!-- <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
+                        <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span> -->
                     </div>
                     <div class="send-input">
                         <el-input
@@ -1353,7 +1378,11 @@ export default {
             this.modelSelected = this.$options.filters.getModelLabel(this.selectedModel, this.modelAll);
         },
         getModelLabelRdo(val) {
-            this.selectedModel = val;
+            if (val.disabled) {
+                Message.error('该模型不可用');
+                return
+            }
+            this.selectedModel = val.value;
             this.modelSwitch();
         },
         // ai平台切换
@@ -2270,6 +2299,25 @@ export default {
                 return;
             }
         },
+        // 获取单挑对话记录的uuid
+        getChildData(curSessKey,uuid) {
+            let all_data = this.chatCache;
+            let data = [];
+            for (let i = 0; i < all_data.length; i++) {
+                if (all_data[i].key == curSessKey) {
+                    console.log(this.selectedSess);
+                    if (all_data[i].child && all_data[i].child.length > 0) {
+                        let child_data = all_data[i].child;
+                        let get_tar_data = child_data.filter(item => item.uuid == uuid);
+                        if (get_tar_data.length > 0) {
+                            return get_tar_data;
+                        }
+                    }
+                } 
+            }
+            return data;
+        },
+        // 删除当前所有父子对话记录
         async removeChatParent(key) {
             this.getAllChatData();
             let title = "";
@@ -2305,10 +2353,11 @@ export default {
                 this.createNewPage();
             }
         },
-        // 删除对话记录
+        // 删除单条对话记录
         async removeChat(targetName) {
             this.getAllChatData();
             let del_data = [];
+            let curSessKey = sessionStorage.getItem('recordSelectSessKey');
             for (let i = 0; i < this.chatCache.length; i++) {
                 if (this.chatCache[i].key == this.selectedSess) {
                     let child = this.chatCache[i].child;
@@ -2349,6 +2398,7 @@ export default {
                             }
                         }
                     } else {
+                        curSessKey = sessionStorage.getItem('recordSelectSessKey');
                         let sess = this.selectedSess;
                         for (let i = 0; i < this.chatCache.length; i++) {
                             if (this.chatCache[i].key == sess) {
@@ -2359,7 +2409,8 @@ export default {
                                 break;
                             }
                         }
-      
+                        
+                        del_data = this.getChildData(curSessKey, targetName)
                         let new_data = this.chatCache.filter(tab => tab.key != this.selectedSess);
                         this.selectedSess = sess;
                         this.recordSelectSessKey();
@@ -2372,8 +2423,10 @@ export default {
             if (this.chatCache.length == 0) {
                 this.createNewPage();
             }
-
+            
+            
             let uuids = del_data.map(uuid => uuid.uuid);
+            console.log("del uuids >>> ", uuids);
             const resp = await this.chatDel(uuids);
             if (resp.data.status != 666) {
                 Message.success('删除失败');

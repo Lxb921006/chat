@@ -325,6 +325,10 @@
 }
 .delete {
     z-index: 100000000;
+    position: relative;
+    font-size: 15px;
+    margin-right: 4px;
+    top: 2px;
 }
 .delete:hover {
     color: #af6060!important;
