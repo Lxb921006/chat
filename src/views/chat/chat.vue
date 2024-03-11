@@ -781,6 +781,7 @@ export default {
             this.getSelectSessKey();
             return this.chatCache.filter(d => d.key == this.selectedSess); 
         },
+        // 页面重载后保持选中的上下文
         contextStatus() {
             this.$nextTick(function () {
                 this.contextIcon = sessionStorage.getItem('contextIcon');
