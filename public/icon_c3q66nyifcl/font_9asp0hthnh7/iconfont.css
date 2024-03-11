@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4197599 */
-  src: url('iconfont.woff2?t=1709891828702') format('woff2'),
-       url('iconfont.woff?t=1709891828702') format('woff'),
-       url('iconfont.ttf?t=1709891828702') format('truetype');
+  src: url('iconfont.woff2?t=1710140250670') format('woff2'),
+       url('iconfont.woff?t=1710140250670') format('woff'),
+       url('iconfont.ttf?t=1710140250670') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-huaweiyun:before {
+  content: "\e686";
 }
 
 .icon-xunfeichatgpt:before {

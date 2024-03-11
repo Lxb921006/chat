@@ -61,7 +61,15 @@
             <div class="model-select-box">
                 <div class="contain">
                     <el-radio-group v-model="modelSelected">
-                        <el-radio :key="index" :label="data.label" :disabled="data.disabled" v-for="(data, index) in modelAll" @click.native="getModelLabelRdo(data)">{{ data.label }}</el-radio>
+                        <span v-for="(data, index) in modelAll" :key="index" class="model-icon-radio">
+                            <el-radio  :label="data.label" :disabled="data.disabled" @click.native="getModelLabelRdo(data)">
+                                <span class="cache-title title-model-icon icon-qa-radio">
+                                    <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use :xlink:href="data.icon"></use></svg>
+                                </span>
+                                {{ data.label }}
+                            </el-radio>
+                        </span>
+                        <!-- <el-radio :key="index" :label="data.label" :disabled="data.disabled" v-for="(data, index) in modelAll" @click.native="getModelLabelRdo(data)">{{ data.label }}</el-radio> -->
                     </el-radio-group>
                 </div>
             </div>
@@ -711,7 +719,7 @@ export default {
                     value: 'pg',
                     label: '华为盘古大模型',
                     disabled: true,
-                    icon: '#icon-gooIcon',
+                    icon: '#icon-huaweiyun',
                 }
             ],
             allowFile: ['.txt', '.png'],

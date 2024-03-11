@@ -1217,3 +1217,9 @@ ol > li {
     border-radius: 15px;
     opacity: 0.7;
 }
+.model-icon-radio {
+    margin-right: 12px;
+}
+.icon-qa-radio {
+    bottom: 2px;
+}

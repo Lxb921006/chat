@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "19220106",
+      "name": "华为云",
+      "font_class": "huaweiyun",
+      "unicode": "e686",
+      "unicode_decimal": 59014
+    },
+    {
       "icon_id": "37305447",
       "name": "讯飞星火",
       "font_class": "xunfeichatgpt",
