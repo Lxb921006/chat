@@ -565,6 +565,7 @@ export default {
     },
     data()  {
         return {
+            contextUUID: "",
             contextIcon: "",
             modelSelected: "谷歌Gemini",
             selectedModelIcon: "",
@@ -782,6 +783,7 @@ export default {
         },
         contextStatus() {
             this.$nextTick(function () {
+                this.contextIcon = sessionStorage.getItem('contextIcon');
                 this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
                 let checked = sessionStorage.getItem("checked");
                 this.checked = checked == "1" ? true : false;
@@ -845,8 +847,9 @@ export default {
         addContext(data) {
             if (!this.contextIcon || this.contextIcon == data.icon) {
                 this.contextIcon = data.icon;
+                
             } else {
-                data.checked = !data.checked;
+                // this.contextIcon = "";
                 Message.error("必须选择相同模型的会话");
                 return;
             }
@@ -866,9 +869,12 @@ export default {
             if (this.specifiedContextsTitle.length > 0 ) {
                 this.checked = true;
             } else {
+                data.checked != data.checked;
+                this.contextIcon = "";
                 this.checked = false;
             }
 
+            sessionStorage.setItem('contextIcon', this.contextIcon);
             sessionStorage.setItem('specifiedContexts', JSON.stringify(this.specifiedContexts));
             sessionStorage.setItem('checked', this.checked ? "1" : "2");
         },
