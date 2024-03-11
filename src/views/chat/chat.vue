@@ -805,6 +805,7 @@ export default {
                     this.specifiedContexts = [];
                     this.specifiedContextsTitle = [];
                 }
+
             })
         },
         clearContext() {
