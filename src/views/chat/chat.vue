@@ -100,6 +100,9 @@
                         <transition-group name="el-fade-in">
                             <el-row :gutter="10" v-for="(data, index) in specifiedContextsTitle" :key="index">
                                 <span>
+                                    <span class="cache-title title-model-icon icon-qa-radio">
+                                        <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use :xlink:href="contextIcon"></use></svg>
+                                    </span>
                                     {{ data | getContextTitle() }}
                                     <svg class="icon context-close-2" aria-hidden="true" @click="removeContext(data)">
                                         <use xlink:href="#icon-a-icon_huaban1" ></use>
@@ -155,7 +158,7 @@
                                             <!-- 勾选上下文提交给ai针对同类问题进行连续提问 -->
                                             <p class="add-context">
                                                 <el-tooltip content="勾选上下文提交给ai针对同类问题进一步深度讨论, 必须是相同模型的会话" placement="top">
-                                                    <el-checkbox v-model="data1.checked" size="medium" @change="addContext(data1)" ref="checkbox"></el-checkbox>
+                                                    <el-checkbox v-model="data1.checked" size="medium" @change="addContext(data1)"  ref="checkbox"></el-checkbox>
                                                 </el-tooltip>
                                             </p>
                                         </div>
@@ -562,6 +565,7 @@ export default {
     },
     data()  {
         return {
+            contextIcon: "",
             modelSelected: "谷歌Gemini",
             selectedModelIcon: "",
             modelSwitchNotice: "点我",
@@ -801,6 +805,7 @@ export default {
             })
         },
         clearContext() {
+            this.contextIcon = "";
             this.specifiedContexts = JSON.parse(sessionStorage.getItem('specifiedContexts'));
             let cd = this.chatCache;
             for (let i = 0; i < cd.length; i++) {
@@ -838,6 +843,16 @@ export default {
             return data;
         },
         addContext(data) {
+            console.log("check >>> ", data.checked);
+            if (!this.contextIcon || this.contextIcon == data.icon) {
+                this.contextIcon = data.icon;
+                data.checked = true;
+            } else {
+                data.checked = false;
+                Message.error("必须选择相同模型的会话");
+                return;
+            }
+                
             if (this.specifiedContexts.includes(data.uuid)) {
                 let indexUuid = this.specifiedContexts.indexOf(data.uuid);
                 let indextitle = this.specifiedContextsTitle.indexOf(data.title+"_"+data.uuid);
@@ -888,6 +903,7 @@ export default {
             if (this.specifiedContextsTitle.length > 0 ) {
                 this.checked = true;
             } else {
+                this.contextIcon = "";
                 this.checked = false;
             }
             
