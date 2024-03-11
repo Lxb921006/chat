@@ -843,7 +843,6 @@ export default {
             return data;
         },
         addContext(data) {
-            console.log("check >>> ", data.checked);
             if (!this.contextIcon || this.contextIcon == data.icon) {
                 this.contextIcon = data.icon;
                 data.checked = true;
