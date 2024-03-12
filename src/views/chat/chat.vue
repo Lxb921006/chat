@@ -441,7 +441,7 @@
                             resize="none"
                             >
                         </el-input>
-                        <el-button slot="reference" @click="wsInit()">
+                        <el-button slot="reference" :disabled="allowSend" @click="wsInit()">
                             <svg class="icon z-send-button" aria-hidden="true">
                                 <use xlink:href="#icon-send-01"></use>
                             </svg>
@@ -450,10 +450,12 @@
                         <el-upload
                             :style="{ visibility: selectedModel=='claude-2' || selectedModel=='Gemini' ? 'visible' : 'hidden' }"
                             class="upload-demo"
+                            ref="upload"
                             :action=uploadUrl()
                             :on-preview="handlePreview"
                             :before-upload="checkUploadFileType"
                             :on-success="successUpload"
+                            :on-remove="handleRemove"
                             multiple
                             :limit="1"
                             :data="fileData"
@@ -565,6 +567,7 @@ export default {
     },
     data()  {
         return {
+            allowSend: false,
             contextUUID: "",
             contextIcon: "",
             modelSelected: "谷歌Gemini",
@@ -990,7 +993,10 @@ export default {
             // sessionStorage.setItem("checked", this.checked ? 1 : 2);
         },
         handleRemove(file, fileList) {
+            console.log(this.claudeFile);
             this.isOpenSwitch = true;
+            this.claudeFile = "";
+
         },
         async downloadFile() {
             let name = this.fileData.file;
@@ -1654,6 +1660,8 @@ export default {
                 sessionStorage.setItem("showNewPage", 1);
             }
 
+            this.allowSend = true;
+
             setTimeout(() => {
                 this.finished = true;
                 let id = (100000000 - 1) * Math.random() + 1;
@@ -1877,6 +1885,7 @@ export default {
         close () {
             console.log('-----------websocket已关闭------------')
             this.finished = false;
+            this.allowSend = false;
             let answer = "";
             let div = document.querySelector(".content");
             for (let i = 0; i < this.chatCache.length; i++) {

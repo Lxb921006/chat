@@ -71,7 +71,7 @@
     /* width: 50ox; */
     width: 30px;
     height: 30px;
-    background-color: #262626;
+    background-color: #262626!important;
     border: none;
 }
 .send-input input:focus {
