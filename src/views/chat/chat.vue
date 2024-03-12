@@ -448,7 +448,7 @@
                         </el-button>
                         <!-- 目前只支持claude上传附件 -->
                         <el-upload
-                            :style="{ visibility: selectedModel=='claude-2' || selectedModel=='Gemini' ? 'visible' : 'hidden' }"
+                            :style="{ visibility: selectedModel=='claude-2' || selectedModel=='Gemini' || selectedModel=='qt' ? 'visible' : 'hidden' }"
                             class="upload-demo"
                             ref="upload"
                             :action=uploadUrl()
@@ -462,7 +462,7 @@
                             :file-list="fileList"
                             :on-exceed="handleExceed"
                             >
-                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .png文件; 目前只支持claude/gemini上传附件" placement="top-start">
+                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .png文件;" placement="top-start">
                                 <el-button size="small" type="primary">
                                     <svg class="icon z-send-button" aria-hidden="true">
                                         <use xlink:href="#icon-fujian"></use>
