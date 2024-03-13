@@ -1221,5 +1221,6 @@ ol > li {
     margin-right: 12px;
 }
 .icon-qa-radio {
-    bottom: 2px;
+    position: relative;
+    bottom: 1px;
 }
