@@ -448,7 +448,7 @@
                         </el-button>
                         <!-- 目前只支持claude上传附件 -->
                         <el-upload
-                            :style="{ visibility: selectedModel=='claude-2' || selectedModel=='Gemini' || selectedModel=='qt' ? 'visible' : 'hidden' }"
+                            :style="{ visibility: selectedModel=='claude-2' || selectedModel=='qt' ? 'visible' : 'hidden' }"
                             class="upload-demo"
                             ref="upload"
                             :action=uploadUrl()
