@@ -462,7 +462,7 @@
                             :file-list="fileList"
                             :on-exceed="handleExceed"
                             >
-                            <el-tooltip class="item" effect="dark" content="只能上传.txt, .png文件;" placement="top-start">
+                            <el-tooltip class="item" effect="dark" content="只能上传.png|.jpg|.jpeg文件;" placement="top-start">
                                 <el-button size="small" type="primary">
                                     <svg class="icon z-send-button" aria-hidden="true">
                                         <use xlink:href="#icon-fujian"></use>
@@ -730,7 +730,7 @@ export default {
                     icon: '#icon-huaweiyun',
                 }
             ],
-            allowFile: ['.txt', '.png'],
+            allowFile: ['.png', '.jpg', '.jpeg'],
             loadCount: 0,
             historyDataLoading: false,
             pages: {
@@ -1447,7 +1447,7 @@ export default {
                     window.sessionStorage.setItem('modelSelect', 7);
                     break
                 case 'qt':
-                    window.sessionStorage.setItem('qt', 8);
+                    window.sessionStorage.setItem('modelSelect', 8);
                     break
                 case 'Gemini':
                     window.sessionStorage.setItem('modelSelect', 9);
@@ -1670,12 +1670,8 @@ export default {
                 let modelIcon= "";
                 let newfile = "";
 
-                if (this.selectedModel == 'claude-2' || this.selectedModel == 'Gemini') {
-                    newfile = this.claudeFile;
-                } else {
-                    newfile = "";
-                }
-
+                newfile = this.claudeFile;
+                
                 switch (this.selectedModel) {
                 case 'claude-2':
                     modelIcon = this.claudeIcon;
@@ -1922,7 +1918,6 @@ export default {
                 }
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
-            this.claudeFile = "";
             // this.fileList = [];
             this.chatContent = "";
             this.stopResp = false;
@@ -1963,6 +1958,7 @@ export default {
         },
         // 通义千问
         sendQw() {
+            let file = this.claudeFile;
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
@@ -1977,7 +1973,6 @@ export default {
                 gptData = [];
             }
 
-            let file = this.claudeFile;
             let context = [];
      
             if (gptData.length > 1) {
@@ -2003,6 +1998,7 @@ export default {
         },
         // claude3
         sendClaude() {
+            let file = this.claudeFile;
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
@@ -2017,7 +2013,6 @@ export default {
                 gptData = [];
             }
 
-            let file = this.claudeFile;
             let context = [];
      
             if (gptData.length > 1) {
@@ -2072,7 +2067,7 @@ export default {
         },
         // 讯飞星火
         sendXF() {
-            this.claudeFile = "";
+            let file = this.claudeFile;
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
@@ -2112,7 +2107,7 @@ export default {
         },
         // chatGPT3.5,gpt-4
         chatGPT35() {
-            this.claudeFile = "";
+            let file = this.claudeFile;
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
@@ -2151,6 +2146,7 @@ export default {
         },
         // 谷歌ai
         gemini() {
+            let file = this.claudeFile;
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
@@ -2182,7 +2178,7 @@ export default {
                 最重要的一点请根据你对问题的理解和回答, 生成3个有深度的与问题内容和回答相关联的后续问题以引导进一步的讨论。
                 `
 
-            let file = this.claudeFile;
+            
             let context = null;
             if (gptData.length > 1) {
                 //发送的信息关联上下文
