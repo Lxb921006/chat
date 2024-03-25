@@ -338,7 +338,7 @@
                         <div class="z-rb-title">
                             <h2>历史聊天加载</h2>
                         </div>
-                        <div class="pages">
+                        <!-- <div class="pages">
                             <el-select v-model="selectPage" class="c-select" placeholder="请选择">
                                 <el-option
                                 v-for="item in totalPages"
@@ -352,10 +352,10 @@
                         </div>
                         <div class="search-bk">
                             <el-input v-model="searchBk"></el-input>
-                        </div>
+                        </div> -->
                         <div class="smbpages">
-                            <el-button size="mini" type="primary" @click="clickLoadChatData()">加载数据</el-button>
-                            <el-button size="mini" type="primary" @click="loadLatestTenData()" :loading="tenDataLoading">加载最新10条</el-button>
+                            <!-- <el-button size="mini" type="primary" @click="clickLoadChatData()">加载数据</el-button> -->
+                            <el-button size="mini" type="primary" @click="loadLatestTenData()" :loading="tenDataLoading">加载最新记录</el-button>
                         </div>
                         <el-button slot="reference">
                             <svg class="icon z-rb-icon" aria-hidden="true">
