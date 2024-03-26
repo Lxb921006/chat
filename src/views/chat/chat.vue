@@ -446,7 +446,6 @@
                                 <use xlink:href="#icon-send-01"></use>
                             </svg>
                         </el-button>
-                        <!-- 目前只支持claude上传附件 -->
                         <el-upload
                             :style="{ visibility: selectedModel=='claude-2' || selectedModel=='qt' ? 'visible' : 'hidden' }"
                             class="upload-demo"
@@ -1761,32 +1760,31 @@ export default {
                 // 实例化socket
                 switch (this.selectedModel) {
                     case 'claude-2':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'chatGPT3.5':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'GPT-4':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
-                        // this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'chatGPT':
-                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'bd':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
                     case 'qt':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break
                     case 'tx':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
                     case 'xf':
-                        this.wsUrl = `${wssSinApiUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break    
                     case 'Gemini':
-                        this.wsUrl = `${wssUsUrl}/ws/chat/${sessionStorage.getItem("user")}/`
+                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break     
                 }
                 

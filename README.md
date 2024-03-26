@@ -45,7 +45,8 @@ v16.4.0
 
 
 ### web端体验地址  
-<a href="http://43.156.8.45:8092/chat" target="_blank">体验地址</a>  
+<a href="https://tc.anythingai.online" target="_blank">体验地址</a>  
+需要体验联系我：pythongolangvue@gmail.com  
 
 
 ### web部分ui展示
