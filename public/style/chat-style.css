@@ -883,6 +883,9 @@ ol > li {
 .el-textarea textarea {
     padding-right: 87px!important;
 }
+.upload-demo {
+    height: 30px;
+}
 .upload-demo button {
     position: relative;
     /* float: right; */

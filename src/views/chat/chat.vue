@@ -433,7 +433,7 @@
                             type="textarea"
                             autocomplete="on"
                             show-word-limit
-                            :autosize="{ minRows: 2, maxRows: 3 }"
+                            :autosize="{ minRows: 2, maxRows: 2 }"
                             placeholder="请输入对话内容, 先按住ctrl再按enter键提交"
                             v-model="chatContent"
                             @keyup.native="handleKeyUp"
@@ -2161,24 +2161,8 @@ export default {
                 gptData = [];
             }
 
-            let text = `
-                我的问题是: ${this.chatContent}。作为提问者，我会尽量明确和具体地提出问题。如果我的问题不够具体或存在不确定性，我希望你能通过追问或请求澄清来帮助理解我的需求，以提供最相关的回答。
+            let text = this.chatContent;
 
-                你需要在答案中考虑：
-                
-                - 使用上下文相关性来为我提供连贯、准确并且全面的回复。
-                - 使用简明的自然语言并避免不必要的专业术语。
-                - 在涉及具体概念或代码时使用清晰、易读的格式，包含注释以帮助理解。
-                - 力求提供新颖有价值的见解，避免重复已有的内容。
-                - 保护我的隐私，不将我的对话记录与真实身份相关联或与第三方共享。
-                - 如果回复内容适用于特定职业或学者角色，你需要在回复前使用【{角色}】告知我。你需要根据我的指示调整你的回复风格和语气。
-   
-                如果需要更多信息以提供更准确的回答, 我愿意接受你的追问。
-
-                最重要的一点请根据你对问题的理解和回答, 生成3个有深度的与问题内容和回答相关联的后续问题以引导进一步的讨论。
-                `
-
-            
             let context = null;
             if (gptData.length > 1) {
                 //发送的信息关联上下文
