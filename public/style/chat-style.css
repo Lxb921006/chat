@@ -1227,3 +1227,6 @@ ol > li {
     position: relative;
     bottom: 1px;
 }
+.el-radio__label {
+    color: #fff
+}

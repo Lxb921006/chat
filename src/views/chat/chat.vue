@@ -2080,7 +2080,7 @@ export default {
                 gptData = [];
             }
             
-            let context = null;
+            let context = [];
             if (gptData.length > 1) {
                 //发送的信息关联上下文
                 if (this.specifiedContexts.length > 0) {
@@ -2095,9 +2095,9 @@ export default {
                     }
                 }
                 
-                sendData = {data: this.chatContent, content: context, model: this.selectedModel};
+                sendData = {data: this.chatContent, context: context, model: this.selectedModel};
             } else {
-                sendData = {data: this.chatContent, content: '', model: this.selectedModel};
+                sendData = {data: this.chatContent, context: [], model: this.selectedModel};
             }
            
             this.socket.send(JSON.stringify(sendData));
