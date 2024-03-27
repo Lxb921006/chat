@@ -24,7 +24,7 @@
                     <el-input v-model="user" placeholder="请输入用户名" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
                 </el-col>
                 <el-col class="login-col-2">
-                    <el-input v-model="gacode" placeholder="请输入chatai码" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
+                    <el-input v-model="gacode" placeholder="联系Q拿登录码: 120332269" suffix-icon="el-icon-edit" :disabled="finished" clearable @keyup.enter.native="GaLogin()"></el-input>
                 </el-col>
             </el-row>
             <el-row :gutter="10" class="login-content">
