@@ -917,10 +917,14 @@ export default {
             
             sessionStorage.setItem('checked', this.checked ? "1" : "2");
         },
-        afterLoginDataOnce() {
+        async afterLoginDataOnce() {
             let fld = sessionStorage.getItem('firstLoadData');
             if (!fld) {
-                this.clickLoadChatData();
+                const resp = await this.getChatList(200);
+                let chatData = resp.data.data;
+                if (chatData && chatData.length >0 ) {
+                    this.clickLoadChatData();
+                }
                 sessionStorage.setItem('firstLoadData', 'firstdone');
             }
         },
