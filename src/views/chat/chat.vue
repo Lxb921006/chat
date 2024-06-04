@@ -683,7 +683,7 @@ export default {
                 {
                     value: 'chatGPT3.5',
                     label: 'GPT-3.5-turbo',
-                    disabled: false,
+                    disabled: true,
                     icon: '#icon-a-Chatgpt35',
                 },
                 {
@@ -2473,6 +2473,12 @@ export default {
             }, 50)
         },
         returnChat() {
+            let totals = sessionStorage.getItem("totals");
+            if (!totals || parseInt(totals) <= 0) {
+                Message.success('还有提问记录,没法返回哟,先试试提问吧');
+                return
+            } 
+
             if (!this.show) {
                 this.showNewPage = false;
                 this.show = true;
