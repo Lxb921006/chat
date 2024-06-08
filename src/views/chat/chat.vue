@@ -189,9 +189,17 @@
                                         <!-- 对话完成时间 -->
                                         <transition name="el-zoom-in-center">
                                             <div class="finished-time" v-show="data1.timeShow">
-                                                <i class="el-icon-time time-2">{{ data1.date }}</i>
-                                                <div class="whole-answer">
-                                                    <el-dropdown>
+                                                <el-tooltip content="AI完成时间" placement="top" effect="light">
+                                                    <span class="finished-time-icon"><i class="el-icon-time">{{ data1.date }}</i></span>
+                                                </el-tooltip>
+                                                <el-tooltip content="复制" placement="top" effect="light">
+                                                    <span @click="copyAll(data1.answer)" class="finished-copy-icon"><i class="el-icon-document-copy"></i></span>
+                                                </el-tooltip>
+                                                <el-tooltip content="删除" placement="top" effect="light">
+                                                    <span @click="removeChat(data1.uuid)" class="finished-delete-icon"><i class="el-icon-delete"></i></span>
+                                                </el-tooltip>
+                                                <!-- <div class="whole-answer"> -->
+                                                    <!-- <el-dropdown>
                                                         <span class="el-dropdown-link">
                                                             <svg class="icon" aria-hidden="true">
                                                                 <use xlink:href="#icon-shenglvehao"></use>
@@ -201,8 +209,8 @@
                                                             <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer)">复制整个对话</el-dropdown-item>
                                                             <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.uuid)">删改该对话</el-dropdown-item>
                                                         </el-dropdown-menu>
-                                                    </el-dropdown>
-                                                </div>
+                                                    </el-dropdown> -->
+                                                <!-- </div> -->
                                             </div>
                                         </transition>
                                     </div>

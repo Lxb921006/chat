@@ -117,7 +117,30 @@
     width: 659px;
     margin: 0 auto;
     position: relative;
-    margin-top: -29px;
+    bottom: 10px;
+    /* margin-top: -29px; */
+}
+.finished-time-icon {
+    color: #a5a3a3;
+    font-size: 12px;
+}
+.finished-copy-icon {
+    color: #a5a3a3;
+    font-size: 12px;
+    margin-left: 8px;
+    cursor: pointer;
+}
+.finished-copy-icon:hover {
+    color: #777777;
+}
+.finished-delete-icon {
+    color: #a5a3a3;
+    font-size: 12px;
+    margin-left: 8px;
+    cursor: pointer;
+}
+.finished-delete-icon:hover {
+    color: #777777;
 }
 .whole-answer {
     white-space: pre-wrap;
