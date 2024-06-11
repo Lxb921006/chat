@@ -79,7 +79,11 @@
                     <svg class="icon z-aside" aria-hidden="true" @click="showAside()">
                         <use xlink:href="#icon-wmf-common43"></use>
                     </svg>
+                    
                 </div>
+            </transition>
+            <transition name="el-zoom-in-top">
+                <p v-show="loginCheckStatus" class="login-check">请稍等, 正在检测数据{{ loginCheckDots }}</p>
             </transition>
             <!-- 清空所有选中的上下文 -->
             <div>
@@ -101,7 +105,7 @@
                             <el-row :gutter="10" v-for="(data, index) in specifiedContextsTitle" :key="index">
                                 <span>
                                     <span class="cache-title title-model-icon icon-qa-radio">
-                                        <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use :xlink:href="contextIcon"></use></svg>
+                                        <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use :xlink:href="getContextIcon(data)"></use></svg>
                                     </span>
                                     {{ data | getContextTitle() }}
                                     <svg class="icon context-close-2" aria-hidden="true" @click="removeContext(data)">
@@ -574,6 +578,10 @@ export default {
     },
     data()  {
         return {
+            loginCheckStatus: false,
+            loginCheckTimer: null,
+            loginCheckDots: "",
+            checkTime: 0,
             allowSend: false,
             contextUUID: "",
             contextIcon: "",
@@ -782,6 +790,14 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
+        loginedCheck() {
+            this.loginCheckTimer = setInterval(() => {
+                this.loginCheckDots += '.';
+                if (this.loginCheckDots.length > 3) {
+                    this.loginCheckDots = ''; 
+                }
+            }, 500);
+        },
         filterModelIconZ () {
             let label = this.modelAll.find(item => item.value == this.selectedModel);
             // console.log(label.icon);
@@ -806,7 +822,7 @@ export default {
                             for (let t = 0; t < child.length; t++) {
                                 if (this.specifiedContexts.includes(child[t].uuid)) {
                                     child[t].checked = true;
-                                    this.specifiedContextsTitle.push(child[t].title+"_"+child[t].uuid);
+                                    this.specifiedContextsTitle.push(child[t].title+"_"+child[t].uuid+"_"+child[t].model);
                                 }
                             }
                         }
@@ -854,28 +870,38 @@ export default {
                 }
             }
 
+            if (data.length > 0) {
+                data.forEach(data => {
+                    if (data.model != this.modelSelected) {
+                        Message.error("勾选的上下文无效, 只能勾选同一个模型回复的内容");
+                        return [];
+                    }
+                });
+            }
+
             return data;
         },
-        addContext(data) {
-            if (!this.contextIcon || this.contextIcon == data.icon) {
-                this.contextIcon = data.icon;
-                
-            } else {
-                // this.contextIcon = "";
-                Message.error("必须选择相同模型的会话");
-                return;
+        getContextIcon(data) {
+            let all = this.modelAll;
+            let modelname = data.split("_")
+            for (let i = 0;i < all.length; i++) {
+                if (all[i].value == modelname[2]) {
+                    return all[i].icon;
+                }
             }
-                
+            return "#icon-a-result4";
+        },
+        addContext(data) {
             if (this.specifiedContexts.includes(data.uuid)) {
                 let indexUuid = this.specifiedContexts.indexOf(data.uuid);
-                let indextitle = this.specifiedContextsTitle.indexOf(data.title+"_"+data.uuid);
+                let indextitle = this.specifiedContextsTitle.indexOf(data.title+"_"+data.uuid+"_"+data.model);
                 if (indexUuid !== -1) {
                     this.specifiedContexts.splice(indexUuid, 1);
                     this.specifiedContextsTitle.splice(indextitle, 1);
                 }
             } else {
                 this.specifiedContexts.push(data.uuid);
-                this.specifiedContextsTitle.push(data.title+"_"+data.uuid);
+                this.specifiedContextsTitle.push(data.title+"_"+data.uuid+"_"+data.model);
             }
 
             if (this.specifiedContextsTitle.length > 0 ) {
@@ -925,15 +951,28 @@ export default {
             
             sessionStorage.setItem('checked', this.checked ? "1" : "2");
         },
+        // 登录后加载聊天记录
         async afterLoginDataOnce() {
             let fld = sessionStorage.getItem('firstLoadData');
+            let loginCheckStatus = sessionStorage.getItem('loginCheckStatus');
             if (!fld) {
+                this.loginCheckStatus = true;
+                this.finished = true;
                 const resp = await this.getChatList(200);
                 let chatData = resp.data.data;
                 if (chatData && chatData.length >0 ) {
+                    this.checkTime = 1;
                     this.clickLoadChatData();
                 }
+                clearInterval(this.loginCheckTimer);
+                this.loginCheckStatus = false;
+                this.finished = false;
                 sessionStorage.setItem('firstLoadData', 'firstdone');
+                sessionStorage.setItem('loginCheckStatus', "false");
+            }
+
+            if (loginCheckStatus == "false") {
+                this.loginCheckStatus = false;
             }
         },
         aiNewSesshow() {
@@ -1132,7 +1171,7 @@ export default {
 
             setTimeout(() => {
                 this.chatTitleFormat();
-            }, 2000);
+            }, 500);
 
             return resp;
         },
@@ -1419,7 +1458,7 @@ export default {
                     this.selectedModel = 'Gemini';
                     break;    
                 default:
-                    this.selectedModel = 'Gemini';
+                    this.selectedModel = 'xf';
                     break;
             }
             this.modelSelected = this.$options.filters.getModelLabel(this.selectedModel, this.modelAll);
@@ -1643,6 +1682,10 @@ export default {
         // 建立websocket连接
         wsInit (ai_text) {
             if (ai_text) {
+                if (this.finished) {
+                    Message.error("请等待检测完成");
+                    return
+                }
                 this.chatContent = ai_text;
             }
 
@@ -1929,7 +1972,7 @@ export default {
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
             // this.fileList = [];
-            this.chatContent = "";
+            // this.chatContent = "";
             this.stopResp = false;
             this.socket = null;
             this.pptCreate = false;
@@ -1962,7 +2005,6 @@ export default {
             let file = this.claudeFile;
             let sendData = {};
             sendData = {data: this.chatContent, context: [], model: this.selectedModel, file: file};
-            console.log(sendData);
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
@@ -1991,7 +2033,7 @@ export default {
                     context = this.submitSpecifiedContext();
                     if (context.length >= 6) {
                         context = context.slice(context.length - 5, context.length);
-                    } 
+                    }
                 } else {
                     context = gptData.slice(gptData.length - 6, gptData.length - 1);
                     if (context.length < 4) {
@@ -2592,7 +2634,7 @@ export default {
         this.contextStatus();
         this.checkContextStatus();
         this.getAllChatData();
-        this.getAllChatRecycleData();
+        // this.getAllChatRecycleData();
         this.checkSystemSet();
         this.getContentLen();
         this.checkModel();
@@ -2604,6 +2646,8 @@ export default {
         this.aiNewSesshow();
         this.dafaultIsOpenNewSess();
         this.getSelectSessKey();
+        // 登录后加载聊天记录
+        this.loginedCheck();
         this.afterLoginDataOnce();
     },
 }

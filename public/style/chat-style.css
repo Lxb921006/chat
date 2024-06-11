@@ -1253,3 +1253,8 @@ ol > li {
 .el-radio__label {
     color: #fff
 }
+.login-check {
+    text-align: left;
+    color: #fff;
+    font-size: 12px;
+}
