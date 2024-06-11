@@ -29,6 +29,9 @@ instance.interceptors.response.use(resp => {
     return Promise.resolve(resp) // 异步调用方式将回调函数作为函数参数返回
 }, err => {
     
+    if (!err.response.status) {
+        return Promise.reject(err)
+    };
     switch (err.response.status) {
         case 400:
             Message.error(err.response.data.message);
