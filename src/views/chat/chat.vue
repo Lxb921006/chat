@@ -871,7 +871,6 @@ export default {
             }
 
             if (data.length > 0) {
-                console.log("data >>> ", data);
                 data.forEach(item => {
                     if (item.model != this.selectedModel) {
                         Message.error("勾选的上下文无效, 只能勾选同一个模型回复的内容");
