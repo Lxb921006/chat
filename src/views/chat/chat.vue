@@ -66,7 +66,7 @@
                                 <span class="cache-title title-model-icon icon-qa-radio">
                                     <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use :xlink:href="data.icon"></use></svg>
                                 </span>
-                                {{ data.label }}
+                                    {{ data.label }}
                             </el-radio>
                         </span>
                         <!-- <el-radio :key="index" :label="data.label" :disabled="data.disabled" v-for="(data, index) in modelAll" @click.native="getModelLabelRdo(data)">{{ data.label }}</el-radio> -->
@@ -83,7 +83,7 @@
                 </div>
             </transition>
             <transition name="el-zoom-in-top">
-                <p v-show="loginCheckStatus" class="login-check">请稍等, 正在检测数据{{ loginCheckDots }}</p>
+                <p v-if="loginCheckStatus" class="login-check">请稍等, 正在检测数据{{ loginCheckDots }}</p>
             </transition>
             <!-- 清空所有选中的上下文 -->
             <div>
@@ -964,7 +964,6 @@ export default {
                     this.checkTime = 1;
                     this.clickLoadChatData();
                 }
-                clearInterval(this.loginCheckTimer);
                 this.loginCheckStatus = false;
                 this.finished = false;
                 sessionStorage.setItem('firstLoadData', 'firstdone');
@@ -974,6 +973,10 @@ export default {
             if (loginCheckStatus == "false") {
                 this.loginCheckStatus = false;
             }
+            if (this.loginCheckTimer) {
+                clearInterval(this.loginCheckTimer);
+            }
+            
         },
         aiNewSesshow() {
             let showNewPage = sessionStorage.getItem("showNewPage");
