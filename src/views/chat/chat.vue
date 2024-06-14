@@ -432,7 +432,7 @@
                             type="textarea"
                             autocomplete="on"
                             show-word-limit
-                            :autosize="{ minRows: 5, maxRows: 6 }"
+                            :autosize="{ minRows: 5, maxRows: 5 }"
                             placeholder="请输入对话内容, 先按住ctrl再按enter键提交"
                             v-model="chatContent"
                             @keyup.native="handleKeyUp"
