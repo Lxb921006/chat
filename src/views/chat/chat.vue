@@ -202,19 +202,6 @@
                                                 <el-tooltip content="删除" placement="top" effect="light">
                                                     <span @click="removeChat(data1.uuid)" class="finished-delete-icon"><i class="el-icon-delete"></i></span>
                                                 </el-tooltip>
-                                                <!-- <div class="whole-answer"> -->
-                                                    <!-- <el-dropdown>
-                                                        <span class="el-dropdown-link">
-                                                            <svg class="icon" aria-hidden="true">
-                                                                <use xlink:href="#icon-shenglvehao"></use>
-                                                            </svg>
-                                                        </span>
-                                                        <el-dropdown-menu slot="dropdown">
-                                                            <el-dropdown-item icon="el-icon-document-copy" @click.native="copyAll(data1.answer)">复制整个对话</el-dropdown-item>
-                                                            <el-dropdown-item icon="el-icon-delete" @click.native="removeChat(data1.uuid)">删改该对话</el-dropdown-item>
-                                                        </el-dropdown-menu>
-                                                    </el-dropdown> -->
-                                                <!-- </div> -->
                                             </div>
                                         </transition>
                                     </div>
@@ -445,7 +432,7 @@
                             type="textarea"
                             autocomplete="on"
                             show-word-limit
-                            :autosize="{ minRows: 2, maxRows: 2 }"
+                            :autosize="{ minRows: 5, maxRows: 6 }"
                             placeholder="请输入对话内容, 先按住ctrl再按enter键提交"
                             v-model="chatContent"
                             @keyup.native="handleKeyUp"

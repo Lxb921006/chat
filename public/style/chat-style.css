@@ -239,7 +239,7 @@
 }
 .content {
     overflow: auto;
-    height: 70%;
+    height: 59%;
     margin: 0 auto;
     scrollbar-width: none;
 }
@@ -599,7 +599,7 @@ pre code {
 }
 @media only screen and (max-height: 800px) {
     .content,.add-new-sess {
-        height: 63%!important;
+        height: 60%!important;
     }
     .tab {
         height: 37%;
