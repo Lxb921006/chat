@@ -57,6 +57,9 @@
 /* .send-input input:hover {
     border-color: #323232;
 } */
+.send-input {
+    margin-top: 10px;
+}
 .send-input input {
     height: 57px;
     line-height: 57px;
@@ -882,7 +885,7 @@ ol > li {
     position: relative;
     color: #fff;
     font-size: 12px;
-    bottom: 6px;
+    /* bottom: 6px; */
 }
 .z-model-show .el-link.el-link--success {
     color: #28ae64;

@@ -246,7 +246,7 @@
             <!-- 所有设置 -->
             <div class="footer list-group"  id="sortable">
                 <!-- 设置 -->
-                <div class="setting">
+                <!-- <div class="setting">
                     <el-popover
                         placement="right-start"
                         title="设置"
@@ -296,9 +296,9 @@
                             </svg>
                         </el-button>
                     </el-popover>
-                </div>
+                </div> -->
                 <!-- 用户管理-TODO.... -->
-                <div class="user rb">
+                <!-- <div class="user rb">
                     <el-popover
                         placement="right"
                         width="400"
@@ -327,9 +327,9 @@
                             </svg>
                         </el-button>
                     </el-popover>
-                </div>
+                </div> -->
                 <!-- 历史记录 -->
-                <div class="user rb">
+                <!-- <div class="user rb">
                     <el-popover
                         placement="right"
                         width="400"
@@ -337,23 +337,7 @@
                         <div class="z-rb-title">
                             <h2>历史聊天加载</h2>
                         </div>
-                        <!-- <div class="pages">
-                            <el-select v-model="selectPage" class="c-select" placeholder="请选择">
-                                <el-option
-                                v-for="item in totalPages"
-                                :key="item"
-                                :label="item"
-                                :value="item"
-                                :disabled="item==pages.page"
-                                >
-                                </el-option>
-                            </el-select>
-                        </div>
-                        <div class="search-bk">
-                            <el-input v-model="searchBk"></el-input>
-                        </div> -->
                         <div class="smbpages">
-                            <!-- <el-button size="mini" type="primary" @click="clickLoadChatData()">加载数据</el-button> -->
                             <el-button size="mini" type="primary" @click="loadLatestTenData()" :loading="tenDataLoading">加载最新记录</el-button>
                         </div>
                         <el-button slot="reference">
@@ -362,9 +346,9 @@
                             </svg>
                         </el-button>
                     </el-popover>
-                </div>
+                </div> -->
                 <!-- 对话输入 -->
-                <div class="send-question">
+                <div class="send-question"> 
                     <div class="z-model-show">
                         <span>模型: 
                             <el-popover
@@ -424,8 +408,6 @@
                                 </el-link>
                             </el-popover>
                         </span>
-                        <!-- <span v-if="isScrollLoadDataStatus">滚动加载: 【<span class="z-model-s">开启</span>】; </span>
-                        <span v-else>滚动加载: 【<span class="z-model-s-c">关闭</span>】; </span> -->
                     </div>
                     <div class="send-input">
                         <el-input
