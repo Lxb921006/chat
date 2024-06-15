@@ -74,17 +74,17 @@
                 </div>
             </div>
             <!-- 左侧边栏的收起跟打开按钮 -->
-            <transition name="el-zoom-in-top">
+            <!-- <transition name="el-zoom-in-top"> -->
                 <div class="collapse-aside" v-show="mh">
                     <svg class="icon z-aside" aria-hidden="true" @click="showAside()">
                         <use xlink:href="#icon-wmf-common43"></use>
                     </svg>
-                    
+                    <transition name="el-zoom-in-top">
+                        <p v-show="loginCheckStatus" class="login-check">请稍等, 正在检测数据{{ loginCheckDots }}</p>
+                    </transition>
                 </div>
-            </transition>
-            <transition name="el-zoom-in-top">
-                <p v-if="loginCheckStatus" class="login-check">请稍等, 正在检测数据{{ loginCheckDots }}</p>
-            </transition>
+            <!-- </transition> -->
+            
             <!-- 清空所有选中的上下文 -->
             <div>
                 <transition name="el-fade-in">

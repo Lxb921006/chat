@@ -239,7 +239,7 @@
 }
 .content {
     overflow: auto;
-    height: 59%;
+    height: 63%;
     margin: 0 auto;
     scrollbar-width: none;
 }
@@ -1042,7 +1042,7 @@ ol > li {
 }
 .add-new-sess {
     overflow: hidden;
-    height: 70%;
+    height: 63%;
     scrollbar-width: none;
     position: relative;
 }
@@ -1254,6 +1254,9 @@ ol > li {
     color: #fff
 }
 .login-check {
+    display: inline-block;
+    position: relative;
+    bottom: 19px;
     text-align: left;
     color: #fff;
     font-size: 12px;
