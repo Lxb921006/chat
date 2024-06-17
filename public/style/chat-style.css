@@ -1223,11 +1223,25 @@ ol > li {
     top: 1px;
 }
 .ai-img {
-    width: 600px;
-    height: 500px;
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.ai-img .el-image__inner {
+    width: 30%;
+    padding-left: 3px;
+    padding-top: 3px;
+}
+.wx-hide-show {
+    text-align: left;
+}
+.wx-hide-show svg {
+    right: 7px;
+    bottom: 7px;
 }
 .ai-wx {
     float: left;
+    margin-top: 5px;
 }
 .ai-wx p {
     font-size: 13px;

@@ -235,14 +235,24 @@
                 </transition>
             </div>
             <el-divider></el-divider>
-            <div class="ai-wx">
-                <p>微信小程序</p>
-                <el-image
-                    style="width: 100px; height: 100px"
-                    src="../img/ai-wx.jpg"
-                    fit="contain">
-                </el-image>
+            <div class="wx-hide-show">
+
+            
+                    <svg class="icon" aria-hidden="true" @click="wxCodeShow()">
+                        <use xlink:href="#icon-shousuo1"></use>
+                    </svg>
+                
             </div>
+            <transition name="el-zoom-in-center">
+                <div class="ai-wx" v-show="wxhideShow">
+                    <p>微信小程序</p>
+                    <el-image
+                        style="width: 100px; height: 100px"
+                        src="../img/ai-wx.jpg"
+                        fit="contain">
+                    </el-image>
+                </div>
+            </transition>
             <!-- 所有设置 -->
             <div class="footer list-group"  id="sortable">
                 <!-- 设置 -->
@@ -547,6 +557,7 @@ export default {
     },
     data()  {
         return {
+            wxhideShow: false,
             loginCheckStatus: false,
             loginCheckTimer: null,
             loginCheckDots: "",
@@ -759,6 +770,9 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
+        wxCodeShow() {
+            this.wxhideShow = !this.wxhideShow;
+        },
         loginedCheck() {
             this.loginCheckTimer = setInterval(() => {
                 this.loginCheckDots += '.';
