@@ -437,6 +437,13 @@
                                 <use xlink:href="#icon-send-01"></use>
                             </svg>
                         </el-button>
+                        <el-tooltip class="item" effect="dark" content="刷新对话记录" placement="top-start">
+                            <el-button class="z-flush-data" @click="loadLatestTenData()">
+                                <svg class="icon z-send-button" aria-hidden="true">
+                                    <use xlink:href="#icon-shuaxin3"></use>
+                                </svg>
+                            </el-button>
+                        </el-tooltip>
                         <el-upload
                             :style="{ visibility: selectedModel=='claude-2' || selectedModel=='qt' ? 'visible' : 'hidden' }"
                             class="upload-demo"
@@ -460,7 +467,7 @@
                                 </el-button>
                             </el-tooltip>
                         </el-upload>
-                    
+                        <div class="over-z-index"></div>
                     </div>
                 </div>
             </div>
@@ -1229,7 +1236,8 @@ export default {
             this.showhi = true;
             this.setTimer = false;
             this.scrollLoading = true;
-
+            this.loginCheckStatus = true;
+            this.loginedCheck();
             this.pages.page = 1;
             this.loadCount = 0;
             const resp = await this.getChatList();
@@ -1268,9 +1276,12 @@ export default {
             sessionStorage.setItem('page', this.pages.page);
             sessionStorage.setItem('totals', resp.data.totals);
             sessionStorage.setItem('totalPages', JSON.stringify(this.totalPages));
+            sessionStorage.setItem('loginCheckStatus', "false");
             
             
             // 必须等数据加载完才能让handleScroll继续监听滚动条
+            this.loginCheckStatus = false;
+            clearInterval(this.loginCheckTimer);
             this.setTimer = true; 
             this.scrollLoading = false;
             this.tenDataLoading = false;

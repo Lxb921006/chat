@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4197599 */
-  src: url('iconfont.woff2?t=1718607442326') format('woff2'),
-       url('iconfont.woff?t=1718607442326') format('woff'),
-       url('iconfont.ttf?t=1718607442326') format('truetype');
+  src: url('iconfont.woff2?t=1718616971630') format('woff2'),
+       url('iconfont.woff?t=1718616971630') format('woff'),
+       url('iconfont.ttf?t=1718616971630') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,26 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-shuaxin3:before {
+  content: "\e638";
+}
+
+.icon-shuaxin1:before {
+  content: "\e669";
+}
+
+.icon-shuaxin2:before {
+  content: "\e75f";
+}
+
+.icon-icon-shuaxin:before {
+  content: "\e631";
+}
+
+.icon-shuaxin:before {
+  content: "\e63e";
 }
 
 .icon-shousuo-zhankai:before {

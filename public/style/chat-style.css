@@ -69,13 +69,14 @@
 .send-input button {
     position: relative;
     float: right;
-    bottom: 43px;
-    right: 50px;
-    /* width: 50ox; */
+    bottom: 35px;
+    /* right: 50px; */
+    right: 10px;
     width: 30px;
     height: 30px;
     background-color: #262626!important;
     border: none;
+    z-index: 101;
 }
 .send-input input:focus {
     border-color: #323232;
@@ -600,9 +601,9 @@ pre code {
         padding-right: 568px;
     }
 }
-@media only screen and (max-height: 800px) {
+@media only screen and (max-height: 900px) {
     .content,.add-new-sess {
-        height: 60%!important;
+        height: 59%!important;
     }
     .tab {
         height: 37%;
@@ -908,18 +909,25 @@ ol > li {
 }
 .el-textarea textarea {
     padding-right: 87px!important;
+    padding-bottom: 20px!important;
 }
 .upload-demo {
     height: 30px;
 }
 .upload-demo button {
-    position: relative;
-    /* float: right; */
+    /* position: relative;
     bottom: 38px;
-    /* right: 47px; */
     left: 282px;
     width: 30px;
     height: 30px;
+    background-color: #262626;
+    border: none; */
+    position: relative;
+    bottom: 21px;
+    right: 234px;
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
     background-color: #262626;
     border: none;
 }
@@ -929,7 +937,7 @@ ol > li {
 }
 .upload-demo ul {
     position: relative;
-    bottom: 44px;
+    bottom: 33px;
 }
 .el-popconfirm__action {
     padding-top: 8px;
@@ -1233,7 +1241,7 @@ ol > li {
     padding-top: 3px;
 }
 .wx-hide-show {
-    text-align: left;
+    float: left;
 }
 .wx-hide-show svg {
     right: 7px;
@@ -1242,6 +1250,7 @@ ol > li {
 .ai-wx {
     float: left;
     margin-top: 5px;
+    clear: both;
 }
 .ai-wx p {
     font-size: 13px;
@@ -1277,4 +1286,22 @@ ol > li {
     text-align: left;
     color: #fff;
     font-size: 12px;
+}
+.z-flush-data {
+    position: relative;
+    float: left!important;
+    font-size: 10px;
+    bottom: 27px!important;
+    right: 4px!important;
+    height: 20px!important;
+}
+.over-z-index {
+    position: relative;
+    height: 30px;
+    background-color: #262626;
+    bottom: 58px;
+    z-index: 100;
+    margin: -3px 11px;
+    z-index: 100;
+    opacity: 0.8;
 }
