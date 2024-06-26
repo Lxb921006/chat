@@ -31,7 +31,7 @@
                 <transition-group name="zoom" tag="ul">
                     <el-menu-item :index=data.key v-for="data in chatCache" :key="data.key" @click="jump(data)" v-show="true">
                         <el-tooltip content="删除该组的所有会话, 请谨慎操作!" placement="top" effect="light">
-                            <i class="el-icon-delete delete" @click="removeChatParent(data.key)"></i>
+                            <i class="el-icon-delete delete" @click="removeChatParentConfirm(data.key)"></i>
                         </el-tooltip>
                         <span slot="title" class="cache-title">
                             <span slot="title" class="cache-title title-model-icon">
@@ -91,7 +91,7 @@
                     <div class="context-close" v-show="checked">
                         <span @click="clearContext()">
                             <svg class="icon" aria-hidden="true">
-                                <use xlink:href="#icon-a-icon_huaban1" ></use>
+                                <use xlink:href="#icon-qingchu" ></use>
                             </svg>
                         </span>
                 </div>
@@ -199,9 +199,7 @@
                                                 <el-tooltip content="复制" placement="top" effect="light">
                                                     <span @click="copyAll(data1.answer)" class="finished-copy-icon"><i class="el-icon-document-copy"></i></span>
                                                 </el-tooltip>
-                                                <el-tooltip content="删除" placement="top" effect="light">
-                                                    <span @click="removeChat(data1.uuid)" class="finished-delete-icon"><i class="el-icon-delete"></i></span>
-                                                </el-tooltip>
+                                                <span @click="removeChatChildConfirm(data1.uuid)" class="finished-delete-icon"><i class="el-icon-delete"></i></span>
                                             </div>
                                         </transition>
                                     </div>
@@ -444,6 +442,13 @@
                                 </svg>
                             </el-button>
                         </el-tooltip>
+                        <el-tooltip class="item" effect="dark" content="清除当前所有记录" placement="top-start">
+                            <el-button class="z-clear-data" @click="clearCurrData()">
+                                <svg class="icon z-send-button" aria-hidden="true">
+                                    <use xlink:href="#icon-qingchu"></use>
+                                </svg>
+                            </el-button>
+                        </el-tooltip>
                         <el-upload
                             :style="{ visibility: selectedModel=='claude-2' || selectedModel=='qt' ? 'visible' : 'hidden' }"
                             class="upload-demo"
@@ -505,6 +510,7 @@
 
 <script>
 import { Message } from 'element-ui'
+import { MessageBox } from 'element-ui';
 import { mapState } from 'vuex'
 import store from '../../store/index'
 import { wssSinUrl, wssUsUrl, wssSinApiUrl } from "../../utils/wssUrl";
@@ -777,6 +783,25 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
+        clearCurrData() {
+            let key = sessionStorage.getItem('recordSelectSessKey');
+            if (!key) {
+                Message.error("删除失败");
+                return
+            }
+
+            MessageBox.confirm('此操作将永久删除当前对话记录, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                    this.removeChatParent(key);
+                }).catch(() => {
+                    Message.info("已取消删除")         
+            });
+
+            // this.removeChatParent(key);
+        },
         wxCodeShow() {
             this.wxhideShow = !this.wxhideShow;
         },
@@ -949,16 +974,18 @@ export default {
                 this.loginCheckStatus = true;
                 this.finished = true;
                 const resp = await this.getChatList(200);
-                let chatData = resp.data.data;
-                if (chatData && chatData.length >0 ) {
-                    this.checkTime = 1;
-                    this.clickLoadChatData();
-                }
-                this.loginCheckStatus = false;
-                this.finished = false;
-                sessionStorage.setItem('firstLoadData', 'firstdone');
-                sessionStorage.setItem('loginCheckStatus', "false");
+                if (resp.data.status && resp.data.status == 666) {
+                    let chatData = resp.data.data;
+                    if (chatData && chatData.length >0 ) {
+                        this.checkTime = 1;
+                        this.clickLoadChatData();
+                    }
+                }  
             }
+            this.loginCheckStatus = false;
+            this.finished = false;
+            sessionStorage.setItem('firstLoadData', 'firstdone');
+            sessionStorage.setItem('loginCheckStatus', "false");
 
             if (loginCheckStatus == "false") {
                 this.loginCheckStatus = false;
@@ -1158,8 +1185,8 @@ export default {
 
             const resp = await chatList({page: page , size: this.pages.size, search: this.searchBk})
             if (resp.data.status != 666) {
-                Message.error('加载历史对话失败')
-                return
+                Message.error('加载历史对话失败');
+                return;
             };
 
             setTimeout(() => {
@@ -2384,10 +2411,21 @@ export default {
             }
             return data;
         },
+        removeChatParentConfirm(data) {
+            MessageBox.confirm('此操作将永久删除当前组里的所有对话记录, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                    this.removeChatParent(data);
+                }).catch(() => {
+                    Message.info("已取消删除")         
+            });
+        },
         // 删除当前所有父子对话记录
         async removeChatParent(key) {
+            
             this.getAllChatData();
-            let title = "";
             
             let sess = key;
             for (let i = 0; i < this.chatCache.length; i++) {
@@ -2419,6 +2457,17 @@ export default {
             if (this.chatCache.length == 0) {
                 this.createNewPage();
             }
+        },
+        removeChatChildConfirm(data) {
+            MessageBox.confirm('此操作将永久删除当前对话记录, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                    this.removeChat(data);
+                }).catch(() => {
+                    Message.info("已取消删除")         
+            });
         },
         // 删除单条对话记录
         async removeChat(targetName) {

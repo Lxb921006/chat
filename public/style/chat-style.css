@@ -1144,7 +1144,7 @@ ol > li {
 }
 .context-close span {
     padding-right: 6px;
-    border: 1px solid #55575b;
+    /* border: 1px solid #55575b; */
     border-radius: 2px;
     border-bottom: none;
     position: relative;
@@ -1294,6 +1294,15 @@ ol > li {
     bottom: 27px!important;
     right: 4px!important;
     height: 20px!important;
+}
+.z-clear-data {
+    position: relative;
+    float: left!important;
+    font-size: 10px;
+    bottom: 26px!important;
+    right: 23px!important;
+    height: 20px!important;
+    font-size: 8px;
 }
 .over-z-index {
     position: relative;
