@@ -69,7 +69,6 @@
                                     {{ data.label }}
                             </el-radio>
                         </span>
-                        <!-- <el-radio :key="index" :label="data.label" :disabled="data.disabled" v-for="(data, index) in modelAll" @click.native="getModelLabelRdo(data)">{{ data.label }}</el-radio> -->
                     </el-radio-group>
                 </div>
             </div>
@@ -416,6 +415,11 @@
                                 </el-link>
                             </el-popover>
                         </span>
+                        <span class="generate-img">生成图片: 
+                            <el-tooltip content="生成图片请先勾选这里, 然后提交要生成的图片内容, 比如: 美丽的山水风景图片" placement="right" effect="light" value="true">
+                                <el-checkbox v-model="isGenerateImg" size="mini" @change="switchImgModel()"></el-checkbox>
+                            </el-tooltip>
+                        </span>
                     </div>
                     <div class="send-input">
                         <el-input
@@ -570,6 +574,7 @@ export default {
     },
     data()  {
         return {
+            isGenerateImg: false,
             wxhideShow: false,
             loginCheckStatus: false,
             loginCheckTimer: null,
@@ -783,6 +788,16 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
+        switchImgModel() {
+            if (this.isGenerateImg) {
+                for (let index = 0; index < this.modelAll.length; index++) {
+                    const element = this.modelAll[index];
+                    if (element.value == "qt") {
+                        this.getModelLabelRdo(element);
+                    }
+                }
+            }
+        },
         clearCurrData() {
             let key = sessionStorage.getItem('recordSelectSessKey');
             if (!key) {
@@ -1995,11 +2010,10 @@ export default {
                 }
                 div.scrollTop = div.scrollHeight - div.clientHeight;
             }
-            // this.fileList = [];
-            // this.chatContent = "";
             this.stopResp = false;
             this.socket = null;
             this.pptCreate = false;
+            this.isGenerateImg = false;
             this.jumpFooter();
             this.saveChatData();
             this.getChatList();
@@ -2038,6 +2052,7 @@ export default {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
+            let generateImg = 10;
 
             if (gptData) {
                 gptData = gptData.child;
@@ -2050,6 +2065,10 @@ export default {
             }
 
             let context = [];
+
+            if (this.isGenerateImg) {
+                generateImg = 11; 
+            }
      
             if (gptData.length > 1) {
                 //发送的信息关联上下文
@@ -2064,9 +2083,9 @@ export default {
                         context = gptData.slice(0, gptData.length - 1);
                     }
                 }
-                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: file};
+                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: file, generateImg: generateImg};
             } else {
-                sendData = {data: this.chatContent, context: [], model: this.selectedModel, file: file};
+                sendData = {data: this.chatContent, context: [], model: this.selectedModel, file: file, generateImg: generateImg};
             }
             
             this.socket.send(JSON.stringify(sendData));

@@ -6,7 +6,7 @@ import { Message } from 'element-ui'
 // 创建axios实例
 const instance = axios.create({
     baseURL: baseUrl,
-    timeout: 10000,
+    timeout: 60000,
 //   responseType: 'json',
 });
 

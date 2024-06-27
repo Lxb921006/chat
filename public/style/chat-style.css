@@ -1314,3 +1314,6 @@ ol > li {
     z-index: 100;
     opacity: 0.8;
 }
+.generate-img {
+    margin-left: 11px;
+}
