@@ -416,8 +416,13 @@
                             </el-popover>
                         </span>
                         <span class="generate-img">生成图片: 
-                            <el-tooltip content="生成图片请先勾选这里, 然后提交要生成的图片内容, 比如: 美丽的山水风景图片" placement="right" effect="light" value="true">
-                                <el-checkbox v-model="isGenerateImg" size="mini" @change="switchImgModel()"></el-checkbox>
+                            <el-tooltip content="生成图片请先勾选这里, 发送比如: 美丽的山水风景图片, 生成过程需要时间, 您的耐心等待是值得的." placement="top" effect="light" :value="tooltipShow">
+                                <el-checkbox v-model="isGenerateImg" size="mini" @click.native="switchFuncModel('qt')"></el-checkbox>
+                            </el-tooltip>
+                        </span>
+                        <span class="generate-img">生成ppt: 
+                            <el-tooltip content="生成ppt请先勾选这里, 发送比如: 2089年财务工作总结, 生成过程需要时间, 您的耐心等待是值得的." placement="bottom" effect="light" :value="tooltipShow">
+                                <el-checkbox v-model="isGenerateppt" size="mini" @click.native="switchFuncModel('xf')"></el-checkbox>
                             </el-tooltip>
                         </span>
                     </div>
@@ -427,7 +432,7 @@
                             autocomplete="on"
                             show-word-limit
                             :autosize="{ minRows: 5, maxRows: 5 }"
-                            placeholder="请输入对话内容, 先按住ctrl再按enter键提交"
+                            placeholder="请输入对话内容, 先按住ctrl再按enter键提交, 当ai只回复一半内容就断开需要继续回复时,请发送: 继续"
                             v-model="chatContent"
                             @keyup.native="handleKeyUp"
                             :disabled="finished"
@@ -574,6 +579,8 @@ export default {
     },
     data()  {
         return {
+            tooltipShow: true,
+            isGenerateppt: false,
             isGenerateImg: false,
             wxhideShow: false,
             loginCheckStatus: false,
@@ -788,15 +795,21 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
-        switchImgModel() {
-            if (this.isGenerateImg) {
-                for (let index = 0; index < this.modelAll.length; index++) {
+        getModelValue(model) {
+            for (let index = 0; index < this.modelAll.length; index++) {
                     const element = this.modelAll[index];
-                    if (element.value == "qt") {
+                    if (element.value == model) {
                         this.getModelLabelRdo(element);
                     }
                 }
+        },
+        switchFuncModel(model) {
+            if (model == "qt") {
+                this.isGenerateppt = false; 
+            } else if (model == "xf") {
+                this.isGenerateImg = false; 
             }
+            this.getModelValue(model);
         },
         clearCurrData() {
             let key = sessionStorage.getItem('recordSelectSessKey');
@@ -1497,7 +1510,7 @@ export default {
                     this.selectedModel = 'Gemini';
                     break;    
                 default:
-                    this.selectedModel = 'xf';
+                    this.selectedModel = 'Gemini';
                     break;
             }
             this.modelSelected = this.$options.filters.getModelLabel(this.selectedModel, this.modelAll);
@@ -2014,6 +2027,7 @@ export default {
             this.socket = null;
             this.pptCreate = false;
             this.isGenerateImg = false;
+            this.isGenerateppt = false;
             this.jumpFooter();
             this.saveChatData();
             this.getChatList();
@@ -2046,6 +2060,7 @@ export default {
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
+        // ai接口
         // 通义千问
         sendQw() {
             let file = this.claudeFile;
@@ -2164,6 +2179,7 @@ export default {
         sendXF() {
             let file = this.claudeFile;
             let sendData = {};
+            let isGenerateppt = 10;
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
 
@@ -2175,6 +2191,10 @@ export default {
                 }
             } else {
                 gptData = [];
+            }
+
+            if (this.isGenerateppt) {
+                isGenerateppt = 11;
             }
             
             let context = [];
@@ -2192,9 +2212,9 @@ export default {
                     }
                 }
                 
-                sendData = {data: this.chatContent, context: context, model: this.selectedModel};
+                sendData = {data: this.chatContent, context: context, model: this.selectedModel, isGenerateppt: isGenerateppt};
             } else {
-                sendData = {data: this.chatContent, context: [], model: this.selectedModel};
+                sendData = {data: this.chatContent, context: [], model: this.selectedModel, isGenerateppt: isGenerateppt};
             }
            
             this.socket.send(JSON.stringify(sendData));
