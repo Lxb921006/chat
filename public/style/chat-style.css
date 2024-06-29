@@ -243,7 +243,7 @@
 }
 .content {
     overflow: auto;
-    height: 63%;
+    height: 61%;
     margin: 0 auto;
     scrollbar-width: none;
 }
@@ -1053,7 +1053,7 @@ ol > li {
 }
 .add-new-sess {
     overflow: hidden;
-    height: 63%;
+    height: 62%;
     scrollbar-width: none;
     position: relative;
 }
