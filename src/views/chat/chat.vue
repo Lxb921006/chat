@@ -2717,6 +2717,7 @@ export default {
         getContextUUID(data) {
             let title = data.split("44444");
             return title[1];
+            
         },
     },
     mounted() {
