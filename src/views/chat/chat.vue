@@ -103,10 +103,13 @@
                         <transition-group name="el-fade-in">
                             <el-row :gutter="10" v-for="(data, index) in specifiedContextsTitle" :key="index">
                                 <span>
-                                    <span class="cache-title title-model-icon icon-qa-radio">
-                                        <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use :xlink:href="getContextIcon(data)"></use></svg>
-                                    </span>
-                                    {{ data | getContextTitle() }}
+                                    <template>
+                                        <el-link :underline="false" type="primary" :href="jumpToTitle(data)">
+                                            <span class="cache-title title-model-icon icon-qa-radio">
+                                                <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use :xlink:href="getContextIcon(data)"></use></svg>
+                                            </span>{{ data | getContextTitle() }}
+                                        </el-link>
+                                    </template>
                                     <svg class="icon context-close-2" aria-hidden="true" @click="removeContext(data)">
                                         <use xlink:href="#icon-a-icon_huaban1" ></use>
                                     </svg>
@@ -795,6 +798,11 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
+        jumpToTitle(data) {
+            let uuid = data.split("44444");
+            console.log(`#${uuid}`);
+            return `#${uuid[1]}`;
+        },
         getModelValue(model) {
             for (let index = 0; index < this.modelAll.length; index++) {
                     const element = this.modelAll[index];
@@ -926,7 +934,7 @@ export default {
         },
         getContextIcon(data) {
             let all = this.modelAll;
-            let modelname = data.split("_")
+            let modelname = data.split("44444")
             for (let i = 0;i < all.length; i++) {
                 if (all[i].value == modelname[2]) {
                     return all[i].icon;
@@ -937,14 +945,14 @@ export default {
         addContext(data) {
             if (this.specifiedContexts.includes(data.uuid)) {
                 let indexUuid = this.specifiedContexts.indexOf(data.uuid);
-                let indextitle = this.specifiedContextsTitle.indexOf(data.title+"_"+data.uuid+"_"+data.model);
+                let indextitle = this.specifiedContextsTitle.indexOf(data.title+"44444"+data.uuid+"44444"+data.model);
                 if (indexUuid !== -1) {
                     this.specifiedContexts.splice(indexUuid, 1);
                     this.specifiedContextsTitle.splice(indextitle, 1);
                 }
             } else {
                 this.specifiedContexts.push(data.uuid);
-                this.specifiedContextsTitle.push(data.title+"_"+data.uuid+"_"+data.model);
+                this.specifiedContextsTitle.push(data.title+"44444"+data.uuid+"44444"+data.model);
             }
 
             if (this.specifiedContextsTitle.length > 0 ) {
@@ -976,14 +984,13 @@ export default {
             sessionStorage.setItem('specifiedContexts', JSON.stringify(this.specifiedContexts));
         },
         removeContext(params) {
-            let data = {data: params.split("_")[0], uuid: parseInt(params.split("_")[1])};
+            let data = {data: params.split("44444")[0], uuid: parseInt(params.split("44444")[1])};
             if (this.specifiedContextsTitle.includes(params)) {
                 let indextitle = this.specifiedContextsTitle.indexOf(params);
                 if (indextitle !== -1) {
                     this.specifiedContextsTitle.splice(indextitle, 1);
                 }
             }
-
             this.unCheck(data.uuid);
             if (this.specifiedContextsTitle.length > 0 ) {
                 this.checked = true;
@@ -2700,15 +2707,15 @@ export default {
             return data;
         },
         getContextTitle(data) {
-            let title = data.split("_");
+            let title = data.split("44444");
             return title[0];
         },
         getContextIcon(data, icon) {
-            let icon_name = icon.split("_");
+            let icon_name = icon.split("44444");
             return icon_name[2];
         },
         getContextUUID(data) {
-            let title = data.split("_");
+            let title = data.split("44444");
             return title[1];
         },
     },
