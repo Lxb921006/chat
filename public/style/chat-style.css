@@ -351,7 +351,7 @@
     font-style: oblique;
 }
 .delete {
-    z-index: 100000000;
+    z-index: 1000;
     position: relative;
     font-size: 15px;
     margin-right: 4px;
@@ -1316,4 +1316,7 @@ ol > li {
 }
 .generate-img {
     margin-left: 11px;
+}
+.popover-btn {
+    margin-top: 8px;
 }

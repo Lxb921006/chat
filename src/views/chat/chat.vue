@@ -33,12 +33,32 @@
                         <el-tooltip content="删除该组的所有会话, 请谨慎操作!" placement="top" effect="light">
                             <i class="el-icon-delete delete" @click="removeChatParentConfirm(data.key)"></i>
                         </el-tooltip>
+                        <!-- <el-popover
+                            placement="top"
+                            width="160"
+                            class="delete"
+                            v-model="visibleTag">
+                            <div class="popover-inp">
+                                <div>
+                                    <el-input v-model="tagInput" placeholder="输入标签" size="mini"></el-input>
+                                </div>
+                            </div>
+                            <div class="popover-btn" style="text-align: right; margin: 0">
+                                <el-button size="mini" type="text" @click="visibleTag = false">取消</el-button>
+                                <el-button type="primary" size="mini" @click="visibleTag = false">确定</el-button>
+                            </div>
+                            <i slot="reference" class="el-icon-circle-plus-outline"></i>
+                        </el-popover> -->
+                        <!-- <el-tooltip content="给该话题组添加标签" placement="top" effect="light">
+                            <i class="el-icon-circle-plus-outline delete" @click="removeChatParentConfirm(data.key)"></i>
+                        </el-tooltip> -->
                         <span slot="title" class="cache-title">
                             <span slot="title" class="cache-title title-model-icon">
                                 <svg  class="icon-qa-3 model-icon" aria-hidden="true"><use  :xlink:href="data.icon"></use></svg>
                             </span>
                             {{ data.title }}
                         </span>
+                        <p slot="title" class="topic-tag">aaa</p>
                     </el-menu-item>
                 </transition-group>
                 </el-menu>
@@ -418,16 +438,16 @@
                                 </el-link>
                             </el-popover>
                         </span>
-                        <span class="generate-img">生成图片: 
+                        <!-- <span class="generate-img">生成图片: 
                             <el-tooltip content="生成图片请先勾选这里, 发送比如: 美丽的山水风景图片, 生成过程需要时间, 您的耐心等待是值得的." placement="top" effect="light" :value="tooltipShow">
-                                <el-checkbox v-model="isGenerateImg" size="mini" @click.native="switchFuncModel('qt')"></el-checkbox>
+                                <el-checkbox v-model="isGenerateImg" size="mini" @click.native="switchFuncModel('qt-vl')"></el-checkbox>
                             </el-tooltip>
                         </span>
                         <span class="generate-img">生成ppt: 
                             <el-tooltip content="生成ppt请先勾选这里, 发送比如: 2089年财务工作总结, 生成过程需要时间, 您的耐心等待是值得的." placement="bottom" effect="light" :value="tooltipShow">
                                 <el-checkbox v-model="isGenerateppt" size="mini" @click.native="switchFuncModel('xf')"></el-checkbox>
                             </el-tooltip>
-                        </span>
+                        </span> -->
                     </div>
                     <div class="send-input">
                         <el-input
@@ -462,7 +482,7 @@
                             </el-button>
                         </el-tooltip>
                         <el-upload
-                            :style="{ visibility: selectedModel=='claude-2' || selectedModel=='qt' ? 'visible' : 'hidden' }"
+                            :style="{ visibility: selectedModel=='qt-file' || selectedModel=='qt-vl' ? 'visible' : 'hidden' }"
                             class="upload-demo"
                             ref="upload"
                             :action=uploadUrl()
@@ -582,6 +602,8 @@ export default {
     },
     data()  {
         return {
+            visibleTag: false,
+            tagInput: "",
             tooltipShow: true,
             isGenerateppt: false,
             isGenerateImg: false,
@@ -699,59 +721,35 @@ export default {
             ],
             modelAll: [
                 {
-                    value: 'claude-2',
-                    label: 'Claude3',
-                    disabled: false,
-                    icon: '#icon-Claude2',
-                },
-                {
-                    value: 'chatGPT3.5',
-                    label: 'GPT-3.5-turbo',
-                    disabled: true,
-                    icon: '#icon-a-Chatgpt35',
-                },
-                {
-                    value: 'GPT-4',
-                    label: 'GPT-4',
-                    disabled: true,
-                    icon: '#icon-a-Chatgpt4',
-                },
-                {
-                    value: 'xf',
-                    label: '讯飞星火',
-                    disabled: false,
-                    icon: '#icon-xunfeichatgpt',
-                },
-                {
-                    value: 'bd',
-                    label: '文心一言',
-                    disabled: false,
-                    icon: '#icon-baidu',
-                },
-                {
                     value: 'Gemini',
                     label: '谷歌Gemini',
                     disabled: false,
                     icon: '#icon-gooIcon',
                 },
                 {
-                    value: 'tx',
-                    label: '腾讯混元大模型',
-                    disabled: false,
-                    icon: '#icon-chanpinguanli',
-                },
-                {
-                    value: 'qt',
-                    label: '阿里巴巴通义千问',
+                    value: 'qt-text',
+                    label: '通义千问-文本模型',
                     disabled: false,
                     icon: '#icon-a-result4',
                 },
                 {
-                    value: 'pg',
-                    label: '华为盘古大模型',
+                    value: 'qt-code',
+                    label: '通义千问-代码模型',
+                    disabled: false,
+                    icon: '#icon-a-result4',
+                },
+                {
+                    value: 'qt-file',
+                    label: '通义千问-文件模型',
                     disabled: true,
-                    icon: '#icon-huaweiyun',
-                }
+                    icon: '#icon-a-result4',
+                },
+                {
+                    value: 'qt-vl',
+                    label: '通义千问-视觉模型',
+                    disabled: true,
+                    icon: '#icon-a-result4',
+                },
             ],
             allowFile: ['.png', '.jpg', '.jpeg'],
             loadCount: 0,
@@ -798,6 +796,9 @@ export default {
         MarkdownCodeBlock,
     },
     methods: {
+        addTag() {
+
+        },
         jumpToTitle(data) {
             let uuid = data.split("44444");
             console.log(`#${uuid}`);
@@ -1489,33 +1490,21 @@ export default {
             let model = window.sessionStorage.getItem('modelSelect');
             
             switch (model) {
-                case '1':
-                    this.selectedModel = 'claude-2';
-                    break
-                case '2':
-                    this.selectedModel = 'chatGPT';
-                    break;
-                case '3':
-                    this.selectedModel = 'tx';
-                    break;
-                case '4':
-                    this.selectedModel = 'xf';
-                    break;
-                case '5':
-                    this.selectedModel = 'bd';
-                    break;
-                case '6':
-                    this.selectedModel = 'chatGPT3.5';
-                    break;
-                case '7':
-                    this.selectedModel = 'GPT-4';
-                    break;
                 case '8':
-                    this.selectedModel = 'qt';
+                    this.selectedModel = 'qt-text';
                     break;
                 case '9':
                     this.selectedModel = 'Gemini';
-                    break;    
+                    break;
+                case '10':
+                    this.selectedModel = 'qt-code';
+                    break;  
+                case '11':
+                    this.selectedModel = 'qt-file';
+                    break;
+                case '12':
+                    this.selectedModel = 'qt-vl';
+                    break;     
                 default:
                     this.selectedModel = 'Gemini';
                     break;
@@ -1534,29 +1523,17 @@ export default {
         modelSwitch() {
             this.modelSelected = this.$options.filters.getModelLabel(this.selectedModel, this.modelAll);
             switch (this.selectedModel) {
-                case 'claude-2':
-                    window.sessionStorage.setItem('modelSelect', 1);
-                    break
-                case 'chatGPT':
-                    window.sessionStorage.setItem('modelSelect', 2);
-                    break
-                case 'tx':
-                    window.sessionStorage.setItem('modelSelect', 3);
-                    break
-                case 'xf':
-                    window.sessionStorage.setItem('modelSelect', 4);
-                    break
-                case 'bd':
-                    window.sessionStorage.setItem('modelSelect', 5);
-                    break
-                case 'chatGPT3.5':
-                    window.sessionStorage.setItem('modelSelect', 6);
-                    break  
-                case 'GPT-4':
-                    window.sessionStorage.setItem('modelSelect', 7);
-                    break
-                case 'qt':
+                case 'qt-text':
                     window.sessionStorage.setItem('modelSelect', 8);
+                    break
+                case 'qt-code':
+                    window.sessionStorage.setItem('modelSelect', 10);
+                    break
+                case 'qt-file':
+                    window.sessionStorage.setItem('modelSelect', 11);
+                    break
+                case 'qt-vl':
+                    window.sessionStorage.setItem('modelSelect', 12);
                     break
                 case 'Gemini':
                     window.sessionStorage.setItem('modelSelect', 9);
@@ -1574,30 +1551,18 @@ export default {
         // ai的链接
         chatGptUrl(model) {
             switch (model) {
-                case 'claude-2':
-                    window.open('https://claude.ai/');
-                    break;
-                case 'chatGPT':
-                    window.open('https://openai.com/');
-                    break;
-                case 'bd':
-                    window.open('https://yiyan.baidu.com/');
-                    break;    
-                case 'tx':
-                    window.open('https://hunyuan.tencent.com/');
-                    break;
-                case 'chatGPT3.5':
-                    window.open('https://openai.com/');
-                    break;    
-                case 'GPT-4':
-                    window.open('https://openai.com/');
-                    break;
-                case 'xf':
-                    window.open('https://xinghuo.xfyun.cn/');
-                    break;    
-                case 'qt':
+                case 'qt-text':
                     window.open('https://qianwen.aliyun.com/');
                     break;  
+                case 'qt-code':
+                    window.open('https://qianwen.aliyun.com/');
+                    break;
+                case 'qt-file':
+                    window.open('https://qianwen.aliyun.com/');
+                    break;
+                case 'qt-vl':
+                    window.open('https://qianwen.aliyun.com/');
+                    break;
                 case 'pg':
                     window.open('https://qianwen.aliyun.com/');
                     break;          
@@ -1785,31 +1750,19 @@ export default {
 
                 newfile = this.claudeFile;
                 
-                switch (this.selectedModel) {
-                case 'claude-2':
-                    modelIcon = this.claudeIcon;
-                    break;
-                case 'chatGPT':
-                    modelIcon = this.chatGptIcon;
-                    break;
-                case 'GPT-4':
-                    modelIcon = this.gpt4;
-                    break;
-                case 'chatGPT3.5':
-                    modelIcon = this.chatGptIcon;
-                    break;   
-                case 'tx':
-                    modelIcon = this.txIcon;
-                    break;
-                case 'bd':
-                    modelIcon = this.wxIcon;
-                    break;    
-                case 'xf':
-                    modelIcon = this.xfIcon;
-                    break;    
-                case 'qt':
+                switch (this.selectedModel) {   
+                case 'qt-text':
                     modelIcon = this.qwIcon;
                     break;
+                case 'qt-code':
+                    modelIcon = this.qwIcon;
+                    break;
+                case 'qt-file':
+                    modelIcon = this.qwIcon;
+                    break; 
+                case 'qt-vl':
+                    modelIcon = this.qwIcon;
+                    break;     
                 case 'Gemini':
                     modelIcon = this.geminiIcon;
                     break;    
@@ -1872,31 +1825,19 @@ export default {
                     return;
                 } 
                 // 实例化socket
-                switch (this.selectedModel) {
-                    case 'claude-2':
+                switch (this.selectedModel) {  
+                    case 'qt-text':
                         this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break
-                    case 'chatGPT3.5':
+                    case  'qt-code':
                         this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break
-                    case 'GPT-4':
+                    case  'qt-file':
                         this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
-                        break
-                    case 'chatGPT':
+                        break 
+                    case  'qt-vl':
                         this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
-                        break
-                    case 'bd':
-                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
-                        break    
-                    case 'qt':
-                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
-                        break
-                    case 'tx':
-                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
-                        break    
-                    case 'xf':
-                        this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
-                        break    
+                        break                                               
                     case 'Gemini':
                         this.wsUrl = `${wssUsUrl}/web-wss/ws/chat/${sessionStorage.getItem("user")}/`
                         break     
@@ -1936,30 +1877,18 @@ export default {
         // 发送数据
         send () {
             switch (this.selectedModel) {
-                case 'claude-2':
-                    this.sendClaude();
-                    break
-                case 'chatGPT':
-                    this.chatLLAM();
-                    break
-                case 'bd':
-                    this.sendBd();
-                    break
-                case 'qt':
+                case 'qt-text':
                     this.sendQw();
                     break
-                case 'tx':
-                    this.sendTx();
+                case 'qt-code':
+                    this.sendQtCode();
                     break
-                case 'chatGPT3.5':
-                    this.chatGPT35();
+                case 'qt-file':
+                    this.sendQtFile();
                     break
-                case 'GPT-4':
-                    this.chatGPT35();
-                    break
-                case 'xf':
-                    this.sendXF();
-                    break
+                case 'qt-vl':
+                    this.sendQtVl();
+                    break 
                 case 'Gemini':
                     this.gemini();
                     break    
@@ -2060,176 +1989,9 @@ export default {
                 Message.error('保存数据失败>>>', resp.data.msg);
             }
         },
-        sendTx() {
-            let file = this.claudeFile;
-            let sendData = {};
-            sendData = {data: this.chatContent, context: [], model: this.selectedModel, file: file};
-            this.socket.send(JSON.stringify(sendData));
-            this.jumpFooter();
-        },
         // ai接口
-        // 通义千问
+        // 通义千问-文本模型
         sendQw() {
-            let file = this.claudeFile;
-            let sendData = {};
-            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
-            let generateImg = 10;
-
-            if (gptData) {
-                gptData = gptData.child;
-                gptData = gptData.filter(item => item.model == this.selectedModel);
-                if (!gptData) {
-                    gptData = []
-                }
-            } else {
-                gptData = [];
-            }
-
-            let context = [];
-
-            if (this.isGenerateImg) {
-                generateImg = 11; 
-            }
-     
-            if (gptData.length > 1) {
-                //发送的信息关联上下文
-                if (this.specifiedContexts.length > 0) {
-                    context = this.submitSpecifiedContext();
-                    if (context.length >= 6) {
-                        context = context.slice(context.length - 5, context.length);
-                    }
-                } else {
-                    context = gptData.slice(gptData.length - 6, gptData.length - 1);
-                    if (context.length < 4) {
-                        context = gptData.slice(0, gptData.length - 1);
-                    }
-                }
-                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: file, generateImg: generateImg};
-            } else {
-                sendData = {data: this.chatContent, context: [], model: this.selectedModel, file: file, generateImg: generateImg};
-            }
-            
-            this.socket.send(JSON.stringify(sendData));
-            this.jumpFooter();
-        },
-        // claude3
-        sendClaude() {
-            let file = this.claudeFile;
-            let sendData = {};
-            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
-
-            if (gptData) {
-                gptData = gptData.child;
-                gptData = gptData.filter(item => item.model == this.selectedModel);
-                if (!gptData) {
-                    gptData = []
-                }
-            } else {
-                gptData = [];
-            }
-
-            let context = [];
-     
-            if (gptData.length > 1) {
-                //发送的信息关联上下文
-                if (this.specifiedContexts.length > 0) {
-                    context = this.submitSpecifiedContext();
-                    if (context.length >= 6) {
-                        context = context.slice(context.length - 5, context.length);
-                    } 
-                } else {
-                    context = gptData.slice(gptData.length - 6, gptData.length - 1);
-                    if (context.length < 4) {
-                        context = gptData.slice(0, gptData.length - 1);
-                    }
-                }
-                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: file};
-            } else {
-                sendData = {data: this.chatContent, context: [], model: this.selectedModel, file: file};
-            }
-            
-            this.socket.send(JSON.stringify(sendData));
-            this.jumpFooter();
-        },
-        // 文心一言
-        sendBd() {
-            this.claudeFile = "";
-            let sendData = {};
-            let lastData = [];
-            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
-
-            if (gptData) {
-                gptData = gptData.child;
-                gptData = gptData.filter(item => item.model == this.selectedModel);
-                if (!gptData) {
-                    gptData = []
-                }
-            } else {
-                gptData = [];
-            }
-
-            if (gptData.length > 1) {
-                //发送的信息关联上下文
-                lastData = gptData[gptData.length - 2];
-                sendData = {cid: lastData.cid, pid: lastData.pid, data: this.chatContent, model: this.selectedModel, content: lastData.title};
-            } else {
-                sendData = {cid: "", pid: "", data: this.chatContent, model: this.selectedModel, content: ''};
-            }
-
-            this.socket.send(JSON.stringify(sendData));
-            this.jumpFooter();
-        },
-        // 讯飞星火
-        sendXF() {
-            let file = this.claudeFile;
-            let sendData = {};
-            let isGenerateppt = 10;
-            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
-            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
-
-            if (gptData) {
-                gptData = gptData.child;
-                gptData = gptData.filter(item => item.model == this.selectedModel);
-                if (!gptData) {
-                    gptData = []
-                }
-            } else {
-                gptData = [];
-            }
-
-            if (this.isGenerateppt) {
-                isGenerateppt = 11;
-            }
-            
-            let context = [];
-            if (gptData.length > 1) {
-                //发送的信息关联上下文
-                if (this.specifiedContexts.length > 0) {
-                    context = this.submitSpecifiedContext();
-                    if (context.length >= 4) {
-                        context = context.slice(context.length-3, context.length);
-                    } 
-                } else {
-                    context = gptData.slice(gptData.length - 4, gptData.length - 1);
-                    if (context.length < 2) {
-                        context = gptData.slice(0, gptData.length - 1);
-                    }
-                }
-                
-                sendData = {data: this.chatContent, context: context, model: this.selectedModel, isGenerateppt: isGenerateppt};
-            } else {
-                sendData = {data: this.chatContent, context: [], model: this.selectedModel, isGenerateppt: isGenerateppt};
-            }
-           
-            this.socket.send(JSON.stringify(sendData));
-            this.jumpFooter();
-        },
-        // chatGPT3.5,gpt-4
-        chatGPT35() {
-            let file = this.claudeFile;
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
             let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
@@ -2251,16 +2013,52 @@ export default {
                     context = this.submitSpecifiedContext();
                     if (context.length >= 6) {
                         context = context.slice(context.length - 5, context.length);
-                    } 
+                    }
                 } else {
                     context = gptData.slice(gptData.length - 6, gptData.length - 1);
                     if (context.length < 4) {
                         context = gptData.slice(0, gptData.length - 1);
                     }
                 }
-                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: ""};
+                sendData = {data: this.chatContent, context: context, model: this.selectedModel};
             } else {
-                sendData = {data: this.chatContent, context: context, model: this.selectedModel, file: ""};
+                sendData = {data: this.chatContent, context: [], model: this.selectedModel};
+            }
+            
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+        },
+        sendQtCode() {
+            let sendData = {};
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
+            if (gptData) {
+                gptData = gptData.child;
+                gptData = gptData.filter(item => item.model == this.selectedModel);
+                if (!gptData) {
+                    gptData = []
+                }
+            } else {
+                gptData = [];
+            }
+
+            let context = [];
+            if (gptData.length > 1) {
+                //发送的信息关联上下文
+                if (this.specifiedContexts.length > 0) {
+                    context = this.submitSpecifiedContext();
+                    if (context.length >= 6) {
+                        context = context.slice(context.length - 5, context.length);
+                    }
+                } else {
+                    context = gptData.slice(gptData.length - 6, gptData.length - 1);
+                    if (context.length < 4) {
+                        context = gptData.slice(0, gptData.length - 1);
+                    }
+                }
+                sendData = {data: this.chatContent, context: context, model: this.selectedModel};
+            } else {
+                sendData = {data: this.chatContent, context: [], model: this.selectedModel};
             }
             
             this.socket.send(JSON.stringify(sendData));
@@ -2696,14 +2494,15 @@ export default {
     },
     filters: {
         getModelLabel(data, allModel) {
-            let label = allModel.find(item => item.value == data);
-            return label.label;
+            let labelName = allModel.find(item => item.value == data);
+            return labelName ? labelName.label : data;
         },
         getModelLabel2(data, allModel) {
             if (allModel && Array.isArray(allModel)) {
-                let label = allModel.find(item => item.value == data);
-                return label ? label.label : "";
+                let labelName = allModel.find(item => item.value == data);
+                return labelName ? labelName.label : "";
             }
+
             return data;
         },
         getContextTitle(data) {
