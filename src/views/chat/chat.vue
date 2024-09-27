@@ -197,7 +197,6 @@
                                             </svg>
                                             {{ data1.title }}  
                                             <el-image class="ai-img" v-if="data1.imageUrl" :src="data1.imageUrl"></el-image>
-                                            <el-link :underline="false" v-else-if="data1.file" @click="getFileText(data1.file)">{{ data1.file }}</el-link>
                                             <span class="iconfont icon-fuzhi copy-title" @click="copyAll(data1.title)"></span>
                                         </p>
                                     </h2>
@@ -747,7 +746,7 @@ export default {
                 {
                     value: 'qt-vl',
                     label: '通义千问-视觉模型',
-                    disabled: true,
+                    disabled: false,
                     icon: '#icon-a-result4',
                 },
             ],
@@ -821,6 +820,11 @@ export default {
             this.getModelValue(model);
         },
         clearCurrData() {
+            let action = sessionStorage.getItem('showNewPage');
+            if (action == "2") {
+                Message.error("当前还没有对话, 没法删除");
+                return;
+            }
             let key = sessionStorage.getItem('recordSelectSessKey');
             if (!key) {
                 Message.error("删除失败");
@@ -1102,7 +1106,10 @@ export default {
             console.log(this.claudeFile);
             this.isOpenSwitch = true;
             this.claudeFile = "";
-
+        },
+        clearUploadFile() {
+            this.$refs.upload.clearFiles();
+            this.claudeFile = "";
         },
         async downloadFile() {
             let name = this.fileData.file;
@@ -1457,7 +1464,7 @@ export default {
             this.chatTitleFormat();
         },
         uploadUrl () {
-            return `${baseUrl}/claude/upload/`
+            return `${baseUrl}/ai/chat/upload/`
         },
         successUpload(response, file, fileList) {
             this.claudeFile = file.name;
@@ -1746,9 +1753,9 @@ export default {
                 let index = Math.random().toString(36).slice(-8);
                 this.show = true;
                 let modelIcon= "";
-                let newfile = "";
+                let imageUrl = "";
 
-                newfile = this.claudeFile;
+                // newfile = this.claudeFile;
                 
                 switch (this.selectedModel) {   
                 case 'qt-text':
@@ -1771,6 +1778,10 @@ export default {
                     break;
                 }
                 
+                if (this.claudeFile != "") {
+                    imageUrl = `${baseUrl}/img/${this.claudeFile}`;
+                }
+
                 let key = uuidv4();
                 let data = {
                     title: this.chatContent,
@@ -1783,12 +1794,12 @@ export default {
                     timeShow: false,
                     cid: "",
                     pid: "",
-                    imageUrl: "",
-                    img: newfile,
+                    imageUrl: imageUrl,
+                    img: "",
                     icon: modelIcon,
                     content: "",
                     model: this.selectedModel,
-                    file: newfile,
+                    file: "",
                     key: key,
                     isParent: 2,
                     checked: false,
@@ -1872,7 +1883,8 @@ export default {
             this.send()
         },
         error () {
-            Message.error("websocket连接失败")
+            Message.error("websocket连接失败");
+            this.clearUploadFile();
         },
         // 发送数据
         send () {
@@ -1907,7 +1919,7 @@ export default {
                             child[k].cid = jd.cid;
                             child[k].pid = jd.pid;
                             child[k].content = jd.content;
-                            child[k].imageUrl = jd.img;
+                            // child[k].imageUrl = jd.img;
                             if (this.specifiedContexts.includes(child[k].uuid)) {
                                 child[k] = true;
                             }
@@ -1945,7 +1957,7 @@ export default {
                                 cid: child[k].cid,
                                 pid: child[k].pid,
                                 cursor: false,
-                                file: this.claudeFile,
+                                file: "",
                                 imageUrl: child[k].imageUrl,
                             }
                             if (this.specifiedContexts.includes(child[k].uuid)) {
@@ -1964,6 +1976,8 @@ export default {
             this.pptCreate = false;
             this.isGenerateImg = false;
             this.isGenerateppt = false;
+            this.claudeFile = "";
+            this.clearUploadFile();
             this.jumpFooter();
             this.saveChatData();
             this.getChatList();
@@ -2028,6 +2042,7 @@ export default {
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
         },
+        // 通义千问-代码模型
         sendQtCode() {
             let sendData = {};
             let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
@@ -2063,6 +2078,86 @@ export default {
             
             this.socket.send(JSON.stringify(sendData));
             this.jumpFooter();
+        },
+        // 通义千问-视觉模型
+        sendQtVl() {
+            let sendData = {};
+            let context = [];
+            let cacheData = JSON.parse(sessionStorage.getItem("chatCache"));
+            let gptData =  cacheData.find(cd => cd.key == this.selectedSess);
+            if (gptData) {
+                gptData = gptData.child;
+                gptData = gptData.filter(item => item.model == this.selectedModel);
+                if (!gptData) {
+                    gptData = []
+                }
+            } else {
+                gptData = [];
+            }
+
+            if (gptData.length > 1 ) {
+                if (this.specifiedContexts.length > 0) {
+                    context = this.submitSpecifiedContext();
+                    if (context.length >= 6) {
+                        context = context.slice(context.length - 5, context.length);
+                    }
+                } else {
+                    context = gptData.slice(gptData.length - 6, gptData.length - 1);
+                    if (context.length < 4) {
+                        context = gptData.slice(0, gptData.length - 1);
+                    }
+                }
+
+                let sendContextList = [];
+                let sendContextData = {};
+                for (let i = 0; i < context.length; i++) {
+                    sendContextData = {
+                        role: "user",
+                        content: [
+                            {image: context[i].imageUrl},
+                            {text: context[i].title}
+                        ]
+                    };
+                    sendContextList.push(sendContextData);
+                    sendContextData = {
+                        role: "assistant",
+                        content: [
+                            {text: context[i].answer}
+                        ]
+                    };
+                    sendContextList.push(sendContextData);
+                }
+                sendContextData = {
+                    role: "user", 
+                    content: [
+                        {text: this.chatContent}
+                    ]
+                };
+                sendContextList.push(sendContextData);
+
+                console.log(sendContextList);
+                sendData = {
+                    context: sendContextList,
+                    model: this.selectedModel,
+                };
+            } else {
+                sendData = {
+                    context: [
+                        {
+                            role: "user", 
+                            content: [
+                                {image: `${baseUrl}/img/${this.claudeFile}`},
+                                {text: this.chatContent}
+                            ]
+                        },
+                    ],
+                    model: this.selectedModel,
+                };
+            }
+
+            this.socket.send(JSON.stringify(sendData));
+            this.jumpFooter();
+
         },
         // 谷歌ai
         gemini() {
