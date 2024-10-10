@@ -274,108 +274,6 @@
             </transition>
             <!-- 所有设置 -->
             <div class="footer list-group"  id="sortable">
-                <!-- 设置 -->
-                <!-- <div class="setting">
-                    <el-popover
-                        placement="right-start"
-                        title="设置"
-                        width="200"
-                        trigger="click"
-                        >
-                        <el-row :gutter="10" class="set-item set-item-1" v-if="false">
-                            <el-col :span="1" class="context-switch col-font">是否开启上下文: </el-col>
-                            <el-col :span="1" class="z-col-2">
-                                <el-switch
-                                    @change="isOpenContext()"
-                                    v-model="contextSwitch"
-                                    active-color="#13ce66"
-                                    inactive-color="#ff4949">
-                                </el-switch>
-                            </el-col>
-                        </el-row>
-                        <el-row :gutter="10" class="set-item set-item-1" v-if="false">
-                            <el-col :span="1" class="z-col-3 col-font">是否开启预设角色回复: </el-col>
-                            <el-col :span="1" class="z-col-4">
-                                <el-tooltip content="只对GPT的模型有效" placement="top">
-                                    <el-switch
-                                        @change="isRoleResp()"
-                                        v-model="roleResp"
-                                        active-color="#13ce66"
-                                        inactive-color="#ff4949">
-                                    </el-switch>
-                                </el-tooltip>
-                            </el-col>
-                        </el-row>
-                        <el-row :gutter="10" class="set-item set-item-1">
-                            <el-col :span="1" class="z-col-7 col-font">是否开启滚动加载: </el-col>
-                            <el-col :span="1" class="z-col-4">
-                                <el-tooltip content="建议关闭" placement="top">
-                                    <el-switch
-                                        @change="saveScrollLoadDataStatus()"
-                                        v-model="isScrollLoadDataStatus"
-                                        active-color="#13ce66"
-                                        inactive-color="#ff4949">
-                                    </el-switch>
-                                </el-tooltip>
-                            </el-col>
-                        </el-row>
-                        <el-button slot="reference">
-                            <svg class="icon sessing-svg" aria-hidden="true">
-                                <use xlink:href="#icon-shezhi3"></use>
-                            </svg>
-                        </el-button>
-                    </el-popover>
-                </div> -->
-                <!-- 用户管理-TODO.... -->
-                <!-- <div class="user rb">
-                    <el-popover
-                        placement="right"
-                        width="400"
-                        trigger="click">
-                        <div class="z-rb-title">
-                            <h2>用户管理</h2>
-                        </div>
-                        <el-row :gutter="20">
-                            <el-col :span=10>
-                                <el-input v-model="rbData" size="mini" clearable></el-input>
-                            </el-col>
-                        </el-row>
-                        <el-table :data="userData" stripe height="249">
-                            <el-table-column type="selection" width="55"></el-table-column>
-                            <el-table-column width="150" property="user" show-overflow-tooltip label="用户"></el-table-column>
-                            <el-table-column width="150" property="answer" show-overflow-tooltip label="密码"></el-table-column>
-                            <el-table-column prop="operate" label="操作">
-                                <template slot-scope="scope">
-                                    <el-button size="mini" @click="restoreChat(scope.row.uuid)" type="primary">更新</el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <el-button slot="reference">
-                            <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-yonghuguanli"></use>
-                            </svg>
-                        </el-button>
-                    </el-popover>
-                </div> -->
-                <!-- 历史记录 -->
-                <!-- <div class="user rb">
-                    <el-popover
-                        placement="right"
-                        width="400"
-                        trigger="click">
-                        <div class="z-rb-title">
-                            <h2>历史聊天加载</h2>
-                        </div>
-                        <div class="smbpages">
-                            <el-button size="mini" type="primary" @click="loadLatestTenData()" :loading="tenDataLoading">加载最新记录</el-button>
-                        </div>
-                        <el-button slot="reference">
-                            <svg class="icon z-rb-icon" aria-hidden="true">
-                                <use xlink:href="#icon-xiaoxilishi"></use>
-                            </svg>
-                        </el-button>
-                    </el-popover>
-                </div> -->
                 <!-- 对话输入 -->
                 <div class="send-question"> 
                     <div class="z-model-show">
@@ -755,7 +653,7 @@ export default {
             historyDataLoading: false,
             pages: {
                 page: 1,
-                size: 10,
+                size: 5,
                 totals: 0,
             },
         }
@@ -1129,7 +1027,7 @@ export default {
         },
         // 滚动加载数据开关
         saveScrollLoadDataStatus() {
-            this.lazyLoadData(); // 当打开开关，防止滚动条刚好在最底部无限刷新的bug
+            this.lazyLoadData(3); // 当打开开关，防止滚动条刚好在最底部无限刷新的bug
             if (this.isScrollLoadDataStatus) {
                 this.setTimer = true;
                 sessionStorage.setItem("rollingLoadSwitch", 1);
@@ -1210,13 +1108,7 @@ export default {
 
             return mergedArray;
         },
-        // 监听滚动条是否已经滚动到底部
-        handleScroll() {
-            let content = document.getElementsByClassName('content')[0];
-            if (content.scrollTop + content.clientHeight + 0.5 >= content.scrollHeight && this.setTimer) {
-                this.scrollLoadChatData();
-            }
-        },
+        
         // 拉取保存在服务端的历史对话-建议关闭，如果数据过多，滚动加载会比较慢
         async getChatList(ac) {
             let page = 1;
@@ -1293,7 +1185,7 @@ export default {
             this.selectedSess = data.key;
             this.recordSelectSessKey();
         },
-        // 重新加载
+        // 重新加载历史记录
         async loadLatestTenData() {
             this.tenDataLoading = true;
             this.recordIsOpenNewSess(2);
@@ -1329,6 +1221,7 @@ export default {
             if (respData.length == 0) {
                 Message.error("没有数据可加载.");
                 this.tenDataLoading = false;
+                this.scrollLoading = false;
                 return;
             }
 
@@ -1352,9 +1245,13 @@ export default {
             // 必须等数据加载完才能让handleScroll继续监听滚动条
             this.loginCheckStatus = false;
             clearInterval(this.loginCheckTimer);
-            this.setTimer = true; 
+            setTimeout(() => {
+                this.lazyLoadData(2);
+                this.setTimer = true;
+            }, 1000);
             this.scrollLoading = false;
             this.tenDataLoading = false;
+            
             this.chatTitleFormat();
         },
         // 点击可选择页面加载数据
@@ -1423,7 +1320,14 @@ export default {
             this.scrollLoading = false;
             this.chatTitleFormat();
         },
-        // 滚动到底部就加载数据
+        // 监听滚动条是否已经滚动到底部
+        handleScroll() {
+            let content = document.getElementsByClassName('content')[0];
+            if (content.scrollTop + content.clientHeight + 0.5 >= content.scrollHeight && this.setTimer) {
+                this.scrollLoadChatData();
+            }
+        },
+        // 滚动到底部就加载历史记录
         async scrollLoadChatData() {
             this.loadCount = parseInt(sessionStorage.getItem('loadCount'));
             let totals = parseInt(sessionStorage.getItem('totals'));
@@ -1441,6 +1345,7 @@ export default {
                 const resp = await this.getChatList(200);
                 let respData = resp.data.data;
                 if (respData.length == 0) {
+                    this.scrollLoading = false;
                     Message.error("没有数据可加载.");
                     return;
                 }
@@ -1457,9 +1362,16 @@ export default {
                 sessionStorage.setItem('page', this.pages.page);
                 
                 sessionStorage.setItem('totals', resp.data.totals);
+            } else {
+                this.setTimer = false;
+                return;
             }
-            
-            this.setTimer = true; // 必须等数据加载完才能让handleScroll继续监听滚动条
+
+            setTimeout(() => {
+                this.lazyLoadData(2);
+                this.setTimer = true;
+            }, 1000);
+             // 必须等数据加载完才能让handleScroll继续监听滚动条
             this.scrollLoading = false;
             this.chatTitleFormat();
         },
@@ -2283,10 +2195,10 @@ export default {
                 tab.scrollTop = tabScroll;
             }, 8)
         },
-        lazyLoadData() {
+        lazyLoadData(h) {
             let content = document.getElementsByClassName('content')[0];
             let scroll = content.scrollTop;
-            scroll -= 3;
+            scroll -= h;
             content.scrollTop = scroll;
         },
         // 滚动到最顶部
@@ -2621,7 +2533,6 @@ export default {
         this.contextStatus();
         this.checkContextStatus();
         this.getAllChatData();
-        // this.getAllChatRecycleData();
         this.checkSystemSet();
         this.getContentLen();
         this.checkModel();
